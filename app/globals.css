@@ -1,14 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
   --primary: #006948;
 }
 
-html[dir="rtl"] {
-  font-family: 'Noto Nastaliq Urdu', 'Noto Sans Arabic', 'Inter', sans-serif;
+/* Urdu: Authentic Google Noto Nastaliq Urdu with normalized vertical spacing */
+html[lang="ur"] {
+  font-family: 'Noto Nastaliq Urdu', serif;
+  line-height: 1.85;
 }
 
+html[lang="ur"] h1,
+html[lang="ur"] h2,
+html[lang="ur"] h3 {
+  line-height: 1.6;
+}
+
+/* Arabic: Crisp Modern Noto Sans Arabic */
+html[lang="ar"] {
+  font-family: 'Noto Sans Arabic', sans-serif;
+  line-height: 1.65;
+}
+
+/* English: Inter UI */
+html[lang="en"],
 html[dir="ltr"] {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
