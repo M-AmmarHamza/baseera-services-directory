@@ -141,16 +141,45 @@
 <body class="bg-surface-container-lowest font-body-md text-on-surface antialiased flex flex-col min-h-screen">
   
   <!-- Header -->
-  <header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-    <div class="h-16 px-gutter flex items-center justify-between max-w-[480px] mx-auto w-full">
+  <header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container-high/40">
+    <div class="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between max-w-7xl mx-auto w-full">
       <div class="flex items-center gap-space-sm">
-        <a aria-label="Go Back" class="w-11 h-11 -ml-space-xs flex items-center justify-center text-on-surface hover:text-primary transition-colors" href="categories.html">
+        <a aria-label="Go Back" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container text-on-surface hover:text-primary transition-colors" href="categories.html">
           <span class="material-symbols-outlined text-[24px]">arrow_back</span>
         </a>
-        <img alt="Baseera Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VifhEhAnyGcIMAzyuf5f1JiVQATzvcwJzkzN2D-g0gIhjkGPPHeQREP_6GXBi6qybDjnH1LpSOIiSsTUAUXGJxnyUWu4N8xlrBq6aC66NMIaHPa5Gcghl7Cayh0drMuGxb7JnbeMzXIYNY2GAaFw7XfnX36ysQ37W_WDJ0XXRu7EXEz0YyabfgENet5RdeIkW4OGCMK00BuGwq07GuCnFh2NtO3g4vUFFUjgwvkpndlGWwfV8ALvSw_3Q"/>
-        <h1 class="font-title-md text-title-md text-on-surface truncate">Provider Details</h1>
+        <a href="index.html" class="flex items-center gap-2.5">
+          <img alt="Baseera Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VifhEhAnyGcIMAzyuf5f1JiVQATzvcwJzkzN2D-g0gIhjkGPPHeQREP_6GXBi6qybDjnH1LpSOIiSsTUAUXGJxnyUWu4N8xlrBq6aC66NMIaHPa5Gcghl7Cayh0drMuGxb7JnbeMzXIYNY2GAaFw7XfnX36ysQ37W_WDJ0XXRu7EXEz0YyabfgENet5RdeIkW4OGCMK00BuGwq07GuCnFh2NtO3g4vUFFUjgwvkpndlGWwfV8ALvSw_3Q"/>
+          <div class="hidden sm:flex flex-col">
+            <span class="font-title-md text-title-md text-on-surface tracking-tight leading-none font-bold">Baseera</span>
+            <span class="font-label-sm text-label-sm text-outline tracking-wider uppercase mt-0.5">Karachi</span>
+          </div>
+        </a>
       </div>
-      <div class="flex items-center">
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="index.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">home</span>
+          <span>Home</span>
+        </a>
+        <a href="categories.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">search</span>
+          <span>Find Services</span>
+        </a>
+        <a href="saved.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">bookmark</span>
+          <span>Saved</span>
+        </a>
+        <a href="blog.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">article</span>
+          <span>Karachi Guides</span>
+        </a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="provider-dashboard.html" class="hidden sm:inline-flex items-center gap-1.5 font-label-sm text-label-sm text-primary font-semibold bg-secondary-fixed/30 px-3 py-1.5 rounded-full hover:bg-secondary-fixed/50 transition-colors">
+          <span>Vendor Studio</span>
+        </a>
         <a href="settings.html" class="w-8 h-8 rounded-full overflow-hidden ring-1 ring-outline/20 hover:ring-primary transition-all">
           <img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4AzipZE5x54eTvTk6U_Nuld4aVm8bttEj_sypX_08gahKrurGREYPQ1YUp9ZowjJOLXrIMXABFDs4LwY2S5BaWs7NO61I6Y7ymgJdnm0setiMWhpfzRtcQagtc_2TjPhjsMSTOKBg-tjTpW9M9B_8r3IRGiE7_duBwL7sIcQim_8A83vtP0MnVErrKsZT7AIRl_AY6t5hP-A5IvJUF4QRZfEAhAsHdwtN2mPcAYvgQq_il2vuzoVx"/>
         </a>
@@ -159,8 +188,11 @@
   </header>
 
   <!-- Main View -->
-  <main class="flex-1 flex flex-col relative w-full pt-16 bg-surface-container-lowest max-w-[480px] mx-auto">
-    <div class="flex flex-col w-full pb-28">
+  <main class="flex-1 flex flex-col relative w-full pt-16 pb-28 md:pb-16 bg-surface-container-lowest max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full pt-4">
+      
+      <!-- Left 2-Column: Provider Profile Details -->
+      <div class="lg:col-span-2 flex flex-col">
       
       <!-- Top Gallery Carousel -->
       <section class="relative w-full bg-surface-container-low overflow-hidden">
@@ -336,20 +368,68 @@
         </div>
       </section>
 
-      <!-- Sticky Bottom Conversion Bar -->
-      <div class="fixed bottom-0 inset-x-0 z-40 bg-surface-container-lowest/95 backdrop-blur-md max-w-[480px] mx-auto px-gutter py-3 border-t border-surface-container-high/40">
-        <div class="flex items-center gap-space-sm">
-          <a class="w-full h-12 bg-primary-container text-on-primary hover:bg-primary active:scale-[0.99] transition-all rounded-xl flex items-center justify-center gap-2 font-title-md text-title-md font-semibold shadow-sm" href="https://wa.me/923332145890?text=Assalam%20o%20Alaikum%20Tariq%20Bhai%2C%20I%20found%20your%20profile%20on%20Baseera%20and%20need%20electrical%20assistance." rel="noopener noreferrer" target="_blank">
-            <svg aria-hidden="true" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.06-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.196 8.196 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8 1-.15.19-.3.21-.55.08-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.44-.06-.13-.57-1.37-.78-1.88-.2-.49-.41-.43-.57-.44h-.48c-.17 0-.44.06-.67.32-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.78 2.72 4.31 3.81.6.26 1.07.41 1.44.53.61.19 1.16.17 1.6.1.48-.07 1.47-.6 1.68-1.18.21-.59.21-1.09.15-1.19-.07-.09-.23-.15-.48-.27z"></path>
-            </svg>
-            <span>Chat on WhatsApp</span>
-          </a>
-        </div>
       </div>
+      <!-- End Left Column -->
+
+      <!-- Right 1-Column: Sticky Booking & WhatsApp Contact Box (Desktop) -->
+      <aside class="hidden lg:block lg:col-span-1">
+        <div class="sticky top-24 bg-surface-container-low rounded-2xl p-6 border border-surface-container-high/60 shadow-sm flex flex-col gap-4">
+          <div class="flex items-center justify-between pb-3 border-b border-surface-container-high/60">
+            <div>
+              <span class="font-label-sm text-outline uppercase tracking-wider block">Standard Inspection</span>
+              <span class="font-headline-sm text-xl text-primary font-bold">Rs. 800 - 1,200</span>
+            </div>
+            <span class="inline-flex items-center gap-1 bg-secondary-container/40 text-primary px-2.5 py-1 rounded-full font-label-sm font-semibold text-xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+              Available Today
+            </span>
+          </div>
+
+          <div class="space-y-2.5 text-on-surface-variant font-body-sm text-sm">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+              <span>Karachi Verified ID & Police Verification</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[18px]">near_me</span>
+              <span>Covers DHA, Clifton, PECHS & Saddar</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[18px]">timer</span>
+              <span>Average 25 - 45 min arrival for emergencies</span>
+            </div>
+          </div>
+
+          <div class="pt-2 flex flex-col gap-2.5">
+            <a class="w-full h-12 bg-primary text-on-primary hover:bg-primary-container active:scale-[0.99] transition-all rounded-xl flex items-center justify-center gap-2 font-title-md text-base font-semibold shadow-sm" href="https://wa.me/923332145890?text=Assalam%20o%20Alaikum%20Tariq%20Bhai%2C%20I%20found%20your%20profile%20on%20Baseera%20and%20need%20electrical%20assistance." rel="noopener noreferrer" target="_blank">
+              <svg aria-hidden="true" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.06-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.196 8.196 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8 1-.15.19-.3.21-.55.08-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.44-.06-.13-.57-1.37-.78-1.88-.2-.49-.41-.43-.57-.44h-.48c-.17 0-.44.06-.67.32-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.78 2.72 4.31 3.81.6.26 1.07.41 1.44.53.61.19 1.16.17 1.6.1.48-.07 1.47-.6 1.68-1.18.21-.59.21-1.09.15-1.19-.07-.09-.23-.15-.48-.27z"></path>
+              </svg>
+              <span>Direct WhatsApp Inquiry</span>
+            </a>
+            <a class="w-full h-11 border border-surface-container-high hover:bg-surface-container text-on-surface font-label-md rounded-xl flex items-center justify-center gap-2 font-semibold transition-colors" href="tel:+923332145890">
+              <span class="material-symbols-outlined text-[18px]">call</span>
+              <span>Call Direct (+92 333 2145890)</span>
+            </a>
+          </div>
+          <p class="text-xs text-outline text-center mt-1">Zero intermediary fee. 100% direct deal between customer & specialist.</p>
+        </div>
+      </aside>
 
     </div>
   </main>
+
+  <!-- Sticky Bottom Conversion Bar (Mobile Only) -->
+  <div class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-surface-container-lowest/95 backdrop-blur-md max-w-[480px] mx-auto px-gutter py-3 border-t border-surface-container-high/40">
+    <div class="flex items-center gap-space-sm">
+      <a class="w-full h-12 bg-primary-container text-on-primary hover:bg-primary active:scale-[0.99] transition-all rounded-xl flex items-center justify-center gap-2 font-title-md text-title-md font-semibold shadow-sm" href="https://wa.me/923332145890?text=Assalam%20o%20Alaikum%20Tariq%20Bhai%2C%20I%20found%20your%20profile%20on%20Baseera%20and%20need%20electrical%20assistance." rel="noopener noreferrer" target="_blank">
+        <svg aria-hidden="true" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+          <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.06-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.196 8.196 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8 1-.15.19-.3.21-.55.08-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.44-.06-.13-.57-1.37-.78-1.88-.2-.49-.41-.43-.57-.44h-.48c-.17 0-.44.06-.67.32-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.78 2.72 4.31 3.81.6.26 1.07.41 1.44.53.61.19 1.16.17 1.6.1.48-.07 1.47-.6 1.68-1.18.21-.59.21-1.09.15-1.19-.07-.09-.23-.15-.48-.27z"></path>
+        </svg>
+        <span>Chat on WhatsApp</span>
+      </a>
+    </div>
+  </div>
 
   <script>
     const gallery = document.getElementById('gallery-track');

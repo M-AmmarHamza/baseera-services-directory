@@ -141,16 +141,45 @@
 <body class="bg-surface-container-lowest font-body-md text-on-surface antialiased flex flex-col min-h-screen">
   
   <!-- Header -->
-  <header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-    <div class="h-16 px-gutter flex items-center justify-between max-w-[480px] mx-auto w-full">
+  <header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container-high/40">
+    <div class="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between max-w-7xl mx-auto w-full">
       <div class="flex items-center gap-space-sm">
-        <a aria-label="Go Back" class="w-11 h-11 -ml-space-xs flex items-center justify-center text-on-surface hover:text-primary transition-colors" href="index.html">
+        <a aria-label="Go Back" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container text-on-surface hover:text-primary transition-colors" href="index.html">
           <span class="material-symbols-outlined text-[24px]">arrow_back</span>
         </a>
-        <img alt="Baseera Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VifhEhAnyGcIMAzyuf5f1JiVQATzvcwJzkzN2D-g0gIhjkGPPHeQREP_6GXBi6qybDjnH1LpSOIiSsTUAUXGJxnyUWu4N8xlrBq6aC66NMIaHPa5Gcghl7Cayh0drMuGxb7JnbeMzXIYNY2GAaFw7XfnX36ysQ37W_WDJ0XXRu7EXEz0YyabfgENet5RdeIkW4OGCMK00BuGwq07GuCnFh2NtO3g4vUFFUjgwvkpndlGWwfV8ALvSw_3Q"/>
-        <h1 class="font-title-md text-title-md text-on-surface truncate">Category Listings</h1>
+        <a href="index.html" class="flex items-center gap-2.5">
+          <img alt="Baseera Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VifhEhAnyGcIMAzyuf5f1JiVQATzvcwJzkzN2D-g0gIhjkGPPHeQREP_6GXBi6qybDjnH1LpSOIiSsTUAUXGJxnyUWu4N8xlrBq6aC66NMIaHPa5Gcghl7Cayh0drMuGxb7JnbeMzXIYNY2GAaFw7XfnX36ysQ37W_WDJ0XXRu7EXEz0YyabfgENet5RdeIkW4OGCMK00BuGwq07GuCnFh2NtO3g4vUFFUjgwvkpndlGWwfV8ALvSw_3Q"/>
+          <div class="hidden sm:flex flex-col">
+            <span class="font-title-md text-title-md text-on-surface tracking-tight leading-none font-bold">Baseera</span>
+            <span class="font-label-sm text-label-sm text-outline tracking-wider uppercase mt-0.5">Karachi</span>
+          </div>
+        </a>
       </div>
-      <div class="flex items-center">
+
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="index.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">home</span>
+          <span>Home</span>
+        </a>
+        <a href="categories.html" class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">search</span>
+          <span>Find Services</span>
+        </a>
+        <a href="saved.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">bookmark</span>
+          <span>Saved</span>
+        </a>
+        <a href="blog.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">article</span>
+          <span>Karachi Guides</span>
+        </a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="provider-dashboard.html" class="hidden sm:inline-flex items-center gap-1.5 font-label-sm text-label-sm text-primary font-semibold bg-secondary-fixed/30 px-3 py-1.5 rounded-full hover:bg-secondary-fixed/50 transition-colors">
+          <span>Vendor Studio</span>
+        </a>
         <a href="settings.html" class="w-8 h-8 rounded-full overflow-hidden ring-1 ring-outline/20 hover:ring-primary transition-all">
           <img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4AzipZE5x54eTvTk6U_Nuld4aVm8bttEj_sypX_08gahKrurGREYPQ1YUp9ZowjJOLXrIMXABFDs4LwY2S5BaWs7NO61I6Y7ymgJdnm0setiMWhpfzRtcQagtc_2TjPhjsMSTOKBg-tjTpW9M9B_8r3IRGiE7_duBwL7sIcQim_8A83vtP0MnVErrKsZT7AIRl_AY6t5hP-A5IvJUF4QRZfEAhAsHdwtN2mPcAYvgQq_il2vuzoVx"/>
         </a>
@@ -159,47 +188,50 @@
   </header>
 
   <!-- Main View -->
-  <main class="flex-1 flex flex-col relative w-full pt-16 bg-surface-container-lowest max-w-[480px] mx-auto">
-    <div class="flex flex-col w-full pb-24">
+  <main class="flex-1 flex flex-col relative w-full pt-16 bg-surface-container-lowest max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col w-full pb-24 md:pb-16">
       
       <!-- Header Title & Subtext Context -->
-      <section class="px-gutter pt-space-md pb-space-sm bg-surface-container-lowest">
-        <div class="flex items-center gap-space-xs text-primary font-label-md text-label-md uppercase tracking-wider mb-1">
+      <section class="py-space-md bg-surface-container-lowest">
+        <div class="flex items-center gap-space-xs text-primary font-label-md text-label-md uppercase tracking-wider mb-1 font-semibold">
           <span class="material-symbols-outlined text-[16px]">bolt</span>
           <span>Karachi Verified Network</span>
         </div>
-        <h2 class="font-headline-lg text-headline-lg text-on-surface" id="listingHeading">Top Electricians in Karachi</h2>
-        <p class="font-body-md text-body-md text-outline mt-1">Verified residential and commercial electrical specialists across Karachi.</p>
+        <h2 class="font-headline-lg text-headline-lg text-2xl sm:text-3xl text-on-surface font-extrabold" id="listingHeading">Top Electricians in Karachi</h2>
+        <p class="font-body-md text-body-md text-outline mt-1 max-w-2xl">Verified residential and commercial electrical specialists across Karachi. Contact directly on WhatsApp without commission.</p>
       </section>
 
       <!-- Horizontal Scrollable Filter Chips -->
-      <nav aria-label="Filters" class="sticky top-16 z-30 bg-surface-container-lowest/95 backdrop-blur-sm py-2 px-gutter overflow-x-auto scrollbar-none border-b border-surface-container-high/40">
-        <div class="flex items-center gap-2 min-w-max" id="filterChipsContainer">
-          <button class="px-3 py-1.5 rounded-full font-label-md text-label-md bg-secondary-container text-on-secondary-container transition-colors flex items-center gap-1.5 focus:outline-none" data-filter="all">
+      <nav aria-label="Filters" class="sticky top-16 z-30 bg-surface-container-lowest/95 backdrop-blur-sm py-2.5 overflow-x-auto scrollbar-none border-b border-surface-container-high/40">
+        <div class="flex items-center gap-2 min-w-max flex-wrap" id="filterChipsContainer">
+          <button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md bg-secondary-container text-on-secondary-container transition-colors flex items-center gap-1.5 focus:outline-none font-semibold" data-filter="all">
             <span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">check</span>
-            All
+            All Providers
           </button>
-          <button class="px-3 py-1.5 rounded-full font-label-md text-label-md bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low transition-colors shadow-none focus:outline-none" data-filter="individual">
-            Individuals
+          <button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors focus:outline-none" data-filter="individual">
+            Individual Pros
           </button>
-          <button class="px-3 py-1.5 rounded-full font-label-md text-label-md bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low transition-colors shadow-none focus:outline-none" data-filter="shop">
-            Shops / Agencies
+          <button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors focus:outline-none" data-filter="shop">
+            Agencies & Shops
           </button>
-          <button class="px-3 py-1.5 rounded-full font-label-md text-label-md bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low transition-colors flex items-center gap-1.5 focus:outline-none" data-filter="available">
+          <button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors flex items-center gap-1.5 focus:outline-none" data-filter="available">
             <span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
             Available Today
           </button>
-          <button class="px-3 py-1.5 rounded-full font-label-md text-label-md bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low transition-colors focus:outline-none" data-filter="dha">
-            DHA / Clifton
+          <button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors focus:outline-none" data-filter="dha">
+            DHA & Clifton
           </button>
-          <button class="px-3 py-1.5 rounded-full font-label-md text-label-md bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low transition-colors focus:outline-none" data-filter="gulshan">
-            Gulshan
+          <button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors focus:outline-none" data-filter="gulshan">
+            Gulshan-e-Iqbal
+          </button>
+          <button class="px-3.5 py-1.5 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant hover:bg-surface-container-high transition-colors focus:outline-none" data-filter="pechs">
+            PECHS
           </button>
         </div>
       </nav>
 
-      <!-- Provider Directory List -->
-      <section class="px-gutter pt-space-sm flex flex-col gap-3" id="providerListingsSection">
+      <!-- Provider Directory List (Responsive Grid on Desktop) -->
+      <section class="pt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="providerListingsSection">
         
         <!-- Card 1: Muhammad Irfan -->
         <article class="bg-surface-container-lowest rounded-xl p-space-lg flex flex-col gap-3 border border-surface-container-high/60 transition-all hover:bg-surface-bright" data-category="individual dha available">
@@ -395,17 +427,33 @@
 
       </section>
 
-      <!-- Community Trust Note -->
-      <footer class="mt-6 mx-gutter p-4 rounded-xl bg-surface-container-low text-center flex flex-col items-center gap-1.5">
+      <!-- Desktop Footer (Hidden on Mobile) -->
+      <footer class="hidden md:block border-t border-surface-container-high/50 bg-surface-container-low mt-16 py-12 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-outline font-label-sm gap-3">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-primary">verified_user</span>
+            <span class="font-semibold text-on-surface">Baseera Karachi</span> — Direct Local Services Directory
+          </div>
+          <div class="flex gap-4">
+            <a href="index.html" class="hover:text-primary transition-colors">Home</a>
+            <a href="blog.html" class="hover:text-primary transition-colors">Resident Guides</a>
+            <a href="provider-dashboard.html" class="hover:text-primary transition-colors">Vendor Studio</a>
+            <a href="settings.html" class="hover:text-primary transition-colors">Settings</a>
+          </div>
+        </div>
+      </footer>
+
+      <!-- Community Trust Note (Mobile Only) -->
+      <div class="md:hidden mt-6 p-4 rounded-xl bg-surface-container-low text-center flex flex-col items-center gap-1.5">
         <div class="flex items-center gap-1.5 text-primary">
           <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">security</span>
           <span class="font-label-md text-label-md font-semibold">100% Free WhatsApp Direct Contact</span>
         </div>
         <p class="font-body-sm text-body-sm text-outline max-w-xs">Baseera connects you straight to technician WhatsApp numbers. No intermediaries or service fees.</p>
-      </footer>
+      </div>
 
-      <!-- Persistent 4-Item Bottom Navigation Bar -->
-      <nav aria-label="Bottom Bar Navigation" class="fixed bottom-0 left-0 right-0 z-50 bg-surface-container-lowest h-[60px] pb-safe flex items-center justify-around max-w-[480px] mx-auto shadow-[0_-1px_8px_rgba(0,0,0,0.04)]">
+      <!-- Persistent 4-Item Bottom Navigation Bar (Mobile Only) -->
+      <nav aria-label="Bottom Bar Navigation" class="fixed bottom-0 left-0 right-0 z-50 bg-surface-container-lowest h-[60px] pb-safe flex items-center justify-around max-w-[480px] mx-auto shadow-[0_-1px_8px_rgba(0,0,0,0.04)] md:hidden">
         <a href="index.html" class="flex flex-col items-center justify-center flex-1 h-full text-outline hover:text-primary transition-colors focus:outline-none">
           <span class="material-symbols-outlined text-[22px]">home</span>
           <span class="font-label-sm text-label-sm mt-0.5">Home</span>

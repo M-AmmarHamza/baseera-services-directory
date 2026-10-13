@@ -141,23 +141,43 @@
 <body class="bg-surface-container-lowest font-body-md text-on-surface antialiased flex flex-col min-h-screen">
   
   <!-- Header -->
-  <header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-    <div class="h-16 px-gutter flex items-center justify-between max-w-[480px] mx-auto w-full">
-      <a href="index.html" class="flex items-center gap-space-sm group">
+  <header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container-high/40">
+    <div class="h-16 px-4 sm:px-6 lg:px-8 flex items-center justify-between max-w-7xl mx-auto w-full">
+      <a href="index.html" class="flex items-center gap-2.5 group">
         <img alt="Baseera Logo" class="h-8 w-auto object-contain group-hover:scale-105 transition-transform" src="https://lh3.googleusercontent.com/aida/AEtjO1VifhEhAnyGcIMAzyuf5f1JiVQATzvcwJzkzN2D-g0gIhjkGPPHeQREP_6GXBi6qybDjnH1LpSOIiSsTUAUXGJxnyUWu4N8xlrBq6aC66NMIaHPa5Gcghl7Cayh0drMuGxb7JnbeMzXIYNY2GAaFw7XfnX36ysQ37W_WDJ0XXRu7EXEz0YyabfgENet5RdeIkW4OGCMK00BuGwq07GuCnFh2NtO3g4vUFFUjgwvkpndlGWwfV8ALvSw_3Q"/>
         <div class="flex flex-col">
-          <span class="font-title-md text-title-md text-on-surface tracking-tight leading-none">Baseera</span>
+          <span class="font-title-md text-title-md text-on-surface tracking-tight leading-none font-bold">Baseera</span>
           <span class="font-label-sm text-label-sm text-outline tracking-wider uppercase mt-0.5">Karachi</span>
         </div>
       </a>
-      <div class="flex items-center gap-space-md">
-        <a href="blog.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors">
-          Guides
+
+      <!-- Desktop Navigation Links (Visible on Tablet/Desktop) -->
+      <nav class="hidden md:flex items-center gap-6">
+        <a href="index.html" class="font-label-md text-label-md text-primary font-semibold flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">home</span>
+          <span>Home</span>
         </a>
-        <a href="provider-dashboard.html" class="font-label-sm text-label-sm text-primary font-semibold bg-secondary-fixed/30 px-2.5 py-1 rounded-full hover:bg-secondary-fixed/50 transition-colors">
-          Vendor Studio
+        <a href="categories.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">search</span>
+          <span>Find Services</span>
         </a>
-        <a href="settings.html" class="w-8 h-8 rounded-full overflow-hidden ring-1 ring-outline/20 hover:ring-primary transition-all">
+        <a href="saved.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">bookmark</span>
+          <span>Saved</span>
+        </a>
+        <a href="blog.html" class="font-label-md text-label-md text-on-surface-variant font-medium hover:text-primary transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">article</span>
+          <span>Karachi Guides</span>
+        </a>
+      </nav>
+
+      <!-- Right Controls -->
+      <div class="flex items-center gap-3">
+        <a href="provider-dashboard.html" class="inline-flex items-center gap-1.5 font-label-sm text-label-sm text-primary font-semibold bg-secondary-fixed/30 px-3 py-1.5 rounded-full hover:bg-secondary-fixed/50 transition-colors">
+          <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+          <span>Vendor Studio</span>
+        </a>
+        <a href="settings.html" class="w-8 h-8 rounded-full overflow-hidden ring-1 ring-outline/20 hover:ring-primary transition-all flex-shrink-0" title="Profile Settings">
           <img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4AzipZE5x54eTvTk6U_Nuld4aVm8bttEj_sypX_08gahKrurGREYPQ1YUp9ZowjJOLXrIMXABFDs4LwY2S5BaWs7NO61I6Y7ymgJdnm0setiMWhpfzRtcQagtc_2TjPhjsMSTOKBg-tjTpW9M9B_8r3IRGiE7_duBwL7sIcQim_8A83vtP0MnVErrKsZT7AIRl_AY6t5hP-A5IvJUF4QRZfEAhAsHdwtN2mPcAYvgQq_il2vuzoVx"/>
         </a>
       </div>
@@ -165,80 +185,80 @@
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface-container-lowest max-w-[480px] mx-auto">
-    <div class="flex flex-col w-full px-margin pb-space-xl">
+  <main class="flex-1 flex flex-col relative w-full pt-16 pb-24 md:pb-16 bg-surface-container-lowest max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col w-full pb-space-xl">
       
       <!-- Hero Section -->
-      <section class="flex flex-col pt-space-md pb-space-lg">
-        <div class="flex items-center gap-space-xs mb-space-xs flex-wrap">
-          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed/30 text-on-secondary-fixed-variant font-label-sm text-label-sm">
+      <section class="flex flex-col items-center text-center pt-space-md md:pt-8 pb-space-lg max-w-3xl mx-auto w-full">
+        <div class="flex items-center justify-center gap-space-xs mb-space-xs flex-wrap">
+          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-secondary-fixed/30 text-on-secondary-fixed-variant font-label-sm text-label-sm">
             <span class="material-symbols-outlined text-[14px] text-primary">location_on</span>
             Karachi, PK
           </span>
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
             <span class="inline-block w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-            Direct WhatsApp
+            Direct WhatsApp Inquiries
           </span>
         </div>
-        <h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tight mt-1 mb-2">
-          Find Trusted Local Services
+        <h1 class="font-headline-xl text-3xl sm:text-4xl md:text-5xl text-on-surface tracking-tight mt-2 mb-3 font-extrabold leading-tight">
+          Find Trusted Local Services in Karachi
         </h1>
-        <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed mb-space-lg">
-          Connect directly with verified local specialists across Karachi without intermediaries.
+        <p class="font-body-md text-base sm:text-lg text-on-surface-variant leading-relaxed mb-6 max-w-2xl">
+          Connect directly with verified local specialists across Karachi without intermediaries, commissions, or delay.
         </p>
 
         <!-- Search Box -->
-        <div class="relative w-full">
-          <div class="flex items-center w-full bg-surface-container-low rounded-xl px-3.5 py-3 shadow-sm transition-all focus-within:bg-surface-container-lowest focus-within:shadow-md">
-            <span class="material-symbols-outlined text-outline text-[22px] mr-2.5 select-none">search</span>
+        <div class="relative w-full max-w-2xl">
+          <div class="flex items-center w-full bg-surface-container-low rounded-2xl px-4 py-3.5 shadow-sm transition-all focus-within:bg-surface-container-lowest focus-within:shadow-md border border-surface-container-high/60">
+            <span class="material-symbols-outlined text-outline text-[24px] mr-3 select-none">search</span>
             <input 
-              class="w-full bg-transparent font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none" 
+              class="w-full bg-transparent font-body-md text-base text-on-surface placeholder:text-outline focus:outline-none" 
               id="serviceSearch" 
-              placeholder="Search electrician, plumber, AC repair..." 
+              placeholder="Search electrician, plumber, AC repair, home chef..." 
               type="text"
             />
             <button 
               onclick="window.location.href='categories.html'" 
               aria-label="Filter" 
-              class="flex items-center justify-center w-8 h-8 rounded-lg bg-surface-container text-on-surface-variant ml-1 hover:bg-surface-container-high transition-colors" 
+              class="flex items-center justify-center w-9 h-9 rounded-xl bg-surface-container text-on-surface-variant ml-1 hover:bg-surface-container-high transition-colors" 
               type="button"
             >
-              <span class="material-symbols-outlined text-[18px]">tune</span>
+              <span class="material-symbols-outlined text-[20px]">tune</span>
             </button>
           </div>
         </div>
 
         <!-- Quick Filter Chips -->
-        <div class="flex items-center gap-space-xs mt-space-md overflow-x-auto no-scrollbar py-0.5" id="districtChips">
-          <button onclick="window.location.href='categories.html'" class="px-3 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md shrink-0">
+        <div class="flex items-center justify-center gap-2 mt-4 flex-wrap" id="districtChips">
+          <button onclick="window.location.href='categories.html'" class="px-3.5 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md shrink-0 transition-transform active:scale-95 shadow-sm">
             All Districts
           </button>
-          <button onclick="window.location.href='categories.html?district=dha-clifton'" class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md shrink-0 hover:bg-surface-container-high transition-colors">
+          <button onclick="window.location.href='categories.html?district=dha-clifton'" class="px-3.5 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md shrink-0 hover:bg-surface-container-high transition-colors">
             DHA & Clifton
           </button>
-          <button onclick="window.location.href='categories.html?district=gulshan'" class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md shrink-0 hover:bg-surface-container-high transition-colors">
+          <button onclick="window.location.href='categories.html?district=gulshan'" class="px-3.5 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md shrink-0 hover:bg-surface-container-high transition-colors">
             Gulshan-e-Iqbal
           </button>
-          <button onclick="window.location.href='categories.html?district=pechs'" class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md shrink-0 hover:bg-surface-container-high transition-colors">
+          <button onclick="window.location.href='categories.html?district=pechs'" class="px-3.5 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md shrink-0 hover:bg-surface-container-high transition-colors">
             PECHS
           </button>
-          <button onclick="window.location.href='categories.html?district=north-nazimabad'" class="px-3 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md shrink-0 hover:bg-surface-container-high transition-colors">
+          <button onclick="window.location.href='categories.html?district=north-nazimabad'" class="px-3.5 py-1.5 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md shrink-0 hover:bg-surface-container-high transition-colors">
             North Nazimabad
           </button>
         </div>
       </section>
 
-      <!-- Browse by Specialty Grid (3x3) -->
+      <!-- Browse by Specialty Grid (Responsive 3 to 9 cols) -->
       <section class="flex flex-col mb-space-xl">
         <div class="flex items-center justify-between mb-space-md">
           <div>
-            <h2 class="font-headline-sm text-headline-sm text-on-surface">Browse by Specialty</h2>
+            <h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Browse by Specialty</h2>
             <p class="font-label-sm text-label-sm text-outline">Verified community technicians & cooks</p>
           </div>
           <a href="categories.html" class="font-label-md text-label-md text-primary font-semibold hover:underline">9 Categories</a>
         </div>
 
-        <div class="grid grid-cols-3 gap-2.5">
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 gap-3">
           <!-- 1. Electrician -->
           <a class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container-low active:bg-surface-container-high transition-colors text-center group" href="categories.html?cat=electrician">
             <div class="w-10 h-10 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary mb-2 shadow-sm group-hover:scale-105 transition-transform">
@@ -332,13 +352,13 @@
           <a class="font-label-md text-label-md text-primary font-semibold hover:underline" href="categories.html">View All</a>
         </div>
 
-        <!-- Horizontally Scrolling Cards -->
-        <div class="flex gap-3.5 overflow-x-auto no-scrollbar pb-2 pt-0.5 -mx-margin px-margin">
+        <!-- Responsive Cards: Horizontal Scroll on Mobile, 3-Col Grid on Desktop -->
+        <div class="flex gap-3.5 overflow-x-auto no-scrollbar pb-2 pt-0.5 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-x-visible">
           
           <!-- Provider 1: Tariq Mahmood -->
-          <div class="flex flex-col w-[290px] shrink-0 bg-surface-container-low rounded-xl p-3.5 shadow-sm justify-between hover:shadow-md transition-shadow">
+          <div class="flex flex-col w-[280px] shrink-0 md:w-auto md:shrink bg-surface-container-low rounded-xl p-3.5 shadow-sm justify-between hover:shadow-md transition-shadow border border-surface-container-high/40">
             <div>
-              <a href="provider-profile.html?id=tariq-electric" class="block relative w-full h-32 rounded-lg overflow-hidden mb-3 bg-surface-container group">
+              <a href="provider-profile.html?id=tariq-electric" class="block relative w-full h-36 rounded-lg overflow-hidden mb-3 bg-surface-container group">
                 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="Tariq Mahmood" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBK9qWTJzXQzuvOCxeaY9oaT5QnMSIE_WRvPrYq3ndOxqfGwgRJiuusiLQI6ptKnL9aXydagk97uFwsxC7j-gxTH2VH5N_HAJpsT3T0CG_IE0OBqsRNY1C_6XY0VC8sNDh1YBotW-weRk3E7XwleN6ZT1cvkRynmWL_e-anI_it8xQNPs3oqJRRO7Xrk7PfW-P6i2RwcClJxEboVmdY8ZF6bL0HcCJgGu5qW0x9sje5DlC6qn7x4H7V"/>
                 <div class="absolute top-2 right-2 bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-0.5 rounded-full flex items-center gap-1">
                   <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
@@ -378,9 +398,9 @@
           </div>
 
           <!-- Provider 2: Kashif Ali -->
-          <div class="flex flex-col w-[290px] shrink-0 bg-surface-container-low rounded-xl p-3.5 shadow-sm justify-between hover:shadow-md transition-shadow">
+          <div class="flex flex-col w-[280px] shrink-0 md:w-auto md:shrink bg-surface-container-low rounded-xl p-3.5 shadow-sm justify-between hover:shadow-md transition-shadow border border-surface-container-high/40">
             <div>
-              <a href="provider-profile.html?id=karachi-cooling-expert" class="block relative w-full h-32 rounded-lg overflow-hidden mb-3 bg-surface-container group">
+              <a href="provider-profile.html?id=karachi-cooling-expert" class="block relative w-full h-36 rounded-lg overflow-hidden mb-3 bg-surface-container group">
                 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="Kashif Ali" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrVEOf4Kmm3ZmFg2SVyQFHc7CD8jvopigKY9y06BL7csj1WLTVWDmQqVt9BLA-VImJWY1FnjTlOTMBdLORMVFgTEdwQKPPqGcSnJWhS5AriQLENY6vHirxqBOzQHMWyqZjRyr6tgRG-1ieePqu9nM2GIZj-GUmMil3H8fWsOahBKbVJj1EXc7oGAdad_P_Cb1e1CbAKo9FYlkkU-0dpz0biB1i9POZASr1lFg6dTIGFODNEO_8u9eb"/>
                 <div class="absolute top-2 right-2 bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-0.5 rounded-full flex items-center gap-1">
                   <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
@@ -420,9 +440,9 @@
           </div>
 
           <!-- Provider 3: Farzana Kitchen -->
-          <div class="flex flex-col w-[290px] shrink-0 bg-surface-container-low rounded-xl p-3.5 shadow-sm justify-between hover:shadow-md transition-shadow">
+          <div class="flex flex-col w-[280px] shrink-0 md:w-auto md:shrink bg-surface-container-low rounded-xl p-3.5 shadow-sm justify-between hover:shadow-md transition-shadow border border-surface-container-high/40">
             <div>
-              <a href="provider-profile.html?id=dha-home-chef-fatima" class="block relative w-full h-32 rounded-lg overflow-hidden mb-3 bg-surface-container group">
+              <a href="provider-profile.html?id=dha-home-chef-fatima" class="block relative w-full h-36 rounded-lg overflow-hidden mb-3 bg-surface-container group">
                 <img class="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="Farzana Kitchen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZZ3jFfYAUp1f6ZwaA3bw9DUYqcbD067tf2DiX2SWLVRwTUhafGFCOzOzsUTICpmDPFe91mBv1GRm3r-qyUJZbnBeN57VtXsCuKHMVsXx1aioXkyo3Sw6_yQg78DkkPYzj3soUYY7YS49NK-hbHVquzL-bkNCxoWMINuv2OS5c5kG0a8JFOI5irxZcGHL_fDVrQ4YMj7ltf8FV7Xr-DHs1rDSBoxy0sTlo2SIaOGOn_DXV-DBQ1RiE"/>
                 <div class="absolute top-2 right-2 bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-0.5 rounded-full flex items-center gap-1">
                   <span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
@@ -464,24 +484,94 @@
         </div>
       </section>
 
-      <!-- Community Trust Banner -->
-      <section class="bg-surface-container-low rounded-xl p-4 flex items-start gap-3">
-        <div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
-          <span class="material-symbols-outlined text-[22px]">security</span>
+      <!-- Trust & Resource Banners (Responsive 2-col on desktop) -->
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
+        <div class="bg-surface-container-low rounded-2xl p-5 flex items-start gap-4 border border-surface-container-high/50">
+          <div class="w-12 h-12 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[26px]">security</span>
+          </div>
+          <div class="flex flex-col">
+            <h3 class="font-title-md text-title-md text-on-surface font-bold">Zero Commission, Direct Contact</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+              Baseera does not charge middlemen fees. Discuss requirements, timing, and rates directly with technicians over WhatsApp.
+            </p>
+          </div>
         </div>
-        <div class="flex flex-col">
-          <h3 class="font-title-md text-title-md text-on-surface font-semibold">Zero Commission, Direct Contact</h3>
-          <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
-            Baseera does not charge middlemen fees. Discuss requirements, timing, and details directly with providers over WhatsApp.
-          </p>
+
+        <div class="bg-surface-container-low rounded-2xl p-5 flex items-start gap-4 border border-surface-container-high/50">
+          <div class="w-12 h-12 rounded-xl bg-primary-fixed text-on-primary-fixed-variant flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-[26px]">support_agent</span>
+          </div>
+          <div class="flex flex-col">
+            <h3 class="font-title-md text-title-md text-on-surface font-bold">Karachi Utility Helplines</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+              Emergency contacts for K-Electric (118), KW&SB Water (1339), and SSGC Gas (1199) are available in our Karachi Resident Guides.
+            </p>
+            <a href="blog.html" class="inline-flex items-center gap-1 font-label-md text-primary font-semibold mt-2 hover:underline">
+              <span>View Resident Helplines</span>
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </a>
+          </div>
         </div>
       </section>
 
     </div>
   </main>
 
-  <!-- Persistent 4-Item Bottom Navigation Bar -->
-  <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]">
+  <!-- Desktop Footer (Hidden on Mobile) -->
+  <footer class="hidden md:block border-t border-surface-container-high/50 bg-surface-container-low py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div class="md:col-span-1">
+          <div class="flex items-center gap-2.5 mb-3">
+            <img alt="Baseera Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VifhEhAnyGcIMAzyuf5f1JiVQATzvcwJzkzN2D-g0gIhjkGPPHeQREP_6GXBi6qybDjnH1LpSOIiSsTUAUXGJxnyUWu4N8xlrBq6aC66NMIaHPa5Gcghl7Cayh0drMuGxb7JnbeMzXIYNY2GAaFw7XfnX36ysQ37W_WDJ0XXRu7EXEz0YyabfgENet5RdeIkW4OGCMK00BuGwq07GuCnFh2NtO3g4vUFFUjgwvkpndlGWwfV8ALvSw_3Q"/>
+            <span class="font-title-md font-bold text-on-surface">Baseera Karachi</span>
+          </div>
+          <p class="font-body-sm text-outline leading-relaxed">
+            Karachi's trusted local services directory. Connecting residents with verified electricians, plumbers, and technicians directly via WhatsApp.
+          </p>
+        </div>
+        <div>
+          <h4 class="font-label-md font-bold text-on-surface mb-3 uppercase tracking-wider text-xs">Service Areas</h4>
+          <ul class="space-y-2 font-body-sm text-outline">
+            <li><a href="categories.html?district=dha-clifton" class="hover:text-primary transition-colors">DHA & Clifton</a></li>
+            <li><a href="categories.html?district=gulshan" class="hover:text-primary transition-colors">Gulshan-e-Iqbal</a></li>
+            <li><a href="categories.html?district=pechs" class="hover:text-primary transition-colors">PECHS & Bahadurabad</a></li>
+            <li><a href="categories.html?district=north-nazimabad" class="hover:text-primary transition-colors">North Nazimabad</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-label-md font-bold text-on-surface mb-3 uppercase tracking-wider text-xs">Top Categories</h4>
+          <ul class="space-y-2 font-body-sm text-outline">
+            <li><a href="categories.html?cat=electrician" class="hover:text-primary transition-colors">Electricians</a></li>
+            <li><a href="categories.html?cat=plumber" class="hover:text-primary transition-colors">Plumbers</a></li>
+            <li><a href="categories.html?cat=ac" class="hover:text-primary transition-colors">AC Repair Specialists</a></li>
+            <li><a href="categories.html?cat=chef" class="hover:text-primary transition-colors">Home Chefs & Tiffin</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-label-md font-bold text-on-surface mb-3 uppercase tracking-wider text-xs">Karachi Helplines</h4>
+          <ul class="space-y-2 font-body-sm text-outline">
+            <li>K-Electric Hotline: <strong class="text-on-surface">118</strong></li>
+            <li>KW&SB Water Board: <strong class="text-on-surface">1339</strong></li>
+            <li>SSGC Gas Hotline: <strong class="text-on-surface">1199</strong></li>
+            <li>Rescue & Ambulance: <strong class="text-on-surface">1122 / 115</strong></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-surface-container-high/60 pt-6 flex flex-col sm:flex-row items-center justify-between text-outline font-label-sm gap-3">
+        <p>© 2026 Baseera Karachi. Designed for Karachi Metropolitan Area.</p>
+        <div class="flex gap-4">
+          <a href="blog.html" class="hover:text-primary transition-colors">Resident Guides</a>
+          <a href="provider-dashboard.html" class="hover:text-primary transition-colors">Join as Vendor</a>
+          <a href="settings.html" class="hover:text-primary transition-colors">Account Settings</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Persistent 4-Item Bottom Navigation Bar (Mobile Only: Hidden on Desktop) -->
+  <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)] md:hidden">
     <div class="flex justify-around items-center h-16 max-w-[480px] mx-auto px-space-xs">
       <a aria-current="page" class="flex flex-col items-center justify-center flex-1 h-full min-h-[44px] min-w-[44px] transition-colors text-primary font-semibold" href="index.html">
         <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">home</span>
