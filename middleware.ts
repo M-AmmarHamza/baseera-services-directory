@@ -97,10 +97,21 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname === '/index.html' || pathname === '/') {
-    return NextResponse.redirect(
-      new URL(`/${DEFAULT_LOCALE}/${regionInfo.country}/${detectedCitySlug}`, request.url),
-      308
-    );
+    // True Edge Geo-Routing:
+    // User from UAE -> /en/ae/dubai
+    // User from Saudi Arabia -> /en/sa/riyadh
+    // User from Pakistan -> /en/pk/karachi
+    // All other international users -> /en (Global Directory Portal)
+    if (geoCountry === 'AE') {
+      return NextResponse.redirect(new URL('/en/ae/dubai', request.url), 308);
+    }
+    if (geoCountry === 'SA') {
+      return NextResponse.redirect(new URL('/en/sa/riyadh', request.url), 308);
+    }
+    if (geoCountry === 'PK') {
+      return NextResponse.redirect(new URL('/en/pk/karachi', request.url), 308);
+    }
+    return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}`, request.url), 308);
   }
 
   // Check if pathname starts with a supported locale (/en, /ur, /ar)
@@ -108,29 +119,24 @@ export function middleware(request: NextRequest) {
   const firstSegment = segments[0]?.toLowerCase();
   const isSupportedLocale = SUPPORTED_LOCALES.includes(firstSegment);
 
-  // If path has no valid locale prefix: prefix with /en/[country]/[city]
+  // If path has no valid locale prefix: prefix with /en
   if (!isSupportedLocale) {
-    const targetCountry = regionInfo.country;
-    const targetCity = detectedCitySlug;
     return NextResponse.redirect(
-      new URL(`/${DEFAULT_LOCALE}/${targetCountry}/${targetCity}${pathname}`, request.url),
+      new URL(`/${DEFAULT_LOCALE}${pathname}`, request.url),
       308
     );
   }
 
   const lang = firstSegment;
 
-  // Case A: Just "/en", "/ur", or "/ar" -> Redirect to localized default city!
+  // Case A: Just "/en", "/ur", or "/ar" -> Render the Global Directory Portal!
   if (segments.length === 1) {
-    const targetCountry = lang === 'ar' ? 'ae' : regionInfo.country;
-    const targetCity = COUNTRY_DEFAULTS[targetCountry] || 'karachi';
-    return NextResponse.redirect(
-      new URL(`/${lang}/${targetCountry}/${targetCity}`, request.url),
-      308
-    );
+    const response = NextResponse.next();
+    response.headers.set('x-baseera-lang', lang);
+    return response;
   }
 
-  // Case B: Just "/en/pk", "/ur/pk", or "/en/ae" (missing city segment) -> Complete the Silo URL!
+  // Case B: Just "/en/pk", "/ur/pk", or "/en/ae" (country hub without city) -> Go to primary city
   if (segments.length === 2) {
     const country = segments[1].toLowerCase();
     const targetCity = COUNTRY_DEFAULTS[country] || 'karachi';

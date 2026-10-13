@@ -27,6 +27,7 @@ import {
   SlidersHorizontal,
   ThumbsUp,
   Briefcase,
+  Globe,
 } from 'lucide-react';
 
 export {
@@ -57,6 +58,7 @@ export {
   SlidersHorizontal,
   ThumbsUp,
   Briefcase,
+  Globe,
 };
 
 // Official Brand WhatsApp SVG Icon
