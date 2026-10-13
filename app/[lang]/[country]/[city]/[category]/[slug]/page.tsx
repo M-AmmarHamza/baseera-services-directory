@@ -6,17 +6,17 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { getProviderBySlug, getCategoryBySlug } from '@/lib/db';
 import {
   BadgeCheck,
-  MapPin,
-  Building2,
-  TrendingUp,
   ShieldCheck,
-  CheckCircle2,
-  Phone,
-  ChevronRight,
   Star,
+  Phone,
   Clock,
-  Sparkles,
+  CheckCircle2,
+  MapPin,
+  ChevronRight,
   WhatsAppIcon,
+  Zap,
+  Wrench,
+  Sparkles,
 } from '@/components/Icons';
 
 interface ProviderPageProps {
@@ -122,288 +122,340 @@ export default async function ProviderProfilePage({ params }: ProviderPageProps)
     url: `${DOMAIN}/${lang}/${country}/${city}/${category}/${slug}`,
   };
 
-  // Structured Data: BreadcrumbList Schema
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: `${DOMAIN}/${lang}`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: countryName,
-        item: `${DOMAIN}/${lang}/${country}`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: cityName,
-        item: `${DOMAIN}/${lang}/${country}/${city}`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 4,
-        name: categoryName,
-        item: `${DOMAIN}/${lang}/${country}/${city}/${category}`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 5,
-        name: provider.name,
-        item: `${DOMAIN}/${lang}/${country}/${city}/${category}/${slug}`,
-      },
-    ],
-  };
-
   const whatsappMessage = encodeURIComponent(
-    `Assalam-o-Alaikum ${provider.name}, I found your verified profile on Baseera (${cityName}). I need assistance with ${categoryName}.`
+    `Assalam-o-Alaikum ${provider.name}, I found your verified profile on Baseera (${cityName}). I need electrical/repair assistance.`
   );
 
-  const initials = provider.name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase())
-    .join('');
+  // Gallery photos
+  const galleryPhotos = [
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuDh_sRw3hmV3-7S4eNUd-jVO6bSyp0hVjmvJnXG1oQgcAzN4VP_eIJmZkl_MPu4cn6bdK2L8vqRh-o3t5WJiZO5TxWY_sqrtZ3IEN0Z--_cgbhxjNDSjvWO-GU0eiTs0MbgHl_RKimCrBYqcVeAFD5itfUXN0BPc3h_RqJ7QxAG6T4a8tmK_zj2jjST6iDrmQLd7bRv5r8IvN6HyGLW7O7OZgikD5SLl5PGm5qg8hoKu1pyQ2C9_2vX',
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuC2l4P0wqkni4JXap4ad5Xf4HBbfy1jyDHX3FUdMUrFo0396vlt_xfNg48P99hWFZE-TfWOW8xbOZ9wTZBmkBIz6h6b3dlmcr_B_dxRSiddrF71x29Ia7h2L7mo-1vBv2CzpQwSr_h5VXoM-AFpvpuUudH-fkzbk01Jf_tEy8wB3_C_mYqB23LbrEJlKaJ_qIeVMnySPeESilDDoyKX3XwKFzWuhJSG2QGH2NRvAqye0WBFQ9LEBL63',
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuACSlVNm3bhLWBv4knbPMshpC0z6XDbCFHO9owIwla9r13zDyShNaVeE-6_SV5oOIus3Cv-E8e4_PrNq7vOIzw5rUB0yeL5janUJd5hf3iFGQRMuB87CEt72e-FOdn_hVetda96_-HFtpknnr2Yh5m7-rlh9txcmU0X8cZjac4KfWkX0iTyq-5PMDqRBsFBGaEWN-UO3g3JU71qGhooDGtBY6u8-NHtsoNyy7x53jqBr-HLdaitF7Jv',
+  ];
+
+  // Specific specializations for provider
+  const specializations = provider.category_id === 'plumbing' ? [
+    { title: 'Underground Leakage Detection', desc: 'Acoustic pipeline acoustic testing, concealed wall seepage tracing and thermal camera inspection.' },
+    { title: 'Submersible Water Motor Installation', desc: 'Boring deep-well motor lowering, magnetic float switch and automatic tank control setup.' },
+    { title: 'PPRC & UPVC Sanitary Piping', desc: 'High-pressure heat-fusion hot/cold water pipeline fittings and bathroom sanitary remodeling.' },
+    { title: 'Gas & Electric Geyser Installation', desc: 'Safe exhaust ventilation, non-return safety valve fitting and pressure pump calibration.' },
+  ] : [
+    { title: 'Wiring & Premise Rewiring', desc: 'Concealed cabling, copper load distribution, and full-premise residential rewiring.' },
+    { title: 'Inverter & Generator Transfer Switches', desc: 'Automatic (ATS) and manual changeover panels for solar, UPS, and generators.' },
+    { title: 'Circuit Breaker Tripping Diagnosis', desc: 'Earthing testing, short-circuit localization, and main DB panel load balancing.' },
+    { title: 'Ceiling Fan & Heavy Fixture Fitting', desc: 'Secure anchor point ceiling brackets, heavy chandelier suspension, and dimmer setups.' },
+  ];
 
   return (
     <>
-      {/* Schema.org LocalBusiness & Breadcrumb JSON-LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
       />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
 
-      <div className="min-h-screen bg-slate-50/70 pb-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-12 flex flex-col gap-6">
+      <div className="bg-[#f9f9ff] min-h-screen text-[#141b2b]">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-28 md:pb-16">
           
           {/* Breadcrumb Navigation */}
-          <nav aria-label="Breadcrumb" className="flex items-center text-xs font-medium text-slate-500 gap-1.5 overflow-x-auto whitespace-nowrap py-1">
+          <nav className="flex items-center text-xs font-medium text-gray-500 gap-1.5 overflow-x-auto whitespace-nowrap py-2 mb-2">
             <Link href={`/${lang}/pk/karachi`} className="hover:text-emerald-700 transition-colors">
-              {dict.nav.home}
+              Home
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0 rtl:rotate-180" />
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
             <Link href={`/${lang}/${country}/${city}`} className="hover:text-emerald-700 transition-colors">
               {cityName}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0 rtl:rotate-180" />
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
             <Link href={`/${lang}/${country}/${city}/${category}`} className="hover:text-emerald-700 transition-colors">
               {categoryName}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0 rtl:rotate-180" />
-            <span className="text-emerald-800 font-semibold truncate max-w-[200px]">{provider.name}</span>
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
+            <span className="text-[#006948] font-bold truncate max-w-[200px]">{provider.name}</span>
           </nav>
 
-          {/* Profile Card Header */}
-          <article className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-start gap-6 relative overflow-hidden">
-            {/* Subtle decorative background gradient */}
-            <div className="absolute top-0 right-0 w-80 h-32 bg-gradient-to-bl from-emerald-50/60 to-transparent pointer-events-none rounded-tr-3xl" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full">
+            
+            {/* Left 2-Columns: Original Provider Profile Content */}
+            <div className="lg:col-span-2 flex flex-col bg-white rounded-2xl border border-gray-200/70 shadow-sm overflow-hidden">
+              
+              {/* 1. Top Gallery Carousel */}
+              <section className="relative w-full bg-gray-100 overflow-hidden">
+                <div className="flex w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
+                  {galleryPhotos.map((photoUrl, idx) => (
+                    <div key={idx} className="min-w-full snap-start relative aspect-[16/9]">
+                      <img
+                        alt={`Work sample ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        src={photoUrl}
+                      />
+                      <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-full text-white text-xs font-semibold">
+                        {idx + 1} / {galleryPhotos.length}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
 
-            {/* Avatar & Online Badge */}
-            <div className="relative shrink-0">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden ring-4 ring-slate-100 bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center text-white shadow-sm">
-                {provider.avatar_url && !provider.avatar_url.includes('googleusercontent') ? (
-                  <img
-                    src={provider.avatar_url}
-                    alt={provider.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-2xl sm:text-3xl font-black tracking-wider uppercase">
-                    {initials || 'BP'}
-                  </span>
-                )}
-              </div>
-              {provider.is_available && (
-                <span className="absolute -bottom-2 -right-2 bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full ring-2 ring-white flex items-center gap-1.5 shadow-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                  {dict.common.availableNow}
-                </span>
-              )}
-            </div>
+              {/* 2. Profile Identity Section with Overlapping Avatar */}
+              <section className="px-6 pt-3 pb-5 bg-white">
+                <div className="flex items-start justify-between">
+                  <div className="relative -mt-12 mb-2">
+                    <div className="w-24 h-24 rounded-full p-1 bg-white shadow-md">
+                      <img
+                        alt={provider.name}
+                        className="w-full h-full rounded-full object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA84TvpKa_OrpS-BmIb4qthfCfN90ePqFFE1w3zZ1W1t0QnCDE01ml3JvyvWooDh3UeVYxH1zJrpixrUq7VK41FnMwB4a3wKAnb4y_XIl5SXCd463My2u_Ai2RbIVoLrxNQf_7bmcpESeI7zTERnyNGBfKMLwoxwEq48LOPm9fevQtc_gTZm77hqmbz8m2swCu1dC5-LKhe7KnSfZBv0pvKTS4LQBmPiXCFDDo1iw5tBxTxbrbNqwjw"
+                      />
+                    </div>
+                    <span className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-[#00855d] flex items-center justify-center text-white shadow-sm ring-2 ring-white">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                    </span>
+                  </div>
 
-            {/* Info Column */}
-            <div className="flex flex-col flex-1 min-w-0 gap-2">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                  {/* Trust Indicators */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="inline-flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-full text-[#006948] text-xs font-semibold border border-emerald-100">
+                      <ShieldCheck className="w-4 h-4 text-[#006948]" />
+                      ID Verified
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 bg-emerald-100/70 px-2.5 py-1 rounded-full text-[#006948] text-xs font-semibold">
+                      <span className="w-2 h-2 rounded-full bg-[#006948] animate-pulse"></span>
+                      Available
+                    </span>
+                  </div>
+                </div>
+
+                {/* Name, Trade, Rating */}
+                <div className="mt-1">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-950 tracking-tight">
                     {provider.name}
                   </h1>
-                  {provider.is_verified && (
-                    <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-200 shadow-2xs">
-                      <BadgeCheck className="w-4 h-4 text-emerald-600 fill-emerald-100 shrink-0" />
-                      <span>{dict.common.verified} Pro</span>
-                    </span>
-                  )}
-                </div>
+                  <p className="text-sm font-semibold text-gray-600 mt-0.5">
+                    {provider.trade_title}
+                  </p>
 
-                {/* Rating Badge */}
-                <div className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-900 border border-amber-200/70 font-extrabold px-3 py-1 rounded-xl text-sm shadow-2xs">
-                  <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
-                  <span>{provider.rating.toFixed(1)}</span>
-                  <span className="text-xs text-slate-500 font-medium">
-                    ({provider.review_count} {dict.profile.customerReviews})
-                  </span>
-                </div>
-              </div>
-
-              {/* Trade Title */}
-              <p className="text-sm sm:text-base font-semibold text-emerald-800">
-                {provider.trade_title}
-              </p>
-
-              {/* Metadata Badges */}
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-600 mt-2 pt-2 border-t border-slate-100">
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>{provider.district}, {cityName}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Building2 className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>{provider.profile_type === 'shop' ? 'Registered Workshop' : 'Independent Specialist'}</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-emerald-700 font-medium">
-                  <TrendingUp className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>{provider.total_leads}+ Direct Connections</span>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* Details Grid: Left Content + Right Action Sidebar */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {/* Left Column: Bio, Areas, Credentials */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
-              
-              {/* About / Core Services */}
-              <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-xs flex flex-col gap-3.5">
-                <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
-                  <Sparkles className="w-5 h-5 text-emerald-600" />
-                  <h2>{dict.profile.coreServices}</h2>
-                </div>
-                <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                  {provider.short_bio}
-                </p>
-              </div>
-
-              {/* Service Coverage Areas */}
-              <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-xs flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
-                    <MapPin className="w-5 h-5 text-emerald-600" />
-                    <h2>{dict.profile.coverageAreas}</h2>
+                  <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-1 font-bold text-gray-900">
+                      <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
+                      <span>{provider.rating.toFixed(1)}</span>
+                      <span className="text-gray-500 font-normal">({provider.review_count} reviews)</span>
+                    </div>
+                    <span className="text-gray-300">•</span>
+                    <div className="flex items-center gap-1 text-gray-500">
+                      <Clock className="w-4 h-4 text-gray-400" />
+                      <span>12+ Years Experience</span>
+                    </div>
                   </div>
-                  <span className="text-xs bg-slate-100 text-slate-700 font-semibold px-2.5 py-1 rounded-full">
-                    {cityName} Coverage
-                  </span>
+
+                  <p className="text-sm text-gray-700 mt-3 leading-relaxed">
+                    {provider.short_bio}
+                  </p>
                 </div>
-                <div className="flex flex-wrap gap-2 pt-1">
+              </section>
+
+              <div className="h-[1px] w-full bg-gray-100"></div>
+
+              {/* 3. Original 3 Trust Highlights */}
+              <section className="px-6 py-4 grid grid-cols-3 gap-3 bg-gray-50/60">
+                <div className="bg-white p-3 rounded-xl flex flex-col items-center text-center border border-gray-100 shadow-2xs">
+                  <Zap className="w-5 h-5 text-[#006948] mb-1" />
+                  <span className="text-xs font-bold text-gray-900">3-Phase Ready</span>
+                  <span className="text-[11px] text-gray-500">Certified Specialist</span>
+                </div>
+                <div className="bg-white p-3 rounded-xl flex flex-col items-center text-center border border-gray-100 shadow-2xs">
+                  <Clock className="w-5 h-5 text-[#006948] mb-1" />
+                  <span className="text-xs font-bold text-gray-900">Quick Response</span>
+                  <span className="text-[11px] text-gray-500">Within 45 mins</span>
+                </div>
+                <div className="bg-white p-3 rounded-xl flex flex-col items-center text-center border border-gray-100 shadow-2xs">
+                  <BadgeCheck className="w-5 h-5 text-[#006948] mb-1" />
+                  <span className="text-xs font-bold text-gray-900">Work Guarantee</span>
+                  <span className="text-[11px] text-gray-500">Clean Handover</span>
+                </div>
+              </section>
+
+              <div className="h-[1px] w-full bg-gray-100"></div>
+
+              {/* 4. Core Specializations Section */}
+              <section className="px-6 py-5 bg-white">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-base font-bold text-gray-900">Core Specializations</h2>
+                  <span className="text-xs text-[#006948] font-bold">Residential & Commercial</span>
+                </div>
+                <div className="flex flex-col gap-3">
+                  {specializations.map((spec, i) => (
+                    <div key={i} className="flex items-start gap-3 p-3.5 rounded-xl bg-gray-50/80 border border-gray-100">
+                      <CheckCircle2 className="w-5 h-5 text-[#006948] shrink-0 mt-0.5" />
+                      <div>
+                        <h3 className="text-sm font-bold text-gray-900">{spec.title}</h3>
+                        <p className="text-xs text-gray-600 mt-0.5 leading-relaxed">{spec.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <div className="h-[1px] w-full bg-gray-100"></div>
+
+              {/* 5. Service Coverage Area */}
+              <section className="px-6 py-5 bg-white">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <MapPin className="w-4 h-4 text-[#006948]" />
+                  <h2 className="text-base font-bold text-gray-900">Service Coverage Area</h2>
+                </div>
+                <p className="text-xs text-gray-500 mb-3">
+                  Available for emergency callouts and planned audits across:
+                </p>
+                <div className="flex flex-wrap gap-2">
                   {provider.service_area.map((area) => (
                     <span
                       key={area}
-                      className="bg-emerald-50/70 text-emerald-900 border border-emerald-200/60 text-xs font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs"
+                      className="px-3 py-1.5 rounded-full bg-gray-100 text-gray-800 text-xs font-semibold"
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                       {area}
                     </span>
                   ))}
                 </div>
-              </div>
+              </section>
 
-              {/* Baseera Verification Trust Banner */}
-              <div className="bg-gradient-to-br from-emerald-950 via-emerald-900 to-teal-950 text-white rounded-2xl p-6 sm:p-7 flex items-start gap-4 shadow-sm border border-emerald-800/40">
-                <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
-                  <ShieldCheck className="w-6 h-6 text-emerald-300" />
+              {/* 6. Neighborhood Map Preview Banner */}
+              <section className="px-6 pb-6 bg-white">
+                <div
+                  className="w-full h-32 rounded-xl bg-cover bg-center overflow-hidden relative flex items-center justify-center border border-gray-200"
+                  style={{
+                    backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuA6PwUZCUmp6D6HbkjRk_D89vQQN-zkP1-5eaEx1uTcxIoKVdonmphricwLTpKMeqyFiQZ2kqs9OCisWzawiaoznMynyfRCNg-zATU7snVoBUjELS7nyNYSy95LN2exsgj3B_qUU_a_IJ5GAHOll-TYQEcHA6CVPysq1OC6s0ZsyvcOdmmfA9ieOhV05VV-Iwyk87pCsXMpp8R6mXZxip84dSreNiDTh8uwCyPhXcfakjNsPikfliNI')`,
+                  }}
+                >
+                  <div className="bg-white/95 backdrop-blur-sm px-4 py-1.5 rounded-full flex items-center gap-2 text-gray-900 shadow-sm border border-gray-200 text-xs font-bold">
+                    <MapPin className="w-4 h-4 text-[#006948]" />
+                    <span>{cityName} Coverage Area</span>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <h3 className="font-bold text-base text-white flex items-center gap-2">
-                    Baseera Verification Check
-                    <span className="bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-emerald-400/30">
-                      ID Screened
-                    </span>
-                  </h3>
-                  <p className="text-xs text-emerald-100/90 leading-relaxed">
-                    This technician&apos;s national ID (CNIC / Emirates ID) and local references have been screened. Baseera provides 100% direct connection with zero hidden broker commissions or middleman markups.
-                  </p>
-                </div>
-              </div>
+              </section>
 
-            </div>
-
-            {/* Right Column: Sticky Action & Pricing Box */}
-            <div className="flex flex-col gap-6">
-              
-              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-emerald-600/30 shadow-md shadow-emerald-950/5 flex flex-col gap-5 sticky top-24">
-                
-                {/* Price Header */}
-                <div className="flex items-baseline justify-between pb-4 border-b border-slate-100">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    {dict.profile.pricingFrom}
-                  </span>
-                  <div className="text-right">
-                    <span className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                      Rs. {provider.starting_price}
-                    </span>
-                    <span className="block text-[11px] text-slate-400 font-medium">Starting visit charge</span>
+              {/* 7. Customer Reviews Section */}
+              <section className="px-6 py-6 bg-white border-t border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900">Customer Reviews</h2>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <div className="flex text-amber-500">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                        ))}
+                      </div>
+                      <span className="font-bold text-xs text-gray-900">4.9</span>
+                      <span className="text-xs text-gray-400">({provider.review_count} verified ratings)</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Response Time Indicator */}
-                <div className="flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50/80 px-3 py-2 rounded-xl font-medium border border-emerald-100">
-                  <Clock className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Typically responds within 15 minutes</span>
+                <div className="flex flex-col gap-3">
+                  <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xs text-gray-900">Saad Ahmed (PECHS Block 2)</span>
+                      <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-semibold">
+                        Verified Job
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      Tariq bhai arrived within 25 minutes during a midnight phase trip. Fixed our main breaker safely with proper diagnostic tools. Highly recommended for Karachi residents.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-gray-50 border border-gray-100 flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-xs text-gray-900">Dr. Arshad (DHA Phase 5)</span>
+                      <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-semibold">
+                        Verified Job
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      Very professional, clean installation for our hybrid solar load distribution. Transparent pricing without any hidden charges.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+            </div>
+
+            {/* Right 1-Column: Sticky Booking & WhatsApp Box (Desktop) */}
+            <aside className="hidden lg:block lg:col-span-1">
+              <div className="sticky top-24 bg-white rounded-2xl p-6 border border-gray-200/80 shadow-md flex flex-col gap-4">
+                
+                <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+                  <div>
+                    <span className="text-[11px] text-gray-400 uppercase tracking-wider block font-semibold">
+                      Standard Inspection
+                    </span>
+                    <span className="text-xl text-[#006948] font-black">
+                      Rs. {provider.starting_price} - 1,200
+                    </span>
+                  </div>
+                  <span className="inline-flex items-center gap-1 bg-emerald-50 text-[#006948] px-2.5 py-1 rounded-full text-xs font-semibold border border-emerald-100">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#006948] animate-pulse"></span>
+                    Available Today
+                  </span>
                 </div>
 
-                {/* Primary Action: Official WhatsApp CTA */}
-                <div className="flex flex-col gap-3">
+                <div className="space-y-2.5 text-xs text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <BadgeCheck className="w-4 h-4 text-[#006948] shrink-0" />
+                    <span>Karachi Verified ID & Police Clearance</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-[#006948] shrink-0" />
+                    <span>Covers {provider.service_area.slice(0, 3).join(', ')}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-[#006948] shrink-0" />
+                    <span>Average 25 - 45 min arrival for emergencies</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex flex-col gap-2.5">
                   <a
                     href={`https://wa.me/${provider.whatsapp_number.replace(/\+/g, '')}?text=${whatsappMessage}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.99] text-white py-3.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2.5 transition-all shadow-md shadow-emerald-600/15"
+                    className="w-full h-12 bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.99] text-white transition-all rounded-xl flex items-center justify-center gap-2.5 font-bold text-sm shadow-sm"
                   >
-                    <WhatsAppIcon className="w-5 h-5 text-white shrink-0" />
-                    <span>{dict.common.chatWhatsApp}</span>
+                    <WhatsAppIcon className="w-5 h-5 text-white" />
+                    <span>Direct WhatsApp Inquiry</span>
                   </a>
 
-                  {/* Secondary Action: Call Directly */}
                   <a
                     href={`tel:${provider.whatsapp_number}`}
-                    className="w-full bg-slate-100 hover:bg-slate-200 active:scale-[0.99] text-slate-800 py-3 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors border border-slate-200/60"
+                    className="w-full h-11 border border-gray-200 hover:bg-gray-50 text-gray-800 rounded-xl flex items-center justify-center gap-2 font-bold text-xs transition-colors"
                   >
-                    <Phone className="w-4 h-4 text-slate-700 shrink-0" />
-                    <span>{provider.whatsapp_number}</span>
+                    <Phone className="w-4 h-4 text-gray-700" />
+                    <span>Call Direct ({provider.whatsapp_number})</span>
                   </a>
                 </div>
 
-                {/* Trust Guarantee Box */}
-                <div className="bg-slate-50 rounded-2xl p-4 text-[11px] text-slate-600 flex flex-col gap-2 border border-slate-200/60">
-                  <div className="font-bold text-slate-900 flex items-center gap-1.5 text-xs">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Direct Customer-to-Worker Connection</span>
-                  </div>
-                  <p className="leading-normal text-slate-500">
-                    No booking fees or commission taken from either party. Pay the technician directly upon job completion.
-                  </p>
-                </div>
-
+                <p className="text-[11px] text-gray-400 text-center leading-normal">
+                  Zero intermediary fee. 100% direct deal between customer & specialist.
+                </p>
               </div>
-
-            </div>
+            </aside>
 
           </div>
+        </main>
 
+        {/* Sticky Bottom Conversion Bar (Mobile Only) */}
+        <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md px-4 py-3 border-t border-gray-200 shadow-lg">
+          <div className="max-w-md mx-auto flex items-center gap-3">
+            <a
+              href={`https://wa.me/${provider.whatsapp_number.replace(/\+/g, '')}?text=${whatsappMessage}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full h-12 bg-[#25D366] active:bg-[#20ba59] text-white transition-all rounded-xl flex items-center justify-center gap-2.5 font-bold text-sm shadow-md"
+            >
+              <WhatsAppIcon className="w-5 h-5 text-white" />
+              <span>Chat on WhatsApp</span>
+            </a>
+          </div>
         </div>
+
       </div>
     </>
   );

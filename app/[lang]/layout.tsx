@@ -32,15 +32,17 @@ export default async function RootLayout({
             {/* Logo & Locality */}
             <div className="flex items-center gap-3">
               <Link href={`/${lang}/pk/karachi`} className="flex items-center gap-2.5 group">
-                <div className="w-9 h-9 rounded-xl bg-[#006948] flex items-center justify-center text-white font-bold text-lg shadow-sm group-hover:bg-[#00855d] transition-colors">
-                  ب
-                </div>
+                <img
+                  alt="Baseera Logo"
+                  className="h-8 w-auto object-contain group-hover:scale-105 transition-transform"
+                  src="https://lh3.googleusercontent.com/aida/AEtjO1VifhEhAnyGcIMAzyuf5f1JiVQATzvcwJzkzN2D-g0gIhjkGPPHeQREP_6GXBi6qybDjnH1LpSOIiSsTUAUXGJxnyUWu4N8xlrBq6aC66NMIaHPa5Gcghl7Cayh0drMuGxb7JnbeMzXIYNY2GAaFw7XfnX36ysQ37W_WDJ0XXRu7EXEz0YyabfgENet5RdeIkW4OGCMK00BuGwq07GuCnFh2NtO3g4vUFFUjgwvkpndlGWwfV8ALvSw_3Q"
+                />
                 <div className="flex flex-col">
                   <span className="font-extrabold text-lg text-gray-950 tracking-tight leading-none">
-                    {dict.common.brand}
+                    Baseera
                   </span>
                   <span className="text-[11px] text-gray-500 font-semibold tracking-wider uppercase mt-0.5">
-                    {dict.common.tagline}
+                    Karachi
                   </span>
                 </div>
               </Link>
