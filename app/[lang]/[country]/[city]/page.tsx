@@ -1,8 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { getDictionary } from '@/lib/get-dictionary';
-import { getProviders, CATEGORIES } from '@/lib/db';
+import { getProviders, CATEGORIES, getCountryByCode, getAllProviders } from '@/lib/db';
 import SearchBar from '@/components/SearchBar';
 import {
   CategoryIcon,
@@ -10,8 +9,19 @@ import {
   WhatsAppIcon,
   Star,
   BadgeCheck,
+  ShieldCheck,
+  Globe,
   Clock,
 } from '@/components/Icons';
+
+const PROVIDER_PHOTOS: Record<string, string> = {
+  'tariq-mahmood': 'https://lh3.googleusercontent.com/aida-public/AB6AXuBK9qWTJzXQzuvOCxeaY9oaT5QnMSIE_WRvPrYq3ndOxqfGwgRJiuusiLQI6ptKnL9aXydagk97uFwsxC7j-gxTH2VH5N_HAJpsT3T0CG_IE0OBqsRNY1C_6XY0VC8sNDh1YBotW-weRk3E7XwleN6ZT1cvkRynmWL_e-anI_it8xQNPs3oqJRRO7Xrk7PfW-P6i2RwcClJxEboVmdY8ZF6bL0HcCJgGu5qW0x9sje5DlC6qn7x4H7V',
+  'kashif-ali': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDrVEOf4Kmm3ZmFg2SVyQFHc7CD8jvopigKY9y06BL7csj1WLTVWDmQqVt9BLA-VImJWY1FnjTlOTMBdLORMVFgTEdwQKPPqGcSnJWhS5AriQLENY6vHirxqBOzQHMWyqZjRyr6tgRG-1ieePqu9nM2GIZj-GUmMil3H8fWsOahBKbVJj1EXc7oGAdad_P_Cb1e1CbAKo9FYlkkU-0dpz0biB1i9POZASr1lFg6dTIGFODNEO_8u9eb',
+  'farzana-kitchen': 'https://lh3.googleusercontent.com/aida-public/AB6AXuBZZ3jFfYAUp1f6ZwaA3bw9DUYqcbD067tf2DiX2SWLVRwTUhafGFCOzOzsUTICpmDPFe91mBv1GRm3r-qyUJZbnBeN57VtXsCuKHMVsXx1aioXkyo3Sw6_yQg78DkkPYzj3soUYY7YS49NK-hbHVquzL-bkNCxoWMINuv2OS5c5kG0a8JFOI5irxZcGHL_fDVrQ4YMj7ltf8FV7Xr-DHs1rDSBoxy0sTlo2SIaOGOn_DXV-DBQ1RiE',
+  'saleem-master-plumber': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDh_sRw3hmV3-7S4eNUd-jVO6bSyp0hVjmvJnXG1oQgcAzN4VP_eIJmZkl_MPu4cn6bdK2L8vqRh-o3t5WJiZO5TxWY_sqrtZ3IEN0Z--_cgbhxjNDSjvWO-GU0eiTs0MbgHl_RKimCrBYqcVeAFD5itfUXN0BPc3h_RqJ7QxAG6T4a8tmK_zj2jjST6iDrmQLd7bRv5r8IvN6HyGLW7O7OZgikD5SLl5PGm5qg8hoKu1pyQ2C9_2vX',
+  'rashid-al-nuaimi': 'https://lh3.googleusercontent.com/aida-public/AB6AXuC2l4P0wqkni4JXap4ad5Xf4HBbfy1jyDHX3FUdMUrFo0396vlt_xfNg48P99hWFZE-TfWOW8xbOZ9wTZBmkBIz6h6b3dlmcr_B_dxRSiddrF71x29Ia7h2L7mo-1vBv2CzpQwSr_h5VXoM-AFpvpuUudH-fkzbk01Jf_tEy8wB3_C_mYqB23LbrEJlKaJ_qIeVMnySPeESilDDoyKX3XwKFzWuhJSG2QGH2NRvAqye0WBFQ9LEBL63',
+  'asif-electric-works': 'https://lh3.googleusercontent.com/aida-public/AB6AXuACSlVNm3bhLWBv4knbPMshpC0z6XDbCFHO9owIwla9r13zDyShNaVeE-6_SV5oOIus3Cv-E8e4_PrNq7vOIzw5rUB0yeL5janUJd5hf3iFGQRMuB87CEt72e-FOdn_hVetda96_-HFtpknnr2Yh5m7-rlh9txcmU0X8cZjac4KfWkX0iTyq-5PMDqRBsFBGaEWN-UO3g3JU71qGhooDGtBY6u8-NHtsoNyy7x53jqBr-HLdaitF7Jv',
+};
 
 interface PageProps {
   params: Promise<{
@@ -26,11 +36,11 @@ const DOMAIN = 'https://baseera-services-directory.vercel.app';
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, country, city } = await params;
   const cityName = city.charAt(0).toUpperCase() + city.slice(1);
-  const countryCode = country.toUpperCase();
-  const countryName = countryCode === 'PK' ? 'Pakistan' : countryCode === 'AE' ? 'United Arab Emirates' : countryCode;
+  const countryObj = getCountryByCode(country);
+  const countryName = countryObj.name;
 
-  const title = `Baseera ${cityName} - Direct Local Services Directory`;
-  const description = `Connect directly with verified local specialists across ${cityName} without intermediaries, commissions, or delay.`;
+  const title = `Baseera ${cityName}, ${countryName} - Direct Local Services Directory`;
+  const description = `Connect directly with verified local specialists across ${cityName}, ${countryName} without intermediaries, commissions, or delay.`;
   const canonicalUrl = `${DOMAIN}/${lang}/${country}/${city}`;
 
   return {
@@ -59,8 +69,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CityHomePage({ params }: PageProps) {
   const { lang, country, city } = await params;
-  const dict = await getDictionary(lang);
-  const providers = await getProviders(city);
+  const rawProviders = await getProviders(city);
+  const countryObj = getCountryByCode(country);
+  const countryName = countryObj.name;
+  const isNewCity = rawProviders.length === 0;
+  const providers = isNewCity ? (await getAllProviders()).slice(0, 3) : rawProviders;
 
   const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   const countryCode = country.toUpperCase();
@@ -210,7 +223,34 @@ export default async function CityHomePage({ params }: PageProps) {
             </div>
           </section>
 
-          {/* Featured Community Specialists */}
+          {/* New City Onboarding Banner if applicable */}
+          {isNewCity && (
+            <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-6 text-center shadow-2xs">
+              <span className="text-3xl mb-2 block">{countryObj.flag}</span>
+              <h3 className="font-extrabold text-lg text-gray-900">
+                Network Expanding to {cityName}, {countryName}!
+              </h3>
+              <p className="text-xs text-gray-600 max-w-lg mx-auto mt-1 leading-relaxed">
+                We are actively onboarding verified independent technicians, electricians, and plumbers in {cityName}. Zero commissions, 100% direct customer WhatsApp contact.
+              </p>
+              <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
+                <Link
+                  href="/provider-dashboard.html"
+                  className="px-4 py-2 rounded-xl bg-[#006948] text-white text-xs font-bold hover:bg-[#00855d] transition-all shadow-xs"
+                >
+                  Join as {cityName} Vendor (Free)
+                </Link>
+                <Link
+                  href={`/${lang}`}
+                  className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs font-bold hover:bg-gray-50 transition-all"
+                >
+                  Browse All Countries
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Featured Community Specialists - Exact Legacy Card Style */}
           <section className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <div>
@@ -218,71 +258,131 @@ export default async function CityHomePage({ params }: PageProps) {
                   Featured Verified Specialists
                 </h2>
                 <p className="text-xs text-gray-500">
-                  Direct connection with zero intermediary commissions
+                  {isNewCity
+                    ? `Showing verified network pros ready for service inquiries`
+                    : `Direct connection with zero intermediary commissions in ${cityName}`}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {providers.map((pro) => (
-                <article
-                  key={pro.id}
-                  className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs flex flex-col justify-between hover:border-[#006948] hover:shadow-md transition-all gap-4"
-                >
-                  <div className="flex items-start gap-3.5">
-                    <div className="w-14 h-14 rounded-full p-0.5 bg-white shadow-sm ring-1 ring-gray-200 shrink-0">
-                      <img
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA84TvpKa_OrpS-BmIb4qthfCfN90ePqFFE1w3zZ1W1t0QnCDE01ml3JvyvWooDh3UeVYxH1zJrpixrUq7VK41FnMwB4a3wKAnb4y_XIl5SXCd463My2u_Ai2RbIVoLrxNQf_7bmcpESeI7zTERnyNGBfKMLwoxwEq48LOPm9fevQtc_gTZm77hqmbz8m2swCu1dC5-LKhe7KnSfZBv0pvKTS4LQBmPiXCFDDo1iw5tBxTxbrbNqwjw"
-                        alt={pro.name}
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                    </div>
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-1">
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <h3 className="font-bold text-base text-gray-900 truncate">{pro.name}</h3>
-                          {pro.is_verified && (
-                            <BadgeCheck className="w-4 h-4 text-[#006948] shrink-0" />
-                          )}
+            {/* Cards: Horizontal Scroll on Mobile, 3-Col Grid on Desktop */}
+            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 pt-0.5 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-x-visible">
+              {providers.map((pro) => {
+                const coverImg =
+                  PROVIDER_PHOTOS[pro.slug] ||
+                  pro.avatar_url ||
+                  'https://lh3.googleusercontent.com/aida-public/AB6AXuBK9qWTJzXQzuvOCxeaY9oaT5QnMSIE_WRvPrYq3ndOxqfGwgRJiuusiLQI6ptKnL9aXydagk97uFwsxC7j-gxTH2VH5N_HAJpsT3T0CG_IE0OBqsRNY1C_6XY0VC8sNDh1YBotW-weRk3E7XwleN6ZT1cvkRynmWL_e-anI_it8xQNPs3oqJRRO7Xrk7PfW-P6i2RwcClJxEboVmdY8ZF6bL0HcCJgGu5qW0x9sje5DlC6qn7x4H7V';
+
+                const profileLink = `/${lang}/${country}/${city}/${pro.category_id}/${pro.slug}`;
+                const defaultTags =
+                  pro.service_area && pro.service_area.length > 0
+                    ? pro.service_area.slice(0, 3)
+                    : ['Quick Response', 'Work Guarantee', 'Verified'];
+
+                return (
+                  <div
+                    key={pro.id}
+                    className="flex flex-col w-[290px] shrink-0 md:w-auto md:shrink bg-[#f1f3ff]/60 rounded-2xl p-4 shadow-2xs justify-between hover:shadow-md transition-all border border-gray-200/70"
+                  >
+                    <div>
+                      {/* Cover photo with rating and verified badge - Exact Legacy */}
+                      <Link
+                        href={profileLink}
+                        className="block relative w-full h-36 rounded-xl overflow-hidden mb-3 bg-gray-200 group"
+                      >
+                        <img
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          alt={pro.name}
+                          src={coverImg}
+                        />
+                        <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+                          <span className="text-xs font-bold text-gray-900">{pro.rating}</span>
+                          <span className="text-[11px] text-gray-500">({pro.review_count})</span>
                         </div>
-                        <span className="text-xs bg-amber-50 text-amber-900 border border-amber-200 font-extrabold px-2 py-0.5 rounded-md shrink-0 flex items-center gap-1">
-                          <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
-                          {pro.rating}
-                        </span>
+                        {pro.is_verified && (
+                          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-[#006948] text-white px-2 py-0.5 rounded-md text-[11px] font-bold shadow-xs">
+                            <BadgeCheck className="w-3.5 h-3.5 text-white" />
+                            <span>Verified Pro</span>
+                          </div>
+                        )}
+                      </Link>
+
+                      {/* Details */}
+                      <div className="flex flex-col">
+                        <div className="flex items-center justify-between">
+                          <Link
+                            href={profileLink}
+                            className="font-bold text-base text-gray-950 truncate hover:text-[#006948] transition-colors"
+                          >
+                            {pro.name}
+                          </Link>
+                          <span className="text-[11px] text-[#006948] font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            {pro.is_available ? 'Available' : 'Quick Reply'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-[#006948] font-semibold mt-0.5 truncate">
+                          {pro.trade_title}
+                        </p>
+                        <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
+                          <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                          <span className="truncate">{pro.district}, {cityName}</span>
+                        </div>
+
+                        {/* Chips */}
+                        <div className="flex flex-wrap gap-1 mt-2.5 mb-3.5">
+                          {defaultTags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="px-2 py-0.5 rounded-md bg-white border border-gray-200/70 text-gray-700 text-[11px] font-medium"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                      <span className="text-xs text-[#006948] font-bold truncate mt-0.5">
-                        {pro.trade_title}
-                      </span>
-                      <span className="text-xs text-gray-500 flex items-center gap-1 mt-1 truncate">
-                        <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                        {pro.district}
-                      </span>
                     </div>
-                  </div>
 
-                  <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-                    {pro.short_bio}
-                  </p>
-
-                  <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                    {/* WhatsApp Direct Action Button - Exact Legacy Full Width */}
                     <a
-                      href={`https://wa.me/${pro.whatsapp_number.replace(/\+/g, '')}?text=${encodeURIComponent(`Assalam-o-Alaikum ${pro.name}, I found your profile on Baseera ${cityName}.`)}`}
-                      target="_blank"
+                      className="flex items-center justify-center gap-2 w-full h-11 rounded-xl bg-[#006948] text-white text-xs font-bold active:opacity-90 transition-all hover:bg-[#00855d] shadow-2xs"
+                      href={`https://wa.me/${pro.whatsapp_number.replace(/\+/g, '')}?text=${encodeURIComponent(`Salam ${pro.name}, saw your profile on Baseera ${cityName}.`)}`}
                       rel="noopener noreferrer"
-                      className="flex-1 bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.99] text-white py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs"
+                      target="_blank"
                     >
-                      <WhatsAppIcon className="w-4 h-4 text-white shrink-0" />
+                      <WhatsAppIcon className="w-4 h-4 text-white fill-current" />
                       <span>Chat on WhatsApp</span>
                     </a>
-                    <Link
-                      href={`/${lang}/${country}/${city}/${pro.category_id}/${pro.slug}`}
-                      className="py-2.5 px-3.5 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold text-xs transition-colors"
-                    >
-                      View Profile
-                    </Link>
                   </div>
-                </article>
-              ))}
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Exact Legacy Trust & Resource Banners */}
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-2xl p-5 flex items-start gap-4 border border-gray-200/80 shadow-2xs">
+              <div className="w-12 h-12 rounded-xl bg-emerald-50 text-[#006948] flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-6 h-6 text-[#006948]" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-base font-bold text-gray-950">Zero Commission, Direct Contact</h3>
+                <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                  Baseera does not charge middlemen fees. Discuss requirements, timing, and rates directly with technicians in {cityName} over WhatsApp.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 flex items-start gap-4 border border-gray-200/80 shadow-2xs">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100/50 text-[#006948] flex items-center justify-center shrink-0">
+                <Globe className="w-6 h-6 text-[#006948]" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-base font-bold text-gray-950">{cityName} Resident Guides</h3>
+                <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                  Verified emergency helplines, load shedding schedules, and home maintenance tips for residents in {cityName}.
+                </p>
+              </div>
             </div>
           </section>
 

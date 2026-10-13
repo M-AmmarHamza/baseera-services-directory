@@ -3,6 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { getDictionary } from '@/lib/get-dictionary';
 import CitySelector from '@/components/CitySelector';
+import BottomNav from '@/components/BottomNav';
 
 export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'ur' }, { lang: 'ar' }];
@@ -115,6 +116,9 @@ export default async function RootLayout({
             </div>
           </div>
         </footer>
+
+        {/* Persistent Mobile Bottom Navigation Bar (Legacy Fidelity) */}
+        <BottomNav lang={lang} />
       </body>
     </html>
   );

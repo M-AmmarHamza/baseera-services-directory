@@ -176,22 +176,137 @@ export const SEED_PROVIDERS: Provider[] = [
   }
 ];
 
-export const COUNTRIES = [
-  { code: 'pk', name: 'Pakistan', defaultCity: 'karachi' },
-  { code: 'ae', name: 'United Arab Emirates', defaultCity: 'dubai' },
-  { code: 'sa', name: 'Saudi Arabia', defaultCity: 'riyadh' },
+export interface Country {
+  code: string;
+  name: string;
+  defaultCity: string;
+  flag: string;
+  region: 'Middle East' | 'Asia' | 'Americas' | 'Europe' | 'Africa' | 'Oceania';
+}
+
+export interface City {
+  slug: string;
+  name: string;
+  countryCode: string;
+}
+
+export const COUNTRIES: Country[] = [
+  // Middle East & South Asia
+  { code: 'pk', name: 'Pakistan', defaultCity: 'karachi', flag: '🇵🇰', region: 'Asia' },
+  { code: 'ae', name: 'United Arab Emirates', defaultCity: 'dubai', flag: '🇦🇪', region: 'Middle East' },
+  { code: 'sa', name: 'Saudi Arabia', defaultCity: 'riyadh', flag: '🇸🇦', region: 'Middle East' },
+  { code: 'qa', name: 'Qatar', defaultCity: 'doha', flag: '🇶🇦', region: 'Middle East' },
+  { code: 'kw', name: 'Kuwait', defaultCity: 'kuwait', flag: '🇰🇼', region: 'Middle East' },
+  { code: 'bh', name: 'Bahrain', defaultCity: 'manama', flag: '🇧🇭', region: 'Middle East' },
+  { code: 'om', name: 'Oman', defaultCity: 'muscat', flag: '🇴🇲', region: 'Middle East' },
+  { code: 'in', name: 'India', defaultCity: 'mumbai', flag: '🇮🇳', region: 'Asia' },
+  { code: 'bd', name: 'Bangladesh', defaultCity: 'dhaka', flag: '🇧🇩', region: 'Asia' },
+  { code: 'tr', name: 'Turkey', defaultCity: 'istanbul', flag: '🇹🇷', region: 'Middle East' },
+
+  // Americas
+  { code: 'us', name: 'United States', defaultCity: 'new-york', flag: '🇺🇸', region: 'Americas' },
+  { code: 'ca', name: 'Canada', defaultCity: 'toronto', flag: '🇨🇦', region: 'Americas' },
+  { code: 'mx', name: 'Mexico', defaultCity: 'mexico-city', flag: '🇲🇽', region: 'Americas' },
+  { code: 'br', name: 'Brazil', defaultCity: 'sao-paulo', flag: '🇧🇷', region: 'Americas' },
+
+  // Europe
+  { code: 'gb', name: 'United Kingdom', defaultCity: 'london', flag: '🇬🇧', region: 'Europe' },
+  { code: 'de', name: 'Germany', defaultCity: 'berlin', flag: '🇩🇪', region: 'Europe' },
+  { code: 'fr', name: 'France', defaultCity: 'paris', flag: '🇫🇷', region: 'Europe' },
+  { code: 'it', name: 'Italy', defaultCity: 'rome', flag: '🇮🇹', region: 'Europe' },
+  { code: 'es', name: 'Spain', defaultCity: 'madrid', flag: '🇪🇸', region: 'Europe' },
+  { code: 'nl', name: 'Netherlands', defaultCity: 'amsterdam', flag: '🇳🇱', region: 'Europe' },
+  { code: 'ie', name: 'Ireland', defaultCity: 'dublin', flag: '🇮🇪', region: 'Europe' },
+  { code: 'ch', name: 'Switzerland', defaultCity: 'zurich', flag: '🇨🇭', region: 'Europe' },
+
+  // Asia Pacific & Oceania
+  { code: 'au', name: 'Australia', defaultCity: 'sydney', flag: '🇦🇺', region: 'Oceania' },
+  { code: 'nz', name: 'New Zealand', defaultCity: 'auckland', flag: '🇳🇿', region: 'Oceania' },
+  { code: 'my', name: 'Malaysia', defaultCity: 'kuala-lumpur', flag: '🇲🇾', region: 'Asia' },
+  { code: 'sg', name: 'Singapore', defaultCity: 'singapore', flag: '🇸🇬', region: 'Asia' },
+  { code: 'id', name: 'Indonesia', defaultCity: 'jakarta', flag: '🇮🇩', region: 'Asia' },
+  { code: 'jp', name: 'Japan', defaultCity: 'tokyo', flag: '🇯🇵', region: 'Asia' },
+
+  // Africa
+  { code: 'za', name: 'South Africa', defaultCity: 'johannesburg', flag: '🇿🇦', region: 'Africa' },
+  { code: 'eg', name: 'Egypt', defaultCity: 'cairo', flag: '🇪🇬', region: 'Africa' },
+  { code: 'ng', name: 'Nigeria', defaultCity: 'lagos', flag: '🇳🇬', region: 'Africa' },
+  { code: 'ke', name: 'Kenya', defaultCity: 'nairobi', flag: '🇰🇪', region: 'Africa' },
 ];
 
-export const CITIES = [
+export const CITIES: City[] = [
+  // Pakistan
   { slug: 'karachi', name: 'Karachi', countryCode: 'pk' },
   { slug: 'lahore', name: 'Lahore', countryCode: 'pk' },
   { slug: 'islamabad', name: 'Islamabad', countryCode: 'pk' },
+  { slug: 'rawalpindi', name: 'Rawalpindi', countryCode: 'pk' },
+  { slug: 'faisalabad', name: 'Faisalabad', countryCode: 'pk' },
+
+  // UAE
   { slug: 'dubai', name: 'Dubai', countryCode: 'ae' },
   { slug: 'sharjah', name: 'Sharjah', countryCode: 'ae' },
   { slug: 'abu-dhabi', name: 'Abu Dhabi', countryCode: 'ae' },
+  { slug: 'ajman', name: 'Ajman', countryCode: 'ae' },
+
+  // Saudi Arabia
   { slug: 'riyadh', name: 'Riyadh', countryCode: 'sa' },
   { slug: 'jeddah', name: 'Jeddah', countryCode: 'sa' },
+  { slug: 'dammam', name: 'Dammam', countryCode: 'sa' },
+
+  // Qatar, Kuwait, Oman, Bahrain
+  { slug: 'doha', name: 'Doha', countryCode: 'qa' },
+  { slug: 'kuwait', name: 'Kuwait City', countryCode: 'kw' },
+  { slug: 'manama', name: 'Manama', countryCode: 'bh' },
+  { slug: 'muscat', name: 'Muscat', countryCode: 'om' },
+
+  // UK & US
+  { slug: 'london', name: 'London', countryCode: 'gb' },
+  { slug: 'manchester', name: 'Manchester', countryCode: 'gb' },
+  { slug: 'birmingham', name: 'Birmingham', countryCode: 'gb' },
+  { slug: 'new-york', name: 'New York', countryCode: 'us' },
+  { slug: 'houston', name: 'Houston', countryCode: 'us' },
+  { slug: 'chicago', name: 'Chicago', countryCode: 'us' },
+  { slug: 'los-angeles', name: 'Los Angeles', countryCode: 'us' },
+
+  // Canada & Australia
+  { slug: 'toronto', name: 'Toronto', countryCode: 'ca' },
+  { slug: 'vancouver', name: 'Vancouver', countryCode: 'ca' },
+  { slug: 'sydney', name: 'Sydney', countryCode: 'au' },
+  { slug: 'melbourne', name: 'Melbourne', countryCode: 'au' },
+
+  // Europe & Asia
+  { slug: 'berlin', name: 'Berlin', countryCode: 'de' },
+  { slug: 'paris', name: 'Paris', countryCode: 'fr' },
+  { slug: 'istanbul', name: 'Istanbul', countryCode: 'tr' },
+  { slug: 'kuala-lumpur', name: 'Kuala Lumpur', countryCode: 'my' },
+  { slug: 'singapore', name: 'Singapore', countryCode: 'sg' },
+  { slug: 'mumbai', name: 'Mumbai', countryCode: 'in' },
+  { slug: 'delhi', name: 'Delhi', countryCode: 'in' },
+  { slug: 'dhaka', name: 'Dhaka', countryCode: 'bd' },
+  { slug: 'cairo', name: 'Cairo', countryCode: 'eg' },
+  { slug: 'johannesburg', name: 'Johannesburg', countryCode: 'za' },
 ];
+
+export function getCountryByCode(code: string): Country {
+  const norm = code.toLowerCase();
+  const found = COUNTRIES.find((c) => c.code.toLowerCase() === norm);
+  if (found) return found;
+  // Dynamic universal fallback for ANY ISO country code in the world!
+  return {
+    code: norm,
+    name: norm.toUpperCase(),
+    defaultCity: 'capital',
+    flag: '🌍',
+    region: 'Middle East',
+  };
+}
+
+export function getCitiesByCountry(countryCode: string): City[] {
+  const norm = countryCode.toLowerCase();
+  const list = CITIES.filter((c) => c.countryCode.toLowerCase() === norm);
+  if (list.length > 0) return list;
+  return [{ slug: 'main-city', name: 'Main City', countryCode: norm }];
+}
 
 export const CATEGORIES = [
   { id: 'electrician', slug: 'electrician', name: 'Electrician & Wiring', icon: 'bolt', count: 42 },

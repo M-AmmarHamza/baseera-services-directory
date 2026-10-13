@@ -22,15 +22,37 @@ const COUNTRY_DEFAULTS: Record<string, string> = {
   ae: 'dubai',
   sa: 'riyadh',
   qa: 'doha',
-  om: 'muscat',
-  bh: 'manama',
   kw: 'kuwait',
-  gb: 'london',
-  us: 'houston',
+  bh: 'manama',
+  om: 'muscat',
+  in: 'mumbai',
+  bd: 'dhaka',
+  tr: 'istanbul',
+  us: 'new-york',
   ca: 'toronto',
+  mx: 'mexico-city',
+  br: 'sao-paulo',
+  gb: 'london',
+  de: 'berlin',
+  fr: 'paris',
+  it: 'rome',
+  es: 'madrid',
+  nl: 'amsterdam',
+  ie: 'dublin',
+  ch: 'zurich',
+  au: 'sydney',
+  nz: 'auckland',
+  my: 'kuala-lumpur',
+  sg: 'singapore',
+  id: 'jakarta',
+  jp: 'tokyo',
+  za: 'johannesburg',
+  eg: 'cairo',
+  ng: 'lagos',
+  ke: 'nairobi',
 };
 
-// Regional routing defaults (Strictly English default as requested by user)
+// Regional routing defaults
 const REGIONAL_ROUTING: Record<string, { country: string; city: string; defaultLang: string }> = {
   AE: { country: 'ae', city: 'dubai', defaultLang: 'en' },
   PK: { country: 'pk', city: 'karachi', defaultLang: 'en' },
@@ -40,8 +62,12 @@ const REGIONAL_ROUTING: Record<string, { country: string; city: string; defaultL
   BH: { country: 'bh', city: 'manama', defaultLang: 'en' },
   KW: { country: 'kw', city: 'kuwait', defaultLang: 'en' },
   GB: { country: 'gb', city: 'london', defaultLang: 'en' },
-  US: { country: 'us', city: 'houston', defaultLang: 'en' },
+  US: { country: 'us', city: 'new-york', defaultLang: 'en' },
   CA: { country: 'ca', city: 'toronto', defaultLang: 'en' },
+  AU: { country: 'au', city: 'sydney', defaultLang: 'en' },
+  DE: { country: 'de', city: 'berlin', defaultLang: 'en' },
+  FR: { country: 'fr', city: 'paris', defaultLang: 'en' },
+  TR: { country: 'tr', city: 'istanbul', defaultLang: 'en' },
 };
 
 const LEGACY_PROVIDER_MAP: Record<string, { category: string; slug: string }> = {
@@ -97,20 +123,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname === '/index.html' || pathname === '/') {
-    // True Edge Geo-Routing:
-    // User from UAE -> /en/ae/dubai
-    // User from Saudi Arabia -> /en/sa/riyadh
-    // User from Pakistan -> /en/pk/karachi
-    // All other international users -> /en (Global Directory Portal)
-    if (geoCountry === 'AE') {
-      return NextResponse.redirect(new URL('/en/ae/dubai', request.url), 308);
-    }
-    if (geoCountry === 'SA') {
-      return NextResponse.redirect(new URL('/en/sa/riyadh', request.url), 308);
-    }
-    if (geoCountry === 'PK') {
-      return NextResponse.redirect(new URL('/en/pk/karachi', request.url), 308);
-    }
+    // User requested global site by default!
     return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}`, request.url), 308);
   }
 
@@ -139,7 +152,7 @@ export function middleware(request: NextRequest) {
   // Case B: Just "/en/pk", "/ur/pk", or "/en/ae" (country hub without city) -> Go to primary city
   if (segments.length === 2) {
     const country = segments[1].toLowerCase();
-    const targetCity = COUNTRY_DEFAULTS[country] || 'karachi';
+    const targetCity = COUNTRY_DEFAULTS[country] || (country === 'pk' ? 'karachi' : 'main-city');
     return NextResponse.redirect(
       new URL(`/${lang}/${country}/${targetCity}`, request.url),
       308
