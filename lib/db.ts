@@ -209,22 +209,66 @@ export function getCategoryBySlug(slug: string) {
   return CATEGORIES.find((c) => c.slug.toLowerCase() === normalized || c.id.toLowerCase() === normalized) || null;
 }
 
+function mapDbProvider(row: any, fallbackCity: string = 'karachi'): Provider {
+  const citySlug = row.cities?.slug || fallbackCity;
+  const countryCode = row.countries?.code || 'pk';
+  return {
+    id: row.id,
+    name: row.name,
+    slug: row.slug,
+    profile_type: row.profile_type || 'individual',
+    category_id: row.category_id,
+    trade_title: row.trade_title || `${row.name} - Verified Professional`,
+    city_slug: citySlug,
+    country_code: countryCode,
+    district: Array.isArray(row.service_area) && row.service_area.length > 0 ? row.service_area[0] : 'Karachi',
+    service_area: Array.isArray(row.service_area) ? row.service_area : [],
+    whatsapp_number: row.whatsapp_number,
+    avatar_url: row.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(row.name)}`,
+    short_bio: row.short_bio || '',
+    starting_price: Number(row.starting_price) || 500,
+    rating: Number(row.rating) || 4.8,
+    review_count: Number(row.review_count) || 10,
+    total_leads: Number(row.total_leads) || 25,
+    is_verified: Boolean(row.is_verified),
+    is_available: Boolean(row.is_available),
+  };
+}
+
+async function fetchSupabase<T>(path: string): Promise<T | null> {
+  if (!SUPABASE_URL || !SUPABASE_KEY) return null;
+  try {
+    const url = `${SUPABASE_URL.replace(/\/$/, '')}/rest/v1/${path}`;
+    const res = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      },
+      next: { revalidate: 30 },
+    });
+    if (!res.ok) {
+      console.warn(`Supabase REST note [${res.status}]`);
+      return null;
+    }
+    return (await res.json()) as T;
+  } catch (err) {
+    console.warn('Supabase fetch note:', err);
+    return null;
+  }
+}
+
 export async function getProviders(citySlug: string, categorySlug?: string): Promise<Provider[]> {
   const category = categorySlug ? getCategoryBySlug(categorySlug) : null;
   const targetCategoryIds = category ? [category.id, category.slug] : categorySlug ? [categorySlug] : [];
 
-  if (SUPABASE_URL && SUPABASE_KEY) {
-    try {
-      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-      let q = supabase.from('providers').select('*').eq('city_slug', citySlug.toLowerCase());
-      if (category) {
-        q = q.in('category_id', targetCategoryIds);
-      }
-      const { data, error } = await q;
-      if (!error && data && data.length > 0) return data as Provider[];
-    } catch (e) {
-      console.warn('Supabase fetch note:', e);
-    }
+  let queryPath = `providers?select=*,cities!inner(slug),countries!inner(code)&cities.slug=eq.${encodeURIComponent(citySlug.toLowerCase())}`;
+  if (category) {
+    queryPath += `&category_id=in.(${targetCategoryIds.map(encodeURIComponent).join(',')})`;
+  }
+
+  const dbRows = await fetchSupabase<any[]>(queryPath);
+  if (dbRows && dbRows.length > 0) {
+    return dbRows.map((r) => mapDbProvider(r, citySlug));
   }
 
   // Fallback seed
@@ -245,14 +289,9 @@ export async function getProviderBySlug(citySlug: string, categorySlug: string, 
 }
 
 export async function getAllProviders(): Promise<Provider[]> {
-  if (SUPABASE_URL && SUPABASE_KEY) {
-    try {
-      const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-      const { data, error } = await supabase.from('providers').select('*');
-      if (!error && data && data.length > 0) return data as Provider[];
-    } catch (e) {
-      console.warn('Supabase fetch all providers note:', e);
-    }
+  const dbRows = await fetchSupabase<any[]>('providers?select=*,cities!inner(slug),countries!inner(code)');
+  if (dbRows && dbRows.length > 0) {
+    return dbRows.map((r) => mapDbProvider(r, 'karachi'));
   }
   return SEED_PROVIDERS;
 }
