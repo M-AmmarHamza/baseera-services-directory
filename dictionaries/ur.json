@@ -1,0 +1,57 @@
+{
+  "common": {
+    "brand": "بصیرہ",
+    "tagline": "مقامی سروسز کی براہِ راست ڈائریکٹری",
+    "search": "تلاش کریں",
+    "searchPlaceholder": "الیکٹریشن، اے سی، پلمبر اپنے شہر میں تلاش کریں...",
+    "categories": "شعبہ جات",
+    "allCategories": "تمام کیٹیگریز",
+    "saved": "محفوظ کردہ",
+    "verified": "تصدیق شدہ کاریگر",
+    "availableNow": "آج دستیاب",
+    "switchLanguage": "زبان",
+    "viewProfile": "پروفائل دیکھیں",
+    "chatWhatsApp": "واٹس ایپ پر رابطہ کریں",
+    "callDirect": "براہِ راست کال کریں",
+    "zeroCommission": "کوئی کمیشن نہیں، کاریگر اور کسٹمر کا براہِ راست رابطہ۔"
+  },
+  "nav": {
+    "home": "ہوم",
+    "explore": "دریافت کریں",
+    "savedPros": "محفوظ شدہ",
+    "guides": "رہنمائی",
+    "vendorStudio": "وینڈر اسٹوڈیو",
+    "account": "پروفائل"
+  },
+  "home": {
+    "heroTitle": "اپنے شہر میں تصدیق شدہ ماہرین تلاش کریں",
+    "heroSubtitle": "بغیر کسی مڈل مین کے براہِ راست واٹس ایپ پر آرڈر بک کریں۔",
+    "popularSpecialties": "مقبول سروسز",
+    "featuredPros": "نمایاں کاریگر",
+    "whyTrust": "لوگ بصیرہ پر کیوں اعتماد کرتے ہیں؟"
+  },
+  "category": {
+    "titleTemplate": "{city} میں {count} بہترین تصدیق شدہ {category}",
+    "subtitleTemplate": "ایمرجنسی اور شیڈولڈ کام کے لیے تجربہ کار اور تصدیق شدہ کاریگر۔",
+    "allProviders": "تمام کاریگر",
+    "individualOnly": "انفرادی استاد",
+    "shopsOnly": "ایجنسی اور دکانیں"
+  },
+  "emptyState": {
+    "badge": "جلد آ رہا ہے",
+    "title": "ہم بہت جلد {city} میں {category} لانچ کر رہے ہیں!",
+    "description": "کیا آپ {city} میں ایک ماہر {category} ہیں؟ کسٹمرز آپ کی سروسز تلاش کر رہے ہیں۔ آج ہی رجسٹر کریں۔",
+    "ctaVendor": "بطور کاریگر رجسٹر ہوں",
+    "ctaWaitlist": "کسٹمر ویٹ لسٹ میں شامل ہوں",
+    "contactSupport": "فوری سروس کے لیے ہمارے علاقائی کوآرڈینیٹر سے رابطہ کریں۔"
+  },
+  "profile": {
+    "verifiedBadge": "شناختی کارڈ و پولیس تصدیق شدہ",
+    "coverageAreas": "سروس والے علاقے",
+    "coreServices": "خدمات اور خصوصیات",
+    "pricingFrom": "ابتدائی فیس",
+    "customerReviews": "کسٹمرز کے تبصرے",
+    "writeReview": "رائے دیں",
+    "reportProfile": "رپورٹ کریں"
+  }
+}

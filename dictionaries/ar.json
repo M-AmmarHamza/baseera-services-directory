@@ -1,0 +1,57 @@
+{
+  "common": {
+    "brand": "بصيرة",
+    "tagline": "دليل الخدمات المهنية المباشر",
+    "search": "بحث",
+    "searchPlaceholder": "ابحث عن كهربائي، تكييف، سباك في مدينتك...",
+    "categories": "التصنيفات",
+    "allCategories": "جميع التصنيفات",
+    "saved": "المحفوظات",
+    "verified": "مهني موثق",
+    "availableNow": "متاح اليوم",
+    "switchLanguage": "اللغة",
+    "viewProfile": "عرض الملف الشخصي",
+    "chatWhatsApp": "مراسلة عبر واتساب",
+    "callDirect": "اتصال مباشر",
+    "zeroCommission": "بدون أي عمولة وسيط. اتصال مباشر 100% بين العميل والمهني."
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "explore": "استكشف",
+    "savedPros": "المحفوظة",
+    "guides": "أدلة وتوجيهات",
+    "vendorStudio": "استوديو المهنيين",
+    "account": "الحساب"
+  },
+  "home": {
+    "heroTitle": "اعثر على أفضل المهنيين المعتمدين في",
+    "heroSubtitle": "حجز مباشر وسريع عبر واتساب بدون أي رسوم وساطة أو تأخير.",
+    "popularSpecialties": "الخدمات الأكثر طلباً",
+    "featuredPros": "أمهر الحرفيين والخبراء",
+    "whyTrust": "لماذا يثق سكان المنطقة في بصيرة؟"
+  },
+  "category": {
+    "titleTemplate": "أفضل {count} {category} معتمدين في {city}، {country}",
+    "subtitleTemplate": "فنيون محترفون تم التحقق من هوياتهم للطوارئ والأعمال المجدولة.",
+    "allProviders": "جميع الفنيين",
+    "individualOnly": "فني مستقل",
+    "shopsOnly": "ورش ومؤسسات معتمدة"
+  },
+  "emptyState": {
+    "badge": "قريباً",
+    "title": "سنقوم بإطلاق خدمات {category} في {city} قريباً!",
+    "description": "هل أنت فني {category} ماهر في {city}؟ المئات من العملاء يبحثون عن خدمات موثوقة في هذه المنطقة الآن.",
+    "ctaVendor": "سجل الآن كمهني",
+    "ctaWaitlist": "انضم إلى قائمة انتظار العملاء",
+    "contactSupport": "هل تحتاج إلى خدمة طارئة الآن؟ تواصل مع منسقنا عبر واتساب."
+  },
+  "profile": {
+    "verifiedBadge": "تم التحقق من الهوية والسجل المهني",
+    "coverageAreas": "نطاق التغطية والمناطق",
+    "coreServices": "الخدمات والتخصصات الأساسية",
+    "pricingFrom": "يبدأ السعر من",
+    "customerReviews": "تقييمات وآراء العملاء",
+    "writeReview": "أضف تقييمك",
+    "reportProfile": "إبلاغ عن الحساب"
+  }
+}

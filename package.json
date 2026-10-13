@@ -5,9 +5,23 @@
   "description": "Baseera Karachi - Direct Local Services Directory & Business Platform",
   "main": "api/providers.js",
   "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "test": "node api/health.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.1"
+    "@supabase/supabase-js": "^2.49.1",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "autoprefixer": "^10.6.1",
+    "lucide-react": "^1.56.0",
+    "next": "^16.4.0",
+    "postcss": "^8.5.30",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
   }
 }

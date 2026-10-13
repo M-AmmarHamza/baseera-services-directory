@@ -1,0 +1,57 @@
+{
+  "common": {
+    "brand": "Baseera",
+    "tagline": "Direct Local Services Directory",
+    "search": "Search",
+    "searchPlaceholder": "Search electrician, AC, plumbing in your city...",
+    "categories": "Categories",
+    "allCategories": "All Categories",
+    "saved": "Saved",
+    "verified": "Verified Pro",
+    "availableNow": "Available Today",
+    "switchLanguage": "Language",
+    "viewProfile": "View Profile",
+    "chatWhatsApp": "Chat on WhatsApp",
+    "callDirect": "Call Direct",
+    "zeroCommission": "Zero intermediary commission. 100% direct connection."
+  },
+  "nav": {
+    "home": "Home",
+    "explore": "Explore",
+    "savedPros": "Saved",
+    "guides": "Guides",
+    "vendorStudio": "Vendor Studio",
+    "account": "Profile"
+  },
+  "home": {
+    "heroTitle": "Find Verified Local Experts in",
+    "heroSubtitle": "Direct WhatsApp booking with certified tradesmen. No middleman markup.",
+    "popularSpecialties": "Popular Specialties",
+    "featuredPros": "Top Rated Specialists",
+    "whyTrust": "Why Karachi & Gulf Residents Rely on Baseera"
+  },
+  "category": {
+    "titleTemplate": "Top {count} Verified {category} in {city}, {country}",
+    "subtitleTemplate": "Hand-verified specialists ready for emergency and scheduled jobs.",
+    "allProviders": "All Providers",
+    "individualOnly": "Individual Pros",
+    "shopsOnly": "Agencies & Workshops"
+  },
+  "emptyState": {
+    "badge": "Coming Soon",
+    "title": "We are launching {category} in {city} soon!",
+    "description": "Are you a skilled {category} working in {city}? Hundreds of customers are searching for reliable service providers in this area.",
+    "ctaVendor": "Register as a Provider",
+    "ctaWaitlist": "Join Customer Waitlist",
+    "contactSupport": "Looking for urgent service? WhatsApp our regional coordinator."
+  },
+  "profile": {
+    "verifiedBadge": "ID & Police Verified",
+    "coverageAreas": "Coverage Neighborhoods",
+    "coreServices": "Services & Specializations",
+    "pricingFrom": "Starting from",
+    "customerReviews": "Customer Reviews",
+    "writeReview": "Write a Review",
+    "reportProfile": "Report Listing"
+  }
+}

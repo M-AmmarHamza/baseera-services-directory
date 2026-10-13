@@ -19,6 +19,7 @@ $RECYCLE.BIN/
 
 # Node & Build artifacts
 node_modules/
+.next/
 package-lock.json
 .vercel/
 .env
