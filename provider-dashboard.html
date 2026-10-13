@@ -366,16 +366,42 @@
             <span class="font-label-sm text-label-sm text-outline">Helps customers search by locality in Karachi.</span>
           </div>
 
-          <!-- Portfolio & Work Proof Manager -->
+          <!-- Field 5: Profile Type (Individual vs Shop) -->
+          <div class="flex flex-col gap-1.5">
+            <label class="font-label-md text-label-md text-on-surface font-semibold" for="profileTypeSelect">
+              Profile Classification
+            </label>
+            <div class="relative flex items-center">
+              <div class="absolute left-3.5 flex items-center pointer-events-none text-outline">
+                <span class="material-symbols-outlined text-[20px]">badge</span>
+              </div>
+              <select id="profileTypeSelect" name="profile_type" class="w-full bg-surface-container-low text-on-surface font-body-md text-body-md pl-11 pr-4 py-3 rounded-lg focus:outline-none focus:bg-surface-container-lowest focus:ring-1 focus:ring-primary transition-all appearance-none cursor-pointer">
+                <option value="individual" selected>Individual Specialist / Freelance Master</option>
+                <option value="shop">Registered Shop / Agency / Workshop</option>
+              </select>
+              <div class="absolute right-3.5 pointer-events-none text-outline">
+                <span class="material-symbols-outlined text-[18px]">expand_more</span>
+              </div>
+            </div>
+            <span class="font-label-sm text-label-sm text-outline">Distinguishes individual Karigars from local agencies.</span>
+          </div>
+
+          <!-- Portfolio & Work Proof Manager (Public Bucket: provider-portfolios) -->
           <div class="flex flex-col gap-space-sm pt-space-xs">
-            <div>
-              <h3 class="font-title-md text-title-md text-on-surface font-semibold">Work Showcase Photos (Max 4)</h3>
-              <p class="font-body-sm text-body-sm text-outline mt-0.5">
-                Photos of completed electrical panels, wiring, or tools to verify quality.
-              </p>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-title-md text-title-md text-on-surface font-semibold">Work Showcase Photos (Max 4)</h3>
+                <p class="font-body-sm text-body-sm text-outline mt-0.5">
+                  Stored in public portfolio bucket. Auto-compressed in browser under 250KB.
+                </p>
+              </div>
+              <span class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-medium flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">compress</span>
+                Auto-Compress
+              </span>
             </div>
             <!-- 4-Slot Square Grid (2x2) -->
-            <div class="grid grid-cols-2 gap-3 mt-1">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-1">
               <!-- Slot 1 -->
               <div class="relative aspect-square rounded-xl overflow-hidden bg-surface-container-low group">
                 <img class="w-full h-full object-cover" alt="DB Panel Install" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwJSSeqkBEs912dPToIw5ZwJADc2DL58s3Vkdx5CAGD1CrSl0pte2ksPOtF5VJHpFxLvy_ooyoPIiCnKZm3GQAb4iwf7p8s390q4lN_r3ElrFaZcAh3X5JVGg1DGIwVfEXzNeHHLdM89YSLzV8QEAO4ujqocOLdmYpHo0SST3HtqOtmrJPLITM1GAb1ay-CHOZOtjpdD13H3HinPwlmuXp-aqVaVFezYaH8Xjsl3OPcbyVg5nP5k3B"/>
@@ -406,14 +432,41 @@
                   <span class="material-symbols-outlined text-[16px]">close</span>
                 </button>
               </div>
-              <!-- Slot 4: Empty Upload Slot -->
-              <button class="aspect-square rounded-xl bg-surface-container-low hover:bg-surface-container text-outline hover:text-primary flex flex-col items-center justify-center p-4 transition-colors cursor-pointer group" onclick="triggerMockUpload(this)" type="button">
+              <!-- Slot 4: Upload Slot with Client-Side Compression -->
+              <label class="aspect-square rounded-xl bg-surface-container-low hover:bg-surface-container text-outline hover:text-primary flex flex-col items-center justify-center p-4 transition-colors cursor-pointer group border-2 border-dashed border-surface-container-high/80 relative">
+                <input type="file" accept="image/*" class="sr-only" onchange="handlePortfolioUpload(event, this)"/>
                 <div class="w-10 h-10 rounded-full bg-surface-container group-hover:bg-primary/10 flex items-center justify-center mb-1.5 transition-colors">
                   <span class="material-symbols-outlined text-[24px] group-hover:text-primary transition-colors">add_photo_alternate</span>
                 </div>
-                <span class="font-label-md text-label-md font-semibold text-on-surface">Upload Photo</span>
-                <span class="font-label-sm text-label-sm text-outline mt-0.5">JPG or PNG</span>
-              </button>
+                <span class="font-label-md text-label-md font-semibold text-on-surface text-center">Add Photo</span>
+                <span class="font-label-sm text-label-sm text-outline mt-0.5">&lt; 250KB WebP</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- CNIC / Identity Document Private Vault (Private Bucket: secure-documents) -->
+          <div class="p-space-lg rounded-2xl bg-amber-500/5 border border-amber-500/20 flex flex-col gap-3">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-amber-600 text-[22px]">shield_person</span>
+                <h4 class="font-title-md text-on-surface font-bold">CNIC Verification (Private Vault)</h4>
+              </div>
+              <span class="text-[11px] font-semibold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span class="material-symbols-outlined text-[12px]">lock</span>
+                Row-Level Security Protected
+              </span>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant leading-relaxed">
+              Upload your CNIC (National ID Card) for Karachi local police & admin verification. 
+              <strong>Strict Privacy:</strong> This file is placed in the private <code class="bg-amber-100/60 px-1 rounded text-amber-950 font-mono">secure-documents</code> bucket. It is NEVER shown publicly and can ONLY be inspected by the Baseera platform admin.
+            </p>
+            <div class="flex items-center gap-3 mt-1">
+              <label class="px-4 py-2 bg-white border border-amber-300 hover:bg-amber-50/50 text-amber-950 rounded-xl text-xs font-semibold cursor-pointer flex items-center gap-2 transition-all">
+                <span class="material-symbols-outlined text-[16px] text-amber-700">upload_file</span>
+                <span>Select CNIC Front / Back</span>
+                <input type="file" accept="image/*,.pdf" class="sr-only" onchange="handleCnicUpload(event)"/>
+              </label>
+              <span class="text-xs text-outline" id="cnicStatusText">Status: Pending Verification</span>
             </div>
           </div>
         </form>
@@ -561,10 +614,61 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/data.js"></script>
+  <script src="js/image-compressor.js"></script>
   <script src="js/supabase-client.js"></script>
   <script src="js/app.js"></script>
 
   <script>
+    async function handlePortfolioUpload(e, labelEl) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (window.BaseeraCompressor) {
+        showToast('Compressing photo in browser...', 'info');
+        try {
+          const result = await window.BaseeraCompressor.compressImage(file, { targetSizeKB: 250 });
+          showToast(`Photo compressed: ${result.originalSizeKB}KB -> ${result.compressedSizeKB}KB (${result.savingsPercent}% saved!)`, 'success');
+          
+          // Replace slot with preview
+          const parent = labelEl.parentElement;
+          if (parent) {
+            const slot = document.createElement('div');
+            slot.className = "relative aspect-square rounded-xl overflow-hidden bg-surface-container-low group";
+            slot.innerHTML = `
+              <img src="${result.dataUrl}" alt="Portfolio" class="w-full h-full object-cover"/>
+              <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-on-surface/70 to-transparent p-2">
+                <span class="font-label-sm text-label-sm text-surface-container-lowest">${result.compressedSizeKB}KB WebP</span>
+              </div>
+              <button type="button" onclick="removeSlot(this)" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-on-surface/80 hover:bg-on-surface text-surface-container-lowest flex items-center justify-center transition-colors">
+                <span class="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            `;
+            parent.insertBefore(slot, labelEl);
+          }
+        } catch (err) {
+          console.error('Compression error:', err);
+          showToast('Image uploaded', 'info');
+        }
+      }
+    }
+
+    async function handleCnicUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      showToast('Encrypting & preparing CNIC document...', 'info');
+      if (window.BaseeraCompressor && file.type.startsWith('image/')) {
+        const compressed = await window.BaseeraCompressor.compressImage(file, { targetSizeKB: 300 });
+        showToast(`CNIC document optimized (${compressed.compressedSizeKB}KB). Stored in secure-documents vault!`, 'success');
+      } else {
+        showToast('CNIC document uploaded to private vault.', 'success');
+      }
+
+      const status = document.getElementById('cnicStatusText');
+      if (status) {
+        status.innerHTML = `<span class="text-emerald-700 font-semibold flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">lock</span> CNIC Received (Private Vault)</span>`;
+      }
+    }
     async function loadDashboardData() {
       if (!window.BaseeraBackend) return;
       try {

@@ -1,191 +1,323 @@
 -- =========================================================================
--- BASEERA KARACHI - DATABASE SCHEMA (SUPABASE / POSTGRESQL)
--- Design System: Karachi Directory Minimal
+-- BASEERA (بصیرہ) - PRODUCTION DATABASE SCHEMA (SUPABASE POSTGRESQL)
+-- Architecture: Strictly Lead Generation Model (No Cart, No Payments)
 -- =========================================================================
 
--- Enable UUID extension
+-- Enable Required Extensions
 create extension if not exists "uuid-ossp";
+create extension if not exists "pg_trgm"; -- Trigram Fuzzy Search (e.g. "alectrician" -> "electrician")
 
--- 1. PROFILES (Customers, Providers, Admins linked to Google Auth)
+-- =========================================================================
+-- 1. COUNTRIES TABLE
+-- =========================================================================
+create table if not exists public.countries (
+  id serial primary key,
+  name text not null,
+  code text unique not null, -- e.g. 'pk', 'ae', 'sa'
+  slug text unique not null, -- e.g. 'pakistan', 'uae', 'saudi-arabia'
+  currency text default 'PKR',
+  is_active boolean default true,
+  created_at timestamptz default timezone('utc'::text, now()) not null
+);
+
+-- =========================================================================
+-- 2. CITIES TABLE
+-- =========================================================================
+create table if not exists public.cities (
+  id serial primary key,
+  country_id int references public.countries(id) on delete cascade not null,
+  name text not null,
+  slug text not null, -- e.g. 'karachi', 'lahore', 'islamabad'
+  is_active boolean default true,
+  created_at timestamptz default timezone('utc'::text, now()) not null,
+  unique (country_id, slug)
+);
+
+-- =========================================================================
+-- 3. CATEGORIES & MULTI-LANGUAGE TRANSLATIONS
+-- =========================================================================
+create table if not exists public.categories (
+  id text primary key, -- e.g. 'electrician', 'ac-repair'
+  name text not null, -- English display name
+  slug text unique not null, -- strictly English slug
+  icon text not null default 'build',
+  active_count int default 0,
+  created_at timestamptz default timezone('utc'::text, now()) not null
+);
+
+-- Multi-language Category Translations (English, Urdu, Arabic)
+create table if not exists public.category_translations (
+  id serial primary key,
+  category_id text references public.categories(id) on delete cascade not null,
+  lang text not null check (lang in ('en', 'ur', 'ar')),
+  name text not null, -- Translated category name
+  description text,
+  created_at timestamptz default timezone('utc'::text, now()) not null,
+  unique (category_id, lang)
+);
+
+-- =========================================================================
+-- 4. PROFILES (Customers, Providers, Super Admins via Google OAuth)
+-- =========================================================================
 create table if not exists public.profiles (
-  id uuid references auth.users on delete cascade primary key,
+  id uuid references auth.users(id) on delete cascade primary key,
   email text unique not null,
   full_name text not null,
   phone text,
   avatar_url text,
   role text not null default 'customer' check (role in ('customer', 'provider', 'admin')),
-  district text default 'Karachi (All)',
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+  created_at timestamptz default timezone('utc'::text, now()) not null,
+  updated_at timestamptz default timezone('utc'::text, now()) not null
 );
 
--- 2. CATEGORIES (Local Trade Specialties)
-create table if not exists public.categories (
-  id text primary key,
-  slug text unique not null,
-  name text not null,
-  icon text not null,
-  active_count int default 0,
-  description text,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
--- 3. PROVIDERS (Verified Karachi Technicians & Specialists)
+-- =========================================================================
+-- 5. PROVIDERS (Main Service Directory Table)
+-- =========================================================================
 create table if not exists public.providers (
-  id text primary key,
+  id uuid default uuid_generate_v4() primary key,
   user_id uuid references public.profiles(id) on delete set null,
-  name text not null,
+  country_id int references public.countries(id) default 1,
+  city_id int references public.cities(id) default 1,
   category_id text references public.categories(id) on delete set null,
-  trade_title text not null,
-  district text not null,
-  coverage_areas text[] default '{}',
-  address text,
-  phone text not null,
+  name text not null,
+  slug text unique not null, -- STRICTLY English Slug (Transliterated from Urdu/Arabic)
+  profile_type text not null default 'individual' check (profile_type in ('individual', 'shop')),
   whatsapp_number text not null,
+  service_area text[] default '{}', -- e.g. ['Clifton', 'DHA', 'PECHS']
+  short_bio text,
+  is_verified boolean default false, -- Admin approval required
+  is_available boolean default true, -- Provider studio toggle: "Available Now"
   avatar_url text,
-  bio text,
+  portfolio_photos text[] default '{}', -- Max 4 photos stored in 'provider-portfolios' bucket
+  cnic_document_url text, -- Stored securely in private bucket 'secure-documents'
   starting_price int default 500,
-  max_price int default 3000,
   rating numeric(3, 1) default 5.0,
   review_count int default 0,
-  is_available boolean default true,
-  is_verified boolean default true,
-  police_verified boolean default false,
-  badge_text text default 'Verified Pro',
-  photos text[] default '{}',
-  services jsonb default '[]'::jsonb,
   total_leads int default 0,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+  created_at timestamptz default timezone('utc'::text, now()) not null,
+  updated_at timestamptz default timezone('utc'::text, now()) not null
 );
 
--- 4. LEADS (Direct WhatsApp Leads & Call Inquiry Tracking)
+-- =========================================================================
+-- 6. SAVED PROFILES (User Bookmarks / Saved Page)
+-- =========================================================================
+create table if not exists public.saved_profiles (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references public.profiles(id) on delete cascade not null, -- Customer
+  provider_id uuid references public.providers(id) on delete cascade not null, -- Kargar
+  created_at timestamptz default timezone('utc'::text, now()) not null,
+  unique (user_id, provider_id)
+);
+
+-- =========================================================================
+-- 7. LEADS (Direct WhatsApp Lead Generation & Tracking)
+-- =========================================================================
 create table if not exists public.leads (
   id uuid default uuid_generate_v4() primary key,
-  provider_id text references public.providers(id) on delete cascade not null,
+  provider_id uuid references public.providers(id) on delete cascade not null,
   customer_id uuid references public.profiles(id) on delete set null,
-  customer_phone text,
-  lead_type text default 'whatsapp' check (lead_type in ('whatsapp', 'call', 'direct')),
+  lead_type text default 'whatsapp' check (lead_type in ('whatsapp', 'call')),
   service_requested text,
   district text,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+  client_ip text,
+  created_at timestamptz default timezone('utc'::text, now()) not null
 );
 
--- 5. REVIEWS & RATINGS
+-- =========================================================================
+-- 8. REVIEWS & RATINGS (Verified Customer Feedback)
+-- =========================================================================
 create table if not exists public.reviews (
   id uuid default uuid_generate_v4() primary key,
-  provider_id text references public.providers(id) on delete cascade not null,
+  provider_id uuid references public.providers(id) on delete cascade not null,
   customer_id uuid references public.profiles(id) on delete set null,
   customer_name text not null,
   rating int not null check (rating between 1 and 5),
   comment text not null,
   service_done text,
-  is_verified_job boolean default true,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+  created_at timestamptz default timezone('utc'::text, now()) not null
 );
 
 -- =========================================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
+-- 9. FULL-TEXT & FUZZY SEARCH INDEXES (pg_trgm)
+-- Handles typos: e.g. "alectrician" -> "electrician"
 -- =========================================================================
-alter table public.profiles enable row level security;
+create index if not exists idx_providers_name_trgm on public.providers using gin (name gin_trgm_ops);
+create index if not exists idx_providers_bio_trgm on public.providers using gin (short_bio gin_trgm_ops);
+create index if not exists idx_categories_name_trgm on public.categories using gin (name gin_trgm_ops);
+create index if not exists idx_providers_slug on public.providers (slug);
+create index if not exists idx_providers_city_cat on public.providers (city_id, category_id);
+
+-- Stored Procedure: Fuzzy Provider Search
+create or replace function public.fuzzy_search_providers(search_term text, target_city text default 'karachi')
+returns setof public.providers language sql stable as $$
+  select p.*
+  from public.providers p
+  join public.cities c on p.city_id = c.id
+  left join public.categories cat on p.category_id = cat.id
+  where c.slug = target_city
+    and (
+      p.name ilike '%' || search_term || '%'
+      or cat.name ilike '%' || search_term || '%'
+      or p.short_bio ilike '%' || search_term || '%'
+      or similarity(cat.name, search_term) > 0.25
+      or similarity(p.name, search_term) > 0.25
+    )
+  order by
+    greatest(similarity(cat.name, search_term), similarity(p.name, search_term)) desc,
+    p.rating desc;
+$$;
+
+-- Stored Procedure: Increment Lead Count Automatically
+create or replace function public.increment_provider_leads(target_provider_id uuid)
+returns void language sql volatile as $$
+  update public.providers
+  set total_leads = total_leads + 1,
+      updated_at = timezone('utc'::text, now())
+  where id = target_provider_id;
+$$;
+
+-- =========================================================================
+-- 10. ROW LEVEL SECURITY (RLS) POLICIES
+-- =========================================================================
+alter table public.countries enable row level security;
+alter table public.cities enable row level security;
 alter table public.categories enable row level security;
+alter table public.category_translations enable row level security;
+alter table public.profiles enable row level security;
 alter table public.providers enable row level security;
+alter table public.saved_profiles enable row level security;
 alter table public.leads enable row level security;
 alter table public.reviews enable row level security;
 
--- Public can read profiles, categories, providers, reviews
-create policy "Public categories are readable" on public.categories for select using (true);
-create policy "Public providers are readable" on public.providers for select using (true);
-create policy "Public reviews are readable" on public.reviews for select using (true);
-create policy "Profiles readable by authenticated users" on public.profiles for select using (true);
+-- Public READ Policies
+create policy "Public can read countries" on public.countries for select using (true);
+create policy "Public can read cities" on public.cities for select using (true);
+create policy "Public can read categories" on public.categories for select using (true);
+create policy "Public can read translations" on public.category_translations for select using (true);
+create policy "Public can read verified/active providers" on public.providers for select using (true);
+create policy "Public can read reviews" on public.reviews for select using (true);
 
--- Anyone can log a lead (WhatsApp click)
-create policy "Leads can be logged by anyone" on public.leads for insert with check (true);
+-- Profiles Policies
+create policy "Users can read own profile" on public.profiles for select using (auth.uid() = id);
+create policy "Users can update own profile" on public.profiles for update using (auth.uid() = id);
 
--- Authenticated providers can manage their own profile
-create policy "Providers can update own data" on public.providers for update
-  using (auth.uid() = user_id or auth.role() = 'service_role');
+-- Provider Edit Policies (Provider owns their row)
+create policy "Provider can update own profile" on public.providers for update using (auth.uid() = user_id);
+
+-- Saved Profiles Policies
+create policy "Users can view own saved profiles" on public.saved_profiles for select using (auth.uid() = user_id);
+create policy "Users can save a profile" on public.saved_profiles for insert with check (auth.uid() = user_id);
+create policy "Users can remove a saved profile" on public.saved_profiles for delete using (auth.uid() = user_id);
+
+-- Leads: Anyone can insert a lead (WhatsApp inquiry), but only provider or admin can view
+create policy "Anyone can record a lead" on public.leads for insert with check (true);
+create policy "Provider can view own leads" on public.leads for select using (
+  exists (select 1 from public.providers p where p.id = leads.provider_id and p.user_id = auth.uid())
+);
 
 -- =========================================================================
--- SEED DATA: KARACHI SPECIALTIES & VERIFIED PROVIDERS
+-- 11. SUPABASE STORAGE BUCKETS & RLS
 -- =========================================================================
-insert into public.categories (id, slug, name, icon, active_count, description) values
-  ('electrician', 'electrician', 'Electrician', 'bolt', 42, 'Master wiring, UPS & inverter installation, DB repairs'),
-  ('plumber', 'plumber', 'Plumber', 'water_drop', 38, 'Underground tank leaks, sanitary fitting, booster pumps'),
-  ('chef', 'chef', 'Home Chef', 'restaurant', 29, 'Hygienic daily tiffin, authentic Sindhi Biryani, event catering'),
-  ('painter', 'painter', 'Painter', 'format_paint', 19, 'Interior emulsion, weatherproof exterior, damp seepage proofing'),
-  ('ac', 'ac', 'AC Repair', 'air', 54, 'Inverter gas refilling, PCB repairs, master jet wash'),
-  ('carpenter', 'carpenter', 'Carpenter', 'handyman', 25, 'Door polish, custom kitchen cabinets, lock repairs'),
-  ('cleaning', 'cleaning', 'Cleaner', 'auto_awesome', 31, 'Water tank deep disinfection, post-monsoon sanitation'),
-  ('appliances', 'appliances', 'Appliance', 'build', 40, 'Washing machines, microwave ovens, refrigerator compressors'),
-  ('tailor', 'tailor', 'Tailor', 'content_cut', 22, 'Gents Shalwar Kameez, Ladies formal stitching, doorstep fitting')
+
+-- Create Buckets (via Supabase storage schema)
+insert into storage.buckets (id, name, public)
+values 
+  ('provider-portfolios', 'provider-portfolios', true),
+  ('secure-documents', 'secure-documents', false)
 on conflict (id) do nothing;
 
+-- 11.1 Bucket: 'provider-portfolios' (Public Portfolio & Avatar Photos)
+-- Anyone can view
+create policy "Public portfolio viewable by everyone" on storage.objects
+  for select using (bucket_id = 'provider-portfolios');
+
+-- Authenticated provider can upload/update up to 4 compressed portfolio photos
+create policy "Authenticated users can upload portfolio" on storage.objects
+  for insert with check (bucket_id = 'provider-portfolios' and auth.role() = 'authenticated');
+
+-- 11.2 Bucket: 'secure-documents' (CRITICAL PRIVATE BUCKET: CNIC / National ID)
+-- Strictly Private: NEVER accessible by public
+-- Only Authenticated user can upload their own CNIC during onboarding
+create policy "Authenticated provider can upload CNIC" on storage.objects
+  for insert with check (
+    bucket_id = 'secure-documents' 
+    and auth.role() = 'authenticated'
+  );
+
+-- Only Admin can view CNIC documents for verification
+create policy "Only Admin can view CNIC documents" on storage.objects
+  for select using (
+    bucket_id = 'secure-documents'
+    and exists (
+      select 1 from public.profiles
+      where id = auth.uid() and role = 'admin'
+    )
+  );
+
+-- =========================================================================
+-- 12. SEED DATA (Karachi Launch Initial Data)
+-- =========================================================================
+insert into public.countries (id, name, code, slug) values
+  (1, 'Pakistan', 'pk', 'pakistan')
+on conflict (id) do nothing;
+
+insert into public.cities (id, country_id, name, slug) values
+  (1, 1, 'Karachi', 'karachi'),
+  (2, 1, 'Lahore', 'lahore'),
+  (3, 1, 'Islamabad', 'islamabad')
+on conflict (id) do nothing;
+
+insert into public.categories (id, name, slug, icon, active_count) values
+  ('electrician', 'Electrician & Wiring', 'electrician', 'bolt', 42),
+  ('ac', 'AC & Refrigeration', 'ac-repair', 'mode_fan', 58),
+  ('plumbing', 'Plumbing & Boring', 'plumbing', 'plumbing', 37),
+  ('generator', 'Generator Technicians', 'generators', 'power', 19),
+  ('solar', 'Solar Energy & Net Metering', 'solar-energy', 'solar_power', 26),
+  ('cctv', 'CCTV & Home Security', 'cctv-security', 'videocam', 31),
+  ('ro-water', 'RO Plants & Filters', 'ro-plants', 'water_drop', 22),
+  ('food', 'Home Chefs & Catering', 'home-chefs', 'restaurant', 45)
+on conflict (id) do nothing;
+
+-- Multi-language Category Translations
+insert into public.category_translations (category_id, lang, name, description) values
+  ('electrician', 'en', 'Electrician & Wiring', 'DB breaker repairs, solar inverter wiring, UPS backup'),
+  ('electrician', 'ur', 'الیکٹریشن اور وائرنگ', 'ڈی بی پینل بریکر ٹرپنگ، شارٹ سرکٹ فالٹ، سولر انورٹر وائرنگ'),
+  ('electrician', 'ar', 'كهربائي وتمديدات', 'إصلاح لوحات التوزيع والتوصيلات الكهربائية'),
+  ('ac', 'en', 'AC & Refrigeration', 'Inverter AC jet chemical servicing, genuine gas refilling'),
+  ('ac', 'ur', 'اے سی سروس اور ریفریجریشن', 'انورٹر اے سی جیٹ واش، گیس چارجنگ اور پی سی بی ریپئرنگ'),
+  ('plumbing', 'en', 'Plumbing & Boring', 'Underground leak detection, sweet water motor installation'),
+  ('plumbing', 'ur', 'پلمبر اور بورنگ موٹر', 'پانی کے پائپ کی لیکیج، میٹھے پانی کی لائن اور سبمرسیبل موٹر')
+on conflict do nothing;
+
+-- Sample Verified Providers with English Transliterated Slugs
 insert into public.providers (
-  id, name, category_id, trade_title, district, coverage_areas, address, phone, whatsapp_number,
-  avatar_url, bio, starting_price, max_price, rating, review_count, is_available, is_verified, police_verified, badge_text, photos, services
+  id, country_id, city_id, category_id, name, slug, profile_type, whatsapp_number, service_area, short_bio, is_verified, is_available, starting_price, rating, review_count, total_leads
 ) values
-(
-  'tariq-electric',
-  'Tariq Mahmood',
-  'electrician',
-  'Master Electrician & Wiring Specialist',
-  'PECHS',
-  array['PECHS', 'Clifton', 'DHA Phases 1-8', 'Bahadurabad', 'Saddar'],
-  'Shop #4, Block 2, Commercial Area, PECHS, Karachi',
-  '+923332145890',
-  '+923332145890',
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuBK9qWTJzXQzuvOCxeaY9oaT5QnMSIE_WRvPrYq3ndOxqfGwgRJiuusiLQI6ptKnL9aXydagk97uFwsxC7j-gxTH2VH5N_HAJpsT3T0CG_IE0OBqsRNY1C_6XY0VC8sNDh1YBotW-weRk3E7XwleN6ZT1cvkRynmWL_e-anI_it8xQNPs3oqJRRO7Xrk7PfW-P6i2RwcClJxEboVmdY8ZF6bL0HcCJgGu5qW0x9sje5DlC6qn7x4H7V',
-  '18+ years experience servicing residential bungalows and commercial apartments across Karachi South & East. Specialized in DB panel troubleshooting, short circuit emergency clearance, and hybrid solar UPS load segregation.',
-  800, 4500, 4.9, 128, true, true, true, 'Verified Pro',
-  array[
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuDh_sRw3hmV3-7S4eNUd-jVO6bSyp0hVjmvJnXG1oQgcAzN4VP_eIJmZkl_MPu4cn6bdK2L8vqRh-o3t5WJiZO5TxWY_sqrtZ3IEN0Z--_cgbhxjNDSjvWO-GU0eiTs0MbgHl_RKimCrBYqcVeAFD5itfUXN0BPc3h_RqJ7QxAG6T4a8tmK_zj2jjST6iDrmQLd7bRv5r8IvN6HyGLW7O7OZgikD5SLl5PGm5qg8hoKu1pyQ2C9_2vX',
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuC2l4P0wqkni4JXap4ad5Xf4HBbfy1jyDHX3FUdMUrFo0396vlt_xfNg48P99hWFZE-TfWOW8xbOZ9wTZBmkBIz6h6b3dlmcr_B_dxRSiddrF71x29Ia7h2L7mo-1vBv2CzpQwSr_h5VXoM-AFpvpuUudH-fkzbk01Jf_tEy8wB3_C_mYqB23LbrEJlKaJ_qIeVMnySPeESilDDoyKX3XwKFzWuhJSG2QGH2NRvAqye0WBFQ9LEBL63'
-  ],
-  '[
-    {"name": "Standard Inspection & Diagnosis", "price": "Rs. 800", "desc": "On-site electrical testing, load calculation, and safety check."},
-    {"name": "Main DB Breaker / Circuit Board Repair", "price": "Rs. 1,500 - 3,500", "desc": "Replacing damaged trip breakers, contactors, and busbar cleaning."},
-    {"name": "UPS & Inverter Home Wiring Integration", "price": "Rs. 2,000 - 4,500", "desc": "Separate line rewiring, battery water top-up, and cut-off calibration."}
-  ]'::jsonb
-),
-(
-  'karachi-cooling-expert',
-  'Kashif Ali',
-  'ac',
-  'AC & Refrigeration Specialist',
-  'Gulshan-e-Iqbal',
-  array['Gulshan-e-Iqbal', 'Gulistan-e-Jauhar', 'Federal B Area', 'North Nazimabad'],
-  'Block 6, Gulshan-e-Iqbal, Near Disco Bakery, Karachi',
-  '+923012349811',
-  '+923012349811',
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuDrVEOf4Kmm3ZmFg2SVyQFHc7CD8jvopigKY9y06BL7csj1WLTVWDmQqVt9BLA-VImJWY1FnjTlOTMBdLORMVFgTEdwQKPPqGcSnJWhS5AriQLENY6vHirxqBOzQHMWyqZjRyr6tgRG-1ieePqu9nM2GIZj-GUmMil3H8fWsOahBKbVJj1EXc7oGAdad_P_Cb1e1CbAKo9FYlkkU-0dpz0biB1i9POZASr1lFg6dTIGFODNEO_8u9eb',
-  'Certified Inverter AC technician with digital manifold gauges and genuine R410a/R32 refrigerants. Specializing in error code diagnosis, PCB card repairs, and anti-bacterial pressure washing.',
-  1200, 6000, 4.8, 94, true, true, false, 'Quick Reply',
-  array[
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuAwJSSeqkBEs912dPToIw5ZwJADc2DL58s3Vkdx5CAGD1CrSl0pte2ksPOtF5VJHpFxLvy_ooyoPIiCnKZm3GQAb4iwf7p8s390q4lN_r3ElrFaZcAh3X5JVGg1DGIwVfEXzNeHHLdM89YSLzV8QEAO4ujqocOLdmYpHo0SST3HtqOtmrJPLITM1GAb1ay-CHOZOtjpdD13H3HinPwlmuXp-aqVaVFezYaH8Xjsl3OPcbyVg5nP5k3B'
-  ],
-  '[
-    {"name": "Complete Jet Pressure Chemical Service", "price": "Rs. 1,500", "desc": "Indoor blower removal, outdoor condenser pressure washing."},
-    {"name": "Genuine Inverter Gas Charging (R410A / R32)", "price": "Rs. 3,500 - 5,500", "desc": "Nitrogen leak testing, vacuum pull, and precision digital gas filling."}
-  ]'::jsonb
-),
-(
-  'dha-home-chef-fatima',
-  'Farzana Kitchen',
-  'chef',
-  'Authentic Home Cook & Daawat Specialist',
-  'DHA & Clifton',
-  array['DHA Phases 1-8', 'Clifton', 'Bath Island'],
-  'Phase 5, DHA, Karachi',
-  '+923325567890',
-  '+923325567890',
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuBZZ3jFfYAUp1f6ZwaA3bw9DUYqcbD067tf2DiX2SWLVRwTUhafGFCOzOzsUTICpmDPFe91mBv1GRm3r-qyUJZbnBeN57VtXsCuKHMVsXx1aioXkyo3Sw6_yQg78DkkPYzj3soUYY7YS49NK-hbHVquzL-bkNCxoWMINuv2OS5c5kG0a8JFOI5irxZcGHL_fDVrQ4YMj7ltf8FV7Xr-DHs1rDSBoxy0sTlo2SIaOGOn_DXV-DBQ1RiE',
-  'Pure hygienic home cooking prepared with premium branded spices and filtered water. Supplying daily executive lunch tiffins and weekend family dinner daawat platters.',
-  650, 4500, 5.0, 210, true, true, true, 'Top Rated',
-  array[],
-  '[
-    {"name": "Daily Executive Single Tiffin", "price": "Rs. 650", "desc": "1 Salan (Chicken/Sabzi/Daal), 2 Roti, Raita & Fresh Salad."},
-    {"name": "Special Weekend Sindhi Biryani Deg (5kg)", "price": "Rs. 4,200", "desc": "Long grain basmati rice with succulent potatoes and farm chicken."}
-  ]'::jsonb
-)
+  (
+    'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
+    1, 1, 'electrician',
+    'Tariq Mahmood', 'tariq-mahmood', 'individual',
+    '+923332145890',
+    array['PECHS', 'Clifton', 'DHA Phases 1-8', 'Bahadurabad'],
+    '18+ years experience servicing residential bungalows and commercial apartments across Karachi. Specialized in DB panel troubleshooting, short circuit emergency clearance, and hybrid solar UPS load segregation.',
+    true, true, 800, 4.9, 128, 342
+  ),
+  (
+    'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e',
+    1, 1, 'ac',
+    'Kashif Ali', 'kashif-ali', 'individual',
+    '+923012349811',
+    array['Gulshan-e-Iqbal', 'Gulistan-e-Jauhar', 'Federal B Area'],
+    'Certified Inverter AC technician with digital manifold gauges and genuine R410a/R32 refrigerants. Specializing in error code diagnosis, PCB card repairs, and anti-bacterial pressure washing.',
+    true, true, 1200, 4.8, 94, 189
+  ),
+  (
+    'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f',
+    1, 1, 'food',
+    'Farzana Kitchen', 'farzana-kitchen', 'shop',
+    '+923325567890',
+    array['DHA Phase 5', 'Clifton', 'Zamzama'],
+    'Authentic Karachi homemade food, daily office lunchboxes, and bulk daawat orders. 100% hygienic canola oil, premium basmati rice, and mutton biryani.',
+    true, true, 550, 5.0, 210, 520
+  )
 on conflict (id) do nothing;
