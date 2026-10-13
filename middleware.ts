@@ -17,15 +17,28 @@ export const config = {
 const SUPPORTED_LOCALES = ['en', 'ur', 'ar'];
 const DEFAULT_LOCALE = 'en';
 
-// Country to default city and language mapping
+const COUNTRY_DEFAULTS: Record<string, string> = {
+  pk: 'karachi',
+  ae: 'dubai',
+  sa: 'riyadh',
+  qa: 'doha',
+  om: 'muscat',
+  bh: 'manama',
+  kw: 'kuwait',
+  gb: 'london',
+  us: 'houston',
+  ca: 'toronto',
+};
+
+// Regional routing defaults (Strictly English default as requested by user)
 const REGIONAL_ROUTING: Record<string, { country: string; city: string; defaultLang: string }> = {
-  AE: { country: 'ae', city: 'dubai', defaultLang: 'ar' },
+  AE: { country: 'ae', city: 'dubai', defaultLang: 'en' },
   PK: { country: 'pk', city: 'karachi', defaultLang: 'en' },
-  SA: { country: 'sa', city: 'riyadh', defaultLang: 'ar' },
-  QA: { country: 'qa', city: 'doha', defaultLang: 'ar' },
-  OM: { country: 'om', city: 'muscat', defaultLang: 'ar' },
-  BH: { country: 'bh', city: 'manama', defaultLang: 'ar' },
-  KW: { country: 'kw', city: 'kuwait', defaultLang: 'ar' },
+  SA: { country: 'sa', city: 'riyadh', defaultLang: 'en' },
+  QA: { country: 'qa', city: 'doha', defaultLang: 'en' },
+  OM: { country: 'om', city: 'muscat', defaultLang: 'en' },
+  BH: { country: 'bh', city: 'manama', defaultLang: 'en' },
+  KW: { country: 'kw', city: 'kuwait', defaultLang: 'en' },
   GB: { country: 'gb', city: 'london', defaultLang: 'en' },
   US: { country: 'us', city: 'houston', defaultLang: 'en' },
   CA: { country: 'ca', city: 'toronto', defaultLang: 'en' },
@@ -45,16 +58,6 @@ const LEGACY_PROVIDER_MAP: Record<string, { category: string; slug: string }> = 
   'rashid-al-nuaimi': { category: 'ac', slug: 'rashid-al-nuaimi' },
 };
 
-function getPreferredLocale(request: NextRequest, defaultLocale: string): string {
-  const acceptLang = request.headers.get('accept-language');
-  if (acceptLang) {
-    if (acceptLang.includes('ur')) return 'ur';
-    if (acceptLang.includes('ar')) return 'ar';
-    if (acceptLang.includes('en')) return 'en';
-  }
-  return defaultLocale;
-}
-
 export function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
@@ -70,18 +73,17 @@ export function middleware(request: NextRequest) {
   const regionInfo = REGIONAL_ROUTING[geoCountry] || {
     country: 'pk',
     city: 'karachi',
-    defaultLang: 'en',
+    defaultLang: DEFAULT_LOCALE,
   };
 
   const detectedCitySlug = generateEnglishSlug(geoCity) || regionInfo.city;
-  const userLang = getPreferredLocale(request, regionInfo.defaultLang);
 
   // 1. Intercept unlocalized legacy routes (e.g. /provider-profile.html, /categories.html, /index.html)
   if (pathname.includes('provider-profile')) {
     const rawId = searchParams.get('id') || searchParams.get('slug') || '';
     const resolved = LEGACY_PROVIDER_MAP[rawId.toLowerCase()] || { category: 'electrician', slug: 'tariq-mahmood' };
     return NextResponse.redirect(
-      new URL(`/${userLang}/${regionInfo.country}/${detectedCitySlug}/${resolved.category}/${resolved.slug}`, request.url),
+      new URL(`/${DEFAULT_LOCALE}/${regionInfo.country}/${detectedCitySlug}/${resolved.category}/${resolved.slug}`, request.url),
       308
     );
   }
@@ -89,43 +91,58 @@ export function middleware(request: NextRequest) {
   if (pathname.includes('categories.html')) {
     const targetCat = searchParams.get('cat') || searchParams.get('category');
     return NextResponse.redirect(
-      new URL(`/${userLang}/${regionInfo.country}/${detectedCitySlug}${targetCat ? `/${targetCat}` : ''}`, request.url),
+      new URL(`/${DEFAULT_LOCALE}/${regionInfo.country}/${detectedCitySlug}${targetCat ? `/${targetCat}` : ''}`, request.url),
       308
     );
   }
 
-  if (pathname === '/index.html') {
+  if (pathname === '/index.html' || pathname === '/') {
     return NextResponse.redirect(
-      new URL(`/${userLang}/${regionInfo.country}/${detectedCitySlug}`, request.url),
+      new URL(`/${DEFAULT_LOCALE}/${regionInfo.country}/${detectedCitySlug}`, request.url),
       308
     );
   }
 
   // Check if pathname starts with a supported locale (/en, /ur, /ar)
-  const pathnameHasLocale = SUPPORTED_LOCALES.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
+  const segments = pathname.split('/').filter(Boolean);
+  const firstSegment = segments[0]?.toLowerCase();
+  const isSupportedLocale = SUPPORTED_LOCALES.includes(firstSegment);
 
-  // If visiting root "/" or missing locale: redirect to localized geo-silo
-  if (pathname === '/' || !pathnameHasLocale) {
+  // If path has no valid locale prefix: prefix with /en/[country]/[city]
+  if (!isSupportedLocale) {
     const targetCountry = regionInfo.country;
     const targetCity = detectedCitySlug;
-    const cleanPath = pathname === '/' ? '' : pathname;
-
-    // Geo-redirect to: /[lang]/[country]/[city]
-    const redirectUrl = new URL(`/${userLang}/${targetCountry}/${targetCity}${cleanPath}`, request.url);
-    
-    const response = NextResponse.redirect(redirectUrl);
-    response.headers.set('x-baseera-geo-country', targetCountry);
-    response.headers.set('x-baseera-geo-city', targetCity);
-    return response;
+    return NextResponse.redirect(
+      new URL(`/${DEFAULT_LOCALE}/${targetCountry}/${targetCity}${pathname}`, request.url),
+      308
+    );
   }
 
-  // Ensure any downstream segments are strictly English slugs
-  const segments = pathname.split('/').filter(Boolean);
-  const [lang, country, city, category, slug] = segments;
+  const lang = firstSegment;
 
-  // 2. Intercept localized legacy URLs (e.g. /en/pk/karachi/provider-profilehtml)
+  // Case A: Just "/en", "/ur", or "/ar" -> Redirect to localized default city!
+  if (segments.length === 1) {
+    const targetCountry = lang === 'ar' ? 'ae' : regionInfo.country;
+    const targetCity = COUNTRY_DEFAULTS[targetCountry] || 'karachi';
+    return NextResponse.redirect(
+      new URL(`/${lang}/${targetCountry}/${targetCity}`, request.url),
+      308
+    );
+  }
+
+  // Case B: Just "/en/pk", "/ur/pk", or "/en/ae" (missing city segment) -> Complete the Silo URL!
+  if (segments.length === 2) {
+    const country = segments[1].toLowerCase();
+    const targetCity = COUNTRY_DEFAULTS[country] || 'karachi';
+    return NextResponse.redirect(
+      new URL(`/${lang}/${country}/${targetCity}`, request.url),
+      308
+    );
+  }
+
+  const [_, country, city, category, slug] = segments;
+
+  // Case C: Intercept legacy URLs with locale (e.g. /en/pk/karachi/provider-profilehtml)
   if (category && category.includes('provider-profile')) {
     const rawId = searchParams.get('id') || slug || '';
     const resolved = LEGACY_PROVIDER_MAP[rawId.toLowerCase()] || { category: 'electrician', slug: 'tariq-mahmood' };
@@ -139,10 +156,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${lang}/${country}/${city}`, request.url), 308);
   }
 
+  // Ensure any downstream segments are strictly English ASCII slugs
   let needsSanitization = false;
   const sanitizedSegments = segments.map((seg, idx) => {
-    // Keep locale segment as is
-    if (idx === 0) return seg;
+    if (idx === 0) return seg; // Keep locale as is
     const clean = generateEnglishSlug(seg);
     if (clean !== seg) needsSanitization = true;
     return clean;
@@ -155,7 +172,7 @@ export function middleware(request: NextRequest) {
   }
 
   const response = NextResponse.next();
-  response.headers.set('x-baseera-lang', lang || 'en');
+  response.headers.set('x-baseera-lang', lang);
   response.headers.set('x-baseera-country', country || 'pk');
   response.headers.set('x-baseera-city', city || 'karachi');
   return response;
