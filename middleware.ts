@@ -31,6 +31,20 @@ const REGIONAL_ROUTING: Record<string, { country: string; city: string; defaultL
   CA: { country: 'ca', city: 'toronto', defaultLang: 'en' },
 };
 
+const LEGACY_PROVIDER_MAP: Record<string, { category: string; slug: string }> = {
+  'tariq-electric': { category: 'electrician', slug: 'tariq-mahmood' },
+  'tariq-mahmood': { category: 'electrician', slug: 'tariq-mahmood' },
+  'irfan-electrician': { category: 'electrician', slug: 'tariq-mahmood' },
+  'saleem-master-plumber': { category: 'plumbing', slug: 'saleem-master-plumber' },
+  'master-plumber-saleem': { category: 'plumbing', slug: 'saleem-master-plumber' },
+  'raheem-plumber': { category: 'plumbing', slug: 'raheem-plumber' },
+  'asif-electric-works': { category: 'electrician', slug: 'asif-electric-works' },
+  'kashif-ali': { category: 'ac', slug: 'kashif-ali' },
+  'karachi-cooling-expert': { category: 'ac', slug: 'kashif-ali' },
+  'farzana-kitchen': { category: 'food', slug: 'farzana-kitchen' },
+  'rashid-al-nuaimi': { category: 'ac', slug: 'rashid-al-nuaimi' },
+};
+
 function getPreferredLocale(request: NextRequest, defaultLocale: string): string {
   const acceptLang = request.headers.get('accept-language');
   if (acceptLang) {
@@ -42,7 +56,7 @@ function getPreferredLocale(request: NextRequest, defaultLocale: string): string
 }
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
 
   // Let sitemap and robots pass through directly without locale redirection
   if (pathname === '/sitemap.xml' || pathname === '/robots.txt') {
@@ -61,6 +75,31 @@ export function middleware(request: NextRequest) {
 
   const detectedCitySlug = generateEnglishSlug(geoCity) || regionInfo.city;
   const userLang = getPreferredLocale(request, regionInfo.defaultLang);
+
+  // 1. Intercept unlocalized legacy routes (e.g. /provider-profile.html, /categories.html, /index.html)
+  if (pathname.includes('provider-profile')) {
+    const rawId = searchParams.get('id') || searchParams.get('slug') || '';
+    const resolved = LEGACY_PROVIDER_MAP[rawId.toLowerCase()] || { category: 'electrician', slug: 'tariq-mahmood' };
+    return NextResponse.redirect(
+      new URL(`/${userLang}/${regionInfo.country}/${detectedCitySlug}/${resolved.category}/${resolved.slug}`, request.url),
+      308
+    );
+  }
+
+  if (pathname.includes('categories.html')) {
+    const targetCat = searchParams.get('cat') || searchParams.get('category');
+    return NextResponse.redirect(
+      new URL(`/${userLang}/${regionInfo.country}/${detectedCitySlug}${targetCat ? `/${targetCat}` : ''}`, request.url),
+      308
+    );
+  }
+
+  if (pathname === '/index.html') {
+    return NextResponse.redirect(
+      new URL(`/${userLang}/${regionInfo.country}/${detectedCitySlug}`, request.url),
+      308
+    );
+  }
 
   // Check if pathname starts with a supported locale (/en, /ur, /ar)
   const pathnameHasLocale = SUPPORTED_LOCALES.some(
@@ -85,6 +124,20 @@ export function middleware(request: NextRequest) {
   // Ensure any downstream segments are strictly English slugs
   const segments = pathname.split('/').filter(Boolean);
   const [lang, country, city, category, slug] = segments;
+
+  // 2. Intercept localized legacy URLs (e.g. /en/pk/karachi/provider-profilehtml)
+  if (category && category.includes('provider-profile')) {
+    const rawId = searchParams.get('id') || slug || '';
+    const resolved = LEGACY_PROVIDER_MAP[rawId.toLowerCase()] || { category: 'electrician', slug: 'tariq-mahmood' };
+    return NextResponse.redirect(
+      new URL(`/${lang}/${country}/${city}/${resolved.category}/${resolved.slug}`, request.url),
+      308
+    );
+  }
+
+  if (category && (category.includes('categories') || category.includes('index'))) {
+    return NextResponse.redirect(new URL(`/${lang}/${country}/${city}`, request.url), 308);
+  }
 
   let needsSanitization = false;
   const sanitizedSegments = segments.map((seg, idx) => {
