@@ -1,0 +1,13 @@
+{
+  "name": "baseera-karachi",
+  "version": "2.0.0",
+  "type": "module",
+  "description": "Baseera Karachi - Direct Local Services Directory & Business Platform",
+  "main": "api/providers.js",
+  "scripts": {
+    "test": "node api/health.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1"
+  }
+}

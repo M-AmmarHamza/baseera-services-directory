@@ -90,16 +90,39 @@ const StorageService = {
   }
 };
 
-// WhatsApp Lead Link Helper
+// WhatsApp Lead Link Helper & Realtime Tracker
 function openWhatsAppLead(providerId, customNote = '') {
-  const provider = BASEERA_DATA.providers.find(p => p.id === providerId);
-  if (!provider) return;
+  let provider = null;
+  if (typeof BASEERA_DATA !== 'undefined' && BASEERA_DATA.providers) {
+    provider = BASEERA_DATA.providers.find(p => p.id === providerId);
+  }
+  
+  const whatsappNumber = provider ? provider.whatsapp : '923332145890';
+  const providerName = provider ? provider.name : 'Specialist';
+  const businessName = provider ? provider.businessName : 'Baseera Pro';
 
-  const defaultNote = `Assalam-o-Alaikum ${provider.name}, I found your verified profile on Baseera Karachi for ${provider.businessName}. I have a service inquiry.`;
+  // 1. Asynchronously log lead to serverless backend
+  if (window.BaseeraBackend && typeof window.BaseeraBackend.recordLead === 'function') {
+    window.BaseeraBackend.recordLead({
+      provider_id: providerId,
+      service_requested: customNote || `${businessName} Inquiry`,
+      district: provider ? provider.district : 'Karachi',
+      lead_type: 'whatsapp'
+    });
+  }
+
+  showToast('Connecting directly via WhatsApp...', 'success');
+
+  const defaultNote = `Assalam-o-Alaikum ${providerName}, I found your verified profile on Baseera Karachi for ${businessName}. I have an urgent service inquiry.`;
   const text = encodeURIComponent(customNote || defaultNote);
-  const whatsappUrl = `https://wa.me/${provider.whatsapp}?text=${text}`;
-  window.open(whatsappUrl, '_blank');
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${text}`;
+  
+  // Smoothly open WhatsApp
+  setTimeout(() => {
+    window.open(whatsappUrl, '_blank');
+  }, 200);
 }
+
 
 // Generate Standard Bottom Navigation
 function renderBottomNav(activeTab = 'home') {
