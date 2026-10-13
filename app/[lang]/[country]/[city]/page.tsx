@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
 import { getProviders, CATEGORIES } from '@/lib/db';
+import SearchBar from '@/components/SearchBar';
 
 interface PageProps {
   params: Promise<{
@@ -106,20 +107,15 @@ export default async function CityHomePage({ params }: PageProps) {
               {dict.home.heroSubtitle}
             </p>
 
-            {/* Quick Search Bar */}
-            <div className="mt-4 flex items-center bg-white rounded-2xl p-2 shadow-lg text-gray-900">
-              <span className="material-symbols-outlined text-gray-400 ms-3 me-2 text-[22px]">search</span>
-              <input
-                type="text"
+            {/* Quick Interactive Search Bar */}
+            <div className="mt-4">
+              <SearchBar
+                lang={lang}
+                country={country}
+                city={city}
                 placeholder={dict.common.searchPlaceholder}
-                className="w-full bg-transparent text-sm focus:outline-none placeholder-gray-400"
+                searchButtonText={dict.common.search}
               />
-              <button
-                type="button"
-                className="bg-[#006948] hover:bg-[#00855d] text-white px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-colors shrink-0"
-              >
-                {dict.common.search}
-              </button>
             </div>
           </div>
         </section>

@@ -476,6 +476,13 @@
   </main>
 
   <script>
+    // Redirect query searches to modern Next.js intelligent search route
+    const searchParams = new URLSearchParams(window.location.search);
+    const searchQ = searchParams.get('q');
+    if (searchQ) {
+      window.location.replace(`/en/pk/karachi/search?q=${encodeURIComponent(searchQ)}`);
+    }
+
     // Real interactive filter chips logic
     document.addEventListener('DOMContentLoaded', () => {
       const chips = document.querySelectorAll('#filterChipsContainer button');

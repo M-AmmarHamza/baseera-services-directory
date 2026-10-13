@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
 import { getProviders, getCategoryBySlug, CATEGORIES } from '@/lib/db';
+import SearchBar from '@/components/SearchBar';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -195,6 +196,17 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             </Link>
           </div>
         </section>
+
+        {/* Quick Search */}
+        <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-xs">
+          <SearchBar
+            lang={lang}
+            country={country}
+            city={city}
+            placeholder={`Search within ${cityName} (e.g., plumber in orangi, electrician)...`}
+            searchButtonText={dict.common.search}
+          />
+        </div>
 
         {/* Main Content Area */}
         {providers.length > 0 ? (
