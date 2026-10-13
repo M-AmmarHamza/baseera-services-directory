@@ -2,9 +2,21 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
+import { CATEGORIES } from '@/lib/db';
 import { searchProviders } from '@/lib/search';
 import SearchBar from '@/components/SearchBar';
-import { CATEGORIES } from '@/lib/db';
+import {
+  MapPin,
+  BadgeCheck,
+  WhatsAppIcon,
+  Star,
+  Search,
+  SlidersHorizontal,
+  Headphones,
+  ArrowRight,
+  AlertCircle,
+  ChevronRight,
+} from '@/components/Icons';
 
 interface SearchPageProps {
   params: Promise<{
@@ -17,29 +29,20 @@ interface SearchPageProps {
   }>;
 }
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
-
 export async function generateMetadata({
   params,
   searchParams,
 }: SearchPageProps): Promise<Metadata> {
-  const { lang, country, city } = await params;
+  const { city } = await params;
   const { q } = await searchParams;
+  const query = q || '';
   const cityName = city.charAt(0).toUpperCase() + city.slice(1);
-  const countryCode = country.toUpperCase();
-  const countryName = countryCode === 'PK' ? 'Pakistan' : countryCode === 'AE' ? 'United Arab Emirates' : countryCode;
-
-  const queryText = q ? `"${q}"` : 'Services';
-  const title = `Search Results for ${queryText} in ${cityName}, ${countryName} | Baseera`;
-  const description = `Find verified local service providers for ${queryText} in ${cityName}. Contact directly on WhatsApp with zero middleman fee.`;
 
   return {
-    title,
-    description,
-    robots: {
-      index: false, // Search result pages shouldn't create duplicate index bloat, but empty states are indexed on canonical URLs
-      follow: true,
-    },
+    title: query
+      ? `Results for "${query}" in ${cityName} | Baseera`
+      : `Search Verified Technicians in ${cityName} | Baseera`,
+    description: `Search verified plumbers, electricians, AC technicians, and home chefs across ${cityName}. Direct WhatsApp contact with zero platform fee.`,
   };
 }
 
@@ -48,42 +51,56 @@ export default async function SearchResultsPage({
   searchParams,
 }: SearchPageProps) {
   const { lang, country, city } = await params;
-  const { q = '' } = await searchParams;
+  const { q } = await searchParams;
   const dict = await getDictionary(lang);
   const cityName = city.charAt(0).toUpperCase() + city.slice(1);
-  const countryName = country.toUpperCase() === 'PK' ? 'Pakistan' : country.toUpperCase();
 
-  const searchResult = await searchProviders(city, q);
-  const { detectedCategoryName, detectedArea, exactMatches, nearbyCityMatches, originalQuery } = searchResult;
+  const analysis = await searchProviders(city, q || '');
+  const {
+    originalQuery,
+    detectedCategoryId,
+    detectedCategoryName,
+    detectedArea,
+    exactMatches,
+    nearbyCityMatches,
+  } = analysis;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
       
-      {/* Breadcrumbs */}
-      <nav className="flex items-center text-xs font-semibold text-gray-500 gap-2 overflow-x-auto whitespace-nowrap py-1">
+      {/* Breadcrumb Navigation */}
+      <nav aria-label="Breadcrumb" className="flex items-center text-xs font-semibold text-gray-500 gap-1.5 overflow-x-auto whitespace-nowrap py-1">
         <Link href={`/${lang}/pk/karachi`} className="hover:text-emerald-800 transition-colors">
           {dict.nav.home}
         </Link>
-        <span>/</span>
+        <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
         <Link href={`/${lang}/${country}/${city}`} className="hover:text-emerald-800 transition-colors">
           {cityName}
         </Link>
-        <span>/</span>
+        <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
         <span className="text-emerald-800 font-bold">Search</span>
       </nav>
 
-      {/* Hero Search Section */}
-      <section className="bg-gradient-to-br from-[#006948] to-[#004e35] text-white rounded-3xl p-6 sm:p-10 shadow-sm flex flex-col gap-4">
+      {/* Search Header Banner */}
+      <section className="bg-gradient-to-br from-[#006948] via-[#005a3e] to-[#004e35] text-white rounded-3xl p-6 sm:p-10 shadow-sm flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <span className="text-xs uppercase font-bold tracking-wider text-emerald-200">
-            Intelligent Direct Search
-          </span>
-          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
-            Results for <span className="underline decoration-emerald-300 underline-offset-4">&ldquo;{originalQuery || 'All Services'}&rdquo;</span> in {cityName}
+          <div className="flex items-center gap-2 text-emerald-200 text-xs font-bold uppercase tracking-wider">
+            <Search className="w-3.5 h-3.5" />
+            <span>Search Results in {cityName}</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            {originalQuery ? (
+              <span>
+                Search: &ldquo;<span className="text-emerald-200">{originalQuery}</span>&rdquo;
+              </span>
+            ) : (
+              <span>Search Verified Local Technicians</span>
+            )}
           </h1>
         </div>
 
-        <div className="max-w-2xl mt-2">
+        {/* Live Search Bar */}
+        <div className="mt-1">
           <SearchBar
             lang={lang}
             country={country}
@@ -100,13 +117,13 @@ export default async function SearchResultsPage({
             <span className="text-xs text-emerald-200 font-medium">Smart Filter Detected:</span>
             {detectedCategoryName && (
               <span className="bg-emerald-400/20 text-white border border-emerald-300/30 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[15px]">category</span>
+                <SlidersHorizontal className="w-3.5 h-3.5" />
                 Category: {detectedCategoryName}
               </span>
             )}
             {detectedArea && (
               <span className="bg-emerald-400/20 text-white border border-emerald-300/30 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-[15px]">location_on</span>
+                <MapPin className="w-3.5 h-3.5" />
                 Area: {detectedArea}
               </span>
             )}
@@ -132,94 +149,115 @@ export default async function SearchResultsPage({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {exactMatches.map((pro) => (
-              <article
-                key={pro.id}
-                className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs flex flex-col justify-between hover:border-emerald-600 hover:shadow-md transition-all gap-5"
-              >
-                <div>
-                  <div className="flex items-start gap-4">
-                    <img
-                      src={pro.avatar_url}
-                      alt={pro.name}
-                      className="w-16 h-16 rounded-2xl object-cover ring-2 ring-emerald-50 bg-gray-100 shrink-0"
-                    />
-                    <div className="flex flex-col min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-1">
-                        <h3 className="font-bold text-lg text-gray-900 truncate">{pro.name}</h3>
-                        <span className="text-xs bg-emerald-50 text-emerald-800 font-extrabold px-2.5 py-0.5 rounded-full shrink-0">
-                          ★ {pro.rating}
+            {exactMatches.map((pro) => {
+              const initials = pro.name
+                .split(' ')
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((n) => n[0]?.toUpperCase())
+                .join('');
+
+              return (
+                <article
+                  key={pro.id}
+                  className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs flex flex-col justify-between hover:border-emerald-600 hover:shadow-md transition-all gap-5"
+                >
+                  <div>
+                    <div className="flex items-start gap-4">
+                      <div className="w-16 h-16 rounded-2xl overflow-hidden ring-2 ring-emerald-50 bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center text-white shrink-0">
+                        {pro.avatar_url && !pro.avatar_url.includes('googleusercontent') ? (
+                          <img
+                            src={pro.avatar_url}
+                            alt={pro.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-base font-bold">{initials || 'BP'}</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <h3 className="font-bold text-lg text-gray-900 truncate">{pro.name}</h3>
+                            {pro.is_verified && (
+                              <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                            )}
+                          </div>
+                          <span className="text-xs bg-amber-50 text-amber-900 border border-amber-200 font-extrabold px-2 py-0.5 rounded-md shrink-0 flex items-center gap-1">
+                            <Star className="w-3 h-3 fill-amber-400 text-amber-500" />
+                            {pro.rating}
+                          </span>
+                        </div>
+                        <span className="text-xs text-emerald-800 font-bold truncate mt-0.5">
+                          {pro.trade_title}
                         </span>
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
+                          <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                          <span className="truncate font-medium text-emerald-800">{pro.district}</span>
+                        </div>
                       </div>
-                      <span className="text-xs text-emerald-700 font-bold truncate mt-0.5">
-                        {pro.trade_title}
-                      </span>
-                      <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
-                        <span className="material-symbols-outlined text-[15px] text-gray-400">location_on</span>
-                        <span className="truncate font-medium text-emerald-800">{pro.district}</span>
-                      </div>
+                    </div>
+
+                    <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed mt-4">
+                      {pro.short_bio}
+                    </p>
+
+                    {/* Coverage tags */}
+                    <div className="flex flex-wrap gap-1.5 mt-4">
+                      {pro.service_area.slice(0, 4).map((area) => {
+                        const isTargetArea = detectedArea && area.toLowerCase().includes(detectedArea.toLowerCase());
+                        return (
+                          <span
+                            key={area}
+                            className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
+                              isTargetArea
+                                ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                                : 'bg-gray-100 text-gray-700'
+                            }`}
+                          >
+                            {area}
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed mt-4">
-                    {pro.short_bio}
-                  </p>
+                  <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+                    <div>
+                      <span className="text-[10px] text-gray-400 font-medium block">{dict.profile.pricingFrom}</span>
+                      <span className="text-sm font-extrabold text-gray-900">
+                        Rs. {pro.starting_price}
+                      </span>
+                    </div>
 
-                  {/* Coverage tags */}
-                  <div className="flex flex-wrap gap-1.5 mt-4">
-                    {pro.service_area.slice(0, 4).map((area) => {
-                      const isTargetArea = detectedArea && area.toLowerCase().includes(detectedArea.toLowerCase());
-                      return (
-                        <span
-                          key={area}
-                          className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
-                            isTargetArea
-                              ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                              : 'bg-gray-100 text-gray-700'
-                          }`}
-                        >
-                          {isTargetArea && '✓ '}
-                          {area}
-                        </span>
-                      );
-                    })}
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/${lang}/${country}/${city}/${pro.category_id}/${pro.slug}`}
+                        className="py-2.5 px-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold text-xs transition-colors"
+                      >
+                        {dict.common.viewProfile}
+                      </Link>
+                      <a
+                        href={`https://wa.me/${pro.whatsapp_number.replace(/\+/g, '')}?text=${encodeURIComponent(`Assalam-o-Alaikum ${pro.name}, I found your profile on Baseera ${cityName}. I am looking for service in ${detectedArea || pro.district}.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.99] text-white py-2.5 px-3.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
+                      >
+                        <WhatsAppIcon className="w-4 h-4 text-white shrink-0" />
+                        <span>{dict.common.chatWhatsApp}</span>
+                      </a>
+                    </div>
                   </div>
-                </div>
-
-                <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
-                  <div>
-                    <span className="text-[10px] text-gray-400 font-medium block">{dict.profile.pricingFrom}</span>
-                    <span className="text-sm font-extrabold text-gray-900">
-                      Rs. {pro.starting_price}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/${lang}/${country}/${city}/${pro.category_id}/${pro.slug}`}
-                      className="py-2.5 px-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold text-xs transition-colors"
-                    >
-                      {dict.common.viewProfile}
-                    </Link>
-                    <a
-                      href={`https://wa.me/${pro.whatsapp_number.replace(/\+/g, '')}?text=${encodeURIComponent(`Assalam-o-Alaikum ${pro.name}, I found your profile on Baseera ${cityName} while searching for "${originalQuery}". Are you available?`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-[#006948] hover:bg-[#00855d] text-white py-2.5 px-3.5 rounded-xl font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-xs"
-                    >
-                      <span>{dict.common.chatWhatsApp}</span>
-                    </a>
-                  </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </section>
       ) : (
         /* 🚨 ZERO RESULTS FOR THIS AREA/CATEGORY: Smart Empty State (Never Show Misleading Unrelated Pros) */
         <section className="bg-white rounded-3xl p-8 sm:p-12 border border-gray-200 text-center flex flex-col items-center max-w-3xl mx-auto gap-6 my-2 shadow-xs">
           <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center ring-8 ring-amber-50/50">
-            <span className="material-symbols-outlined text-[32px]">search_off</span>
+            <AlertCircle className="w-8 h-8 text-amber-600" />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -234,7 +272,7 @@ export default async function SearchResultsPage({
           {/* Lead Catching CTA */}
           <div className="w-full bg-[#f9f9ff] rounded-2xl p-6 border border-emerald-100 text-start flex flex-col gap-4">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-emerald-700 text-[22px]">support_agent</span>
+              <Headphones className="w-5 h-5 text-emerald-700" />
               <span className="font-bold text-sm text-gray-900">
                 Need urgent assistance in {detectedArea || cityName}?
               </span>
@@ -247,10 +285,11 @@ export default async function SearchResultsPage({
               href={`https://wa.me/923332145890?text=${encodeURIComponent(`Assalam-o-Alaikum Baseera, I need a verified ${detectedCategoryName || 'technician'} in ${detectedArea || originalQuery} (${cityName}). Can you help connect me?`)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#006948] hover:bg-[#00855d] text-white py-3 px-6 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-colors self-start shadow-sm"
+              className="bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.99] text-white py-3 px-6 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all self-start shadow-sm"
             >
+              <WhatsAppIcon className="w-4 h-4 text-white shrink-0" />
               <span>Request {detectedCategoryName || 'Specialist'} via WhatsApp Coordinator</span>
-              <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+              <ArrowRight className="w-4 h-4 text-white shrink-0 rtl:rotate-180" />
             </a>
           </div>
 
@@ -273,7 +312,9 @@ export default async function SearchResultsPage({
                     className="p-4 rounded-xl border border-gray-200 bg-gray-50/50 flex items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <img src={pro.avatar_url} alt={pro.name} className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-700 to-teal-900 flex items-center justify-center text-white shrink-0 font-bold text-xs">
+                        {pro.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                      </div>
                       <div className="flex flex-col min-w-0">
                         <span className="font-bold text-xs text-gray-900 truncate">{pro.name}</span>
                         <span className="text-[11px] text-gray-500 truncate">{pro.district}</span>

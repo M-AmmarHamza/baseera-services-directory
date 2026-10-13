@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Search } from '@/components/Icons';
 
 interface SearchBarProps {
   lang: string;
@@ -41,9 +42,7 @@ export default function SearchBar({
         onSubmit={handleSearch}
         className="flex items-center bg-white rounded-2xl p-2 shadow-lg border border-gray-100 text-gray-900 focus-within:ring-2 focus-within:ring-emerald-500 transition-all"
       >
-        <span className="material-symbols-outlined text-gray-400 ms-3 me-2 text-[22px] shrink-0">
-          search
-        </span>
+        <Search className="w-5 h-5 text-gray-400 ms-3 me-2 shrink-0" />
         <input
           type="text"
           value={query}
