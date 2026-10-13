@@ -1,274 +1,363 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Provider Details - Baseera Karachi</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <meta content="mobile_stack" name="shell-type"/>
+  <title>Tariq Mahmood - Baseera Karachi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
+  <script id="tailwind-config">
     tailwind.config = {
+      darkMode: "class",
       theme: {
         extend: {
           colors: {
-            primary: "#006948",
-            "primary-dark": "#005236",
-            secondary: "#006c49",
-            "secondary-container": "#6cf8bb",
-            "on-secondary-container": "#00714d",
             "surface-container-lowest": "#ffffff",
-            "surface-container-low": "#f9fafb"
+            "tertiary-container": "#ba5551",
+            "tertiary-fixed": "#ffdad7",
+            "tertiary": "#9b3e3b",
+            "surface-container-highest": "#dce2f7",
+            "surface-container-low": "#f1f3ff",
+            "on-tertiary": "#ffffff",
+            "on-background": "#141b2b",
+            "outline": "#6d7a72",
+            "outline-variant": "#bccac0",
+            "surface-container": "#e9edff",
+            "secondary-fixed-dim": "#4edea3",
+            "on-tertiary-fixed": "#410004",
+            "on-surface-variant": "#3d4a42",
+            "on-surface": "#141b2b",
+            "on-primary-container": "#f5fff7",
+            "surface-container-high": "#e1e8fd",
+            "error-container": "#ffdad6",
+            "inverse-on-surface": "#edf0ff",
+            "primary-fixed": "#85f8c4",
+            "on-secondary-fixed-variant": "#005236",
+            "surface-bright": "#f9f9ff",
+            "secondary": "#006c49",
+            "surface": "#f9f9ff",
+            "error": "#ba1a1a",
+            "on-primary": "#ffffff",
+            "secondary-container": "#6cf8bb",
+            "surface-variant": "#dce2f7",
+            "inverse-surface": "#293040",
+            "primary": "#006948",
+            "tertiary-fixed-dim": "#ffb3ae",
+            "secondary-fixed": "#6ffbbe",
+            "primary-container": "#00855d",
+            "background": "#f9f9ff",
+            "on-tertiary-fixed-variant": "#7f2928",
+            "on-error": "#ffffff",
+            "on-primary-fixed-variant": "#005137",
+            "primary-fixed-dim": "#68dba9",
+            "surface-dim": "#d3daef",
+            "surface-tint": "#006c4a",
+            "on-error-container": "#93000a",
+            "inverse-primary": "#68dba9",
+            "on-secondary": "#ffffff",
+            "on-tertiary-container": "#fffbff",
+            "on-secondary-container": "#00714d",
+            "on-secondary-fixed": "#002113",
+            "on-primary-fixed": "#002114"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          spacing: {
+            "space-sm": "0.5rem",
+            "margin": "1rem",
+            "space-xl": "1.5rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "space-md": "0.75rem",
+            "space-lg": "1rem"
           },
           fontFamily: {
-            sans: ['Inter', 'sans-serif']
+            "label-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "body-lg": ["Inter"],
+            "headline-xl": ["Inter"],
+            "headline-lg": ["Inter"],
+            "label-sm": ["Inter"],
+            "title-md": ["Inter"],
+            "headline-sm": ["Inter"]
+          },
+          fontSize: {
+            "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "500" }],
+            "body-sm": ["13px", { lineHeight: "18px", fontWeight: "400" }],
+            "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            "body-lg": ["15px", { lineHeight: "22px", fontWeight: "400" }],
+            "headline-xl": ["28px", { lineHeight: "34px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "headline-lg": ["22px", { lineHeight: "28px", letterSpacing: "-0.015em", fontWeight: "600" }],
+            "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.02em", fontWeight: "600" }],
+            "title-md": ["16px", { lineHeight: "22px", letterSpacing: "-0.005em", fontWeight: "600" }],
+            "headline-sm": ["18px", { lineHeight: "24px", letterSpacing: "-0.01em", fontWeight: "600" }]
           }
         }
       }
-    }
+    };
   </script>
-  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    @layer base {
+      html, body {
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+      main > :first-child {
+        margin-top: 0 !important;
+      }
+      main > :last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .material-symbols-outlined.filled {
+      font-variation-settings: 'FILL' 1;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased text-[#111827]">
-
-  <div class="app-shell pb-24">
-    <!-- Top Header -->
-    <header id="app-header"></header>
-
-    <main class="flex-1 w-full pt-16 bg-white" id="profileContent">
-      <!-- Loading state / Filled dynamically -->
-    </main>
-
-    <!-- Sticky Bottom WhatsApp Bar -->
-    <div id="stickyCtaBar" class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 p-3 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
-      <div class="max-w-[480px] mx-auto flex items-center gap-3">
-        <button id="stickySaveBtn" class="w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:text-emerald-700 hover:bg-gray-50 transition-colors">
-          <span class="material-symbols-outlined text-[24px]">bookmark</span>
-        </button>
-        <button id="stickyWhatsAppBtn" class="flex-1 btn-whatsapp h-12 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm">
-          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.41a8.176 8.176 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.45 0-2.87-.38-4.12-1.11l-.3-.17-3.12.82.83-3.04-.19-.31a8.19 8.19 0 0 1-1.25-4.43c0-4.54 3.69-8.24 8.24-8.24m4.52 11.53c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.12.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.11-.23-.17-.48-.29z"/>
-          </svg>
-          Chat on WhatsApp
-        </button>
+<body class="bg-surface-container-lowest font-body-md text-on-surface antialiased flex flex-col min-h-screen">
+  
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+    <div class="h-16 px-gutter flex items-center justify-between max-w-[480px] mx-auto w-full">
+      <div class="flex items-center gap-space-sm">
+        <a aria-label="Go Back" class="w-11 h-11 -ml-space-xs flex items-center justify-center text-on-surface hover:text-primary transition-colors" href="categories.html">
+          <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+        </a>
+        <img alt="Baseera Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VifhEhAnyGcIMAzyuf5f1JiVQATzvcwJzkzN2D-g0gIhjkGPPHeQREP_6GXBi6qybDjnH1LpSOIiSsTUAUXGJxnyUWu4N8xlrBq6aC66NMIaHPa5Gcghl7Cayh0drMuGxb7JnbeMzXIYNY2GAaFw7XfnX36ysQ37W_WDJ0XXRu7EXEz0YyabfgENet5RdeIkW4OGCMK00BuGwq07GuCnFh2NtO3g4vUFFUjgwvkpndlGWwfV8ALvSw_3Q"/>
+        <h1 class="font-title-md text-title-md text-on-surface truncate">Provider Details</h1>
+      </div>
+      <div class="flex items-center">
+        <a href="settings.html" class="w-8 h-8 rounded-full overflow-hidden ring-1 ring-outline/20 hover:ring-primary transition-all">
+          <img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4AzipZE5x54eTvTk6U_Nuld4aVm8bttEj_sypX_08gahKrurGREYPQ1YUp9ZowjJOLXrIMXABFDs4LwY2S5BaWs7NO61I6Y7ymgJdnm0setiMWhpfzRtcQagtc_2TjPhjsMSTOKBg-tjTpW9M9B_8r3IRGiE7_duBwL7sIcQim_8A83vtP0MnVErrKsZT7AIRl_AY6t5hP-A5IvJUF4QRZfEAhAsHdwtN2mPcAYvgQq_il2vuzoVx"/>
+        </a>
       </div>
     </div>
-  </div>
+  </header>
 
-  <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      renderHeader({ title: 'Provider Details', subtitle: 'Karachi', showBack: true, backHref: 'categories.html' });
-
-      const params = new URLSearchParams(window.location.search);
-      const providerId = params.get('id') || 'tariq-electric';
-      const provider = BASEERA_DATA.providers.find(p => p.id === providerId) || BASEERA_DATA.providers[0];
-
-      renderProfile(provider);
-      setupStickyCta(provider);
-    });
-
-    function renderProfile(p) {
-      const container = document.getElementById('profileContent');
-      const isSaved = StorageService.isSaved(p.id);
-
-      const hasGallery = p.gallery && p.gallery.length > 0;
-
-      container.innerHTML = `
-        <!-- Work Gallery Carousel -->
-        ${hasGallery ? `
-          <div class="relative w-full bg-gray-100 overflow-hidden">
-            <div id="galleryTrack" class="flex w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
-              ${p.gallery.map((g, index) => `
-                <div class="min-w-full snap-start relative aspect-[16/9]">
-                  <img src="${g.url}" alt="${g.title}" class="w-full h-full object-cover" />
-                  <div class="absolute bottom-2.5 right-2.5 bg-black/70 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-white text-[11px] font-medium">
-                    ${index + 1} / ${p.gallery.length}
-                  </div>
-                  <div class="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur-sm px-2.5 py-0.5 rounded text-white text-[11px] font-medium truncate max-w-[200px]">
-                    ${g.title}
-                  </div>
-                </div>
-              `).join('')}
+  <!-- Main View -->
+  <main class="flex-1 flex flex-col relative w-full pt-16 bg-surface-container-lowest max-w-[480px] mx-auto">
+    <div class="flex flex-col w-full pb-28">
+      
+      <!-- Top Gallery Carousel -->
+      <section class="relative w-full bg-surface-container-low overflow-hidden">
+        <div class="flex w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar" id="gallery-track">
+          <!-- Slide 1 -->
+          <div class="min-w-full snap-start relative aspect-[16/9]">
+            <img alt="Switchboard installation" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh_sRw3hmV3-7S4eNUd-jVO6bSyp0hVjmvJnXG1oQgcAzN4VP_eIJmZkl_MPu4cn6bdK2L8vqRh-o3t5WJiZO5TxWY_sqrtZ3IEN0Z--_cgbhxjNDSjvWO-GU0eiTs0MbgHl_RKimCrBYqcVeAFD5itfUXN0BPc3h_RqJ7QxAG6T4a8tmK_zj2jjST6iDrmQLd7bRv5r8IvN6HyGLW7O7OZgikD5SLl5PGm5qg8hoKu1pyQ2C9_2vX"/>
+            <div class="absolute bottom-3 right-3 bg-inverse-surface/80 backdrop-blur-md px-2 py-1 rounded-full text-inverse-on-surface font-label-sm text-label-sm">
+              1 / 3
             </div>
           </div>
-        ` : `
-          <div class="h-20 bg-emerald-900/10 border-b border-gray-100"></div>
-        `}
-
-        <div class="px-4 pb-6">
-          <!-- Identity Card Header -->
-          <div class="flex items-start justify-between ${hasGallery ? '-mt-10' : '-mt-8'} mb-3">
-            <div class="relative">
-              <div class="w-20 h-20 rounded-full p-1 bg-white shadow-md">
-                <img src="${p.avatar}" alt="${p.name}" class="w-full h-full rounded-full object-cover bg-gray-100" />
-              </div>
-              ${p.verified ? `
-                <span class="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center ring-2 ring-white">
-                  <span class="material-symbols-outlined text-[14px] filled">check</span>
-                </span>
-              ` : ''}
-            </div>
-
-            <!-- Badges -->
-            <div class="flex items-center gap-1.5 mt-10">
-              <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-semibold">
-                <span class="material-symbols-outlined text-[15px] filled">verified_user</span>
-                ID Verified
-              </span>
-              ${p.urgentReady ? `
-                <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-800 border border-gray-200 px-2.5 py-1 rounded-full text-xs font-semibold">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 pulse-indicator"></span>
-                  Urgent Ready
-                </span>
-              ` : ''}
+          <!-- Slide 2 -->
+          <div class="min-w-full snap-start relative aspect-[16/9]">
+            <img alt="Distribution box work" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2l4P0wqkni4JXap4ad5Xf4HBbfy1jyDHX3FUdMUrFo0396vlt_xfNg48P99hWFZE-TfWOW8xbOZ9wTZBmkBIz6h6b3dlmcr_B_dxRSiddrF71x29Ia7h2L7mo-1vBv2CzpQwSr_h5VXoM-AFpvpuUudH-fkzbk01Jf_tEy8wB3_C_mYqB23LbrEJlKaJ_qIeVMnySPeESilDDoyKX3XwKFzWuhJSG2QGH2NRvAqye0WBFQ9LEBL63"/>
+            <div class="absolute bottom-3 right-3 bg-inverse-surface/80 backdrop-blur-md px-2 py-1 rounded-full text-inverse-on-surface font-label-sm text-label-sm">
+              2 / 3
             </div>
           </div>
-
-          <!-- Provider Header Info -->
-          <div>
-            <h1 class="text-xl font-bold text-gray-900 flex items-center gap-1.5">
-              ${p.name}
-            </h1>
-            <p class="text-sm font-semibold text-emerald-700 mt-0.5">${p.businessName}</p>
-            <div class="flex items-center gap-1 text-xs text-gray-500 mt-1">
-              <span class="material-symbols-outlined text-[15px] text-gray-400">location_on</span>
-              <span>${p.locality}</span>
+          <!-- Slide 3 -->
+          <div class="min-w-full snap-start relative aspect-[16/9]">
+            <img alt="Finished ceiling lighting" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACSlVNm3bhLWBv4knbPMshpC0z6XDbCFHO9owIwla9r13zDyShNaVeE-6_SV5oOIus3Cv-E8e4_PrNq7vOIzw5rUB0yeL5janUJd5hf3iFGQRMuB87CEt72e-FOdn_hVetda96_-HFtpknnr2Yh5m7-rlh9txcmU0X8cZjac4KfWkX0iTyq-5PMDqRBsFBGaEWN-UO3g3JU71qGhooDGtBY6u8-NHtsoNyy7x53jqBr-HLdaitF7Jv"/>
+            <div class="absolute bottom-3 right-3 bg-inverse-surface/80 backdrop-blur-md px-2 py-1 rounded-full text-inverse-on-surface font-label-sm text-label-sm">
+              3 / 3
             </div>
           </div>
-
-          <!-- Quick Metrics Bar -->
-          <div class="grid grid-cols-3 gap-2 py-3 mt-3 border-y border-gray-100 text-center">
-            <div>
-              <div class="text-sm font-bold text-gray-900 flex items-center justify-center gap-0.5">
-                <span class="material-symbols-outlined text-[16px] text-amber-500 filled">star</span>
-                ${p.rating}
-              </div>
-              <div class="text-[11px] text-gray-400 font-medium">${p.reviewsCount} Reviews</div>
-            </div>
-            <div>
-              <div class="text-sm font-bold text-gray-900">${p.experienceYears}+ Yrs</div>
-              <div class="text-[11px] text-gray-400 font-medium">Experience</div>
-            </div>
-            <div>
-              <div class="text-sm font-bold text-gray-900">${p.jobsCompleted}+</div>
-              <div class="text-[11px] text-gray-400 font-medium">Completed Jobs</div>
-            </div>
-          </div>
-
-          <!-- Direct Phone Call Action -->
-          <div class="flex items-center gap-2 mt-4">
-            <a href="tel:${p.phone}" class="flex-1 py-2.5 px-3 rounded-xl border border-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors">
-              <span class="material-symbols-outlined text-[18px] text-gray-500">call</span>
-              Direct Call (${p.phone})
-            </a>
-          </div>
-
-          <!-- About Narrative -->
-          <div class="mt-5">
-            <h2 class="text-sm font-bold text-gray-900 mb-1.5">About Specialist</h2>
-            <p class="text-xs text-gray-600 leading-relaxed">${p.bio}</p>
-            
-            <div class="flex items-center gap-1.5 mt-3 flex-wrap">
-              ${p.tags.map(t => `
-                <span class="text-[11px] bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200 font-medium">
-                  ${t}
-                </span>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- Working Hours & Locality -->
-          <div class="mt-5 p-3 rounded-xl bg-[#f9fafb] border border-gray-200 flex flex-col gap-2">
-            <div class="flex items-center gap-2 text-xs text-gray-700">
-              <span class="material-symbols-outlined text-[18px] text-emerald-700">schedule</span>
-              <span class="font-medium">Hours: ${p.workingHours}</span>
-            </div>
-            <div class="flex items-center gap-2 text-xs text-gray-700">
-              <span class="material-symbols-outlined text-[18px] text-emerald-700">bolt</span>
-              <span class="font-medium">Response Time: Typically ${p.responseTime}</span>
-            </div>
-          </div>
-
-          <!-- Scope of Services & Rates -->
-          <div class="mt-6">
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-sm font-bold text-gray-900">Services & Rates Guide</h2>
-              <span class="text-[11px] text-gray-400">Starting Estimates</span>
-            </div>
-
-            <div class="flex flex-col gap-2">
-              ${p.services.map(s => `
-                <div class="p-3 rounded-xl border border-gray-200 bg-white flex items-center justify-between gap-3 hover:border-gray-300 transition-colors">
-                  <div class="flex-1">
-                    <h3 class="text-xs font-bold text-gray-900">${s.name}</h3>
-                    <p class="text-[11px] text-gray-500 mt-0.5">${s.desc}</p>
-                  </div>
-                  <div class="text-right shrink-0">
-                    <div class="text-xs font-bold text-emerald-700">${s.price}</div>
-                    <button 
-                      onclick="openWhatsAppLead('${p.id}', 'Assalam-o-Alaikum ${p.name}, I am inquiring about: ${s.name}')"
-                      class="mt-1 text-[10px] text-primary font-semibold hover:underline flex items-center gap-0.5 justify-end"
-                    >
-                      Inquire <span class="material-symbols-outlined text-[12px]">chevron_right</span>
-                    </button>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
-          <!-- Customer Reviews -->
-          <div class="mt-6">
-            <div class="flex items-center justify-between mb-3">
-              <h2 class="text-sm font-bold text-gray-900">Verified Reviews (${p.reviews.length})</h2>
-              <span class="text-xs font-semibold text-emerald-700">${p.rating} / 5.0 Rating</span>
-            </div>
-
-            <div class="flex flex-col gap-2.5">
-              ${p.reviews.map(r => `
-                <div class="p-3 rounded-xl bg-[#f9fafb] border border-gray-200">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-1.5">
-                      <span class="text-xs font-bold text-gray-900">${r.author}</span>
-                      <span class="text-[10px] text-gray-400">• ${r.area}</span>
-                    </div>
-                    <div class="flex items-center text-amber-500 text-xs">
-                      ${Array(r.rating).fill('<span class="material-symbols-outlined text-[14px] filled">star</span>').join('')}
-                    </div>
-                  </div>
-                  <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">"${r.text}"</p>
-                  <span class="text-[10px] text-gray-400 mt-1 block">${r.date}</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-
         </div>
-      `;
-    }
+      </section>
 
-    function setupStickyCta(p) {
-      const waBtn = document.getElementById('stickyWhatsAppBtn');
-      const saveBtn = document.getElementById('stickySaveBtn');
-      const saveIcon = saveBtn.querySelector('.material-symbols-outlined');
+      <!-- Profile Identity Card -->
+      <section class="px-gutter pt-3 pb-5 bg-surface-container-lowest">
+        <div class="flex items-start justify-between">
+          <div class="relative -mt-10 mb-2">
+            <div class="w-20 h-20 rounded-full p-1 bg-surface-container-lowest shadow-sm">
+              <img alt="Tariq Mahmood profile" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA84TvpKa_OrpS-BmIb4qthfCfN90ePqFFE1w3zZ1W1t0QnCDE01ml3JvyvWooDh3UeVYxH1zJrpixrUq7VK41FnMwB4a3wKAnb4y_XIl5SXCd463My2u_Ai2RbIVoLrxNQf_7bmcpESeI7zTERnyNGBfKMLwoxwEq48LOPm9fevQtc_gTZm77hqmbz8m2swCu1dC5-LKhe7KnSfZBv0pvKTS4LQBmPiXCFDDo1iw5tBxTxbrbNqwjw"/>
+            </div>
+            <span class="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-primary-container flex items-center justify-center text-on-primary shadow-xs">
+              <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">check</span>
+            </span>
+          </div>
+          <!-- Quick Trust Indicators -->
+          <div class="flex items-center gap-space-xs mt-1">
+            <span class="inline-flex items-center gap-1 bg-surface-container-low px-2.5 py-1 rounded-full text-secondary font-label-sm text-label-sm font-semibold">
+              <span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+              ID Verified
+            </span>
+            <span class="inline-flex items-center gap-1 bg-secondary-container/30 px-2 py-1 rounded-full text-primary font-label-sm text-label-sm font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+              Available
+            </span>
+          </div>
+        </div>
 
-      const isSaved = StorageService.isSaved(p.id);
-      if (isSaved) {
-        saveIcon.classList.add('text-primary', 'filled');
-      }
+        <!-- Provider Header Info -->
+        <div class="mt-1">
+          <div class="flex items-center gap-space-xs">
+            <h2 class="font-headline-lg text-headline-lg text-on-surface">Tariq Mahmood</h2>
+          </div>
+          <p class="font-label-md text-label-md text-on-surface-variant font-medium mt-0.5">
+            Master Residential & Commercial Electrician
+          </p>
+          <!-- Rating & Tenure Badges -->
+          <div class="flex items-center gap-3 mt-2 text-on-surface-variant font-body-sm text-body-sm">
+            <div class="flex items-center gap-1 text-on-surface font-semibold">
+              <span class="material-symbols-outlined text-amber-500 text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              <span>4.9</span>
+              <span class="text-on-surface-variant font-normal">(128 reviews)</span>
+            </div>
+            <span class="text-outline-variant">•</span>
+            <div class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-[17px] text-outline">history</span>
+              <span>12 Years Experience</span>
+            </div>
+          </div>
+          <!-- Bio -->
+          <p class="font-body-md text-body-md text-on-surface-variant mt-3 leading-relaxed">
+            Specialized in 3-phase wiring, smart home DB panel installation, inverter/UPS wiring, and emergency fault finding across Karachi South & East.
+          </p>
+        </div>
+      </section>
 
-      waBtn.addEventListener('click', () => {
-        openWhatsAppLead(p.id);
-      });
+      <!-- Divider -->
+      <div class="h-[1px] w-full bg-outline-variant/30"></div>
 
-      saveBtn.addEventListener('click', () => {
-        const isNowSaved = StorageService.toggleSave(p.id, p.name);
-        if (isNowSaved) {
-          saveIcon.classList.add('text-primary', 'filled');
-        } else {
-          saveIcon.classList.remove('text-primary', 'filled');
+      <!-- Trust Highlights -->
+      <section class="px-gutter py-4 grid grid-cols-3 gap-2 bg-surface-container-low/40">
+        <div class="bg-surface-container-lowest p-2.5 rounded-xl flex flex-col items-center text-center">
+          <span class="material-symbols-outlined text-primary text-[22px] mb-1">electric_meter</span>
+          <span class="font-label-sm text-label-sm text-on-surface font-semibold">3-Phase Ready</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">Certified</span>
+        </div>
+        <div class="bg-surface-container-lowest p-2.5 rounded-xl flex flex-col items-center text-center">
+          <span class="material-symbols-outlined text-primary text-[22px] mb-1">bolt</span>
+          <span class="font-label-sm text-label-sm text-on-surface font-semibold">Quick Response</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">Within 45 mins</span>
+        </div>
+        <div class="bg-surface-container-lowest p-2.5 rounded-xl flex flex-col items-center text-center">
+          <span class="material-symbols-outlined text-primary text-[22px] mb-1">security</span>
+          <span class="font-label-sm text-label-sm text-on-surface font-semibold">Work Guarantee</span>
+          <span class="font-label-sm text-label-sm text-on-surface-variant text-[10px]">Clean handover</span>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div class="h-[1px] w-full bg-outline-variant/30"></div>
+
+      <!-- Specializations & Services -->
+      <section class="px-gutter py-5 bg-surface-container-lowest">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-title-md text-title-md text-on-surface">Core Specializations</h3>
+          <span class="font-label-sm text-label-sm text-primary font-semibold">Residential & Flat Setup</span>
+        </div>
+        <div class="flex flex-col gap-2.5">
+          <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-container-low/50">
+            <span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            <div>
+              <h4 class="font-body-md text-body-md text-on-surface font-semibold">Wiring & Rewiring</h4>
+              <p class="font-body-sm text-body-sm text-on-surface-variant">Concealed cabling, copper load distribution, and full-premise rewiring.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-container-low/50">
+            <span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            <div>
+              <h4 class="font-body-md text-body-md text-on-surface font-semibold">Inverter & Generator Transfer Switches</h4>
+              <p class="font-body-sm text-body-sm text-on-surface-variant">Automatic and manual changeover panels for solar, UPS, and generators.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-container-low/50">
+            <span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            <div>
+              <h4 class="font-body-md text-body-md text-on-surface font-semibold">Circuit Breaker Tripping Diagnosis</h4>
+              <p class="font-body-sm text-body-sm text-on-surface-variant">Earthing testing, short-circuit localization, and load balancing.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-container-low/50">
+            <span class="material-symbols-outlined text-primary text-[20px] mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            <div>
+              <h4 class="font-body-md text-body-md text-on-surface font-semibold">Ceiling Fan & Chandelier Fitting</h4>
+              <p class="font-body-sm text-body-sm text-on-surface-variant">Secure anchor point ceiling brackets, heavy chandelier suspension, and dimmer setups.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div class="h-[1px] w-full bg-outline-variant/30"></div>
+
+      <!-- Coverage Area Section -->
+      <section class="px-gutter py-5 bg-surface-container-lowest">
+        <div class="flex items-center gap-1.5 mb-1.5">
+          <span class="material-symbols-outlined text-secondary text-[20px]">location_on</span>
+          <h3 class="font-title-md text-title-md text-on-surface">Service Coverage Area</h3>
+        </div>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mb-3">
+          Available for emergency visits and planned electrical audits in:
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface font-label-md text-label-md">Clifton</span>
+          <span class="px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface font-label-md text-label-md">DHA Phases 1-8</span>
+          <span class="px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface font-label-md text-label-md">PECHS</span>
+          <span class="px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface font-label-md text-label-md">Zamzama</span>
+          <span class="px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface font-label-md text-label-md">Garden East</span>
+          <span class="px-3 py-1.5 rounded-full bg-surface-container-low text-on-surface font-label-md text-label-md">Bath Island</span>
+        </div>
+      </section>
+
+      <!-- Neighborhood Map Preview Placeholder -->
+      <section class="px-gutter pb-6 bg-surface-container-lowest">
+        <div class="w-full h-32 rounded-xl bg-surface-container-low overflow-hidden relative flex items-center justify-center bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA6PwUZCUmp6D6HbkjRk_D89vQQN-zkP1-5eaEx1uTcxIoKVdonmphricwLTpKMeqyFiQZ2kqs9OCisWzawiaoznMynyfRCNg-zATU7snVoBUjELS7nyNYSy95LN2exsgj3B_qUU_a_IJ5GAHOll-TYQEcHA6CVPysq1OC6s0ZsyvcOdmmfA9ieOhV05VV-Iwyk87pCsXMpp8R6mXZxip84dSreNiDTh8uwCyPhXcfakjNsPikfliNI')">
+          <div class="bg-surface-container-lowest/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5 text-on-surface shadow-xs">
+            <span class="material-symbols-outlined text-primary text-[18px]">explore</span>
+            <span class="font-label-sm text-label-sm font-semibold">Karachi South & East Coverage</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sticky Bottom Conversion Bar -->
+      <div class="fixed bottom-0 inset-x-0 z-40 bg-surface-container-lowest/95 backdrop-blur-md max-w-[480px] mx-auto px-gutter py-3 border-t border-surface-container-high/40">
+        <div class="flex items-center gap-space-sm">
+          <a class="w-full h-12 bg-primary-container text-on-primary hover:bg-primary active:scale-[0.99] transition-all rounded-xl flex items-center justify-center gap-2 font-title-md text-title-md font-semibold shadow-sm" href="https://wa.me/923332145890?text=Assalam%20o%20Alaikum%20Tariq%20Bhai%2C%20I%20found%20your%20profile%20on%20Baseera%20and%20need%20electrical%20assistance." rel="noopener noreferrer" target="_blank">
+            <svg aria-hidden="true" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.06-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.196 8.196 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.4-.13-.57.13-.17.25-.65.81-.8 1-.15.19-.3.21-.55.08-.25-.13-1.07-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.44-.06-.13-.57-1.37-.78-1.88-.2-.49-.41-.43-.57-.44h-.48c-.17 0-.44.06-.67.32-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.78 2.72 4.31 3.81.6.26 1.07.41 1.44.53.61.19 1.16.17 1.6.1.48-.07 1.47-.6 1.68-1.18.21-.59.21-1.09.15-1.19-.07-.09-.23-.15-.48-.27z"></path>
+            </svg>
+            <span>Chat on WhatsApp</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const gallery = document.getElementById('gallery-track');
+    if (gallery) {
+      gallery.addEventListener('scroll', () => {
+        const slideWidth = gallery.offsetWidth;
+        if (slideWidth > 0) {
+          const activeIndex = Math.round(gallery.scrollLeft / slideWidth);
         }
       });
     }
