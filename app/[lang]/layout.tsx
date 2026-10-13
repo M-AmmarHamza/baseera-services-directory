@@ -84,7 +84,7 @@ export default async function RootLayout({
 
               {/* Vendor Studio Link */}
               <Link
-                href="/provider-dashboard.html"
+                href={`/${lang}/join`}
                 className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold bg-emerald-50 text-[#006948] px-3 py-1.5 rounded-full border border-emerald-200 hover:bg-emerald-100 transition-colors"
               >
                 <span>{dict.nav.vendorStudio}</span>

@@ -69,11 +69,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CityHomePage({ params }: PageProps) {
   const { lang, country, city } = await params;
-  const rawProviders = await getProviders(city);
+  const providers = await getProviders(city);
   const countryObj = getCountryByCode(country);
   const countryName = countryObj.name;
-  const isNewCity = rawProviders.length === 0;
-  const providers = isNewCity ? (await getAllProviders()).slice(0, 3) : rawProviders;
 
   const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   const countryCode = country.toUpperCase();
@@ -223,141 +221,154 @@ export default async function CityHomePage({ params }: PageProps) {
             </div>
           </section>
 
-          {/* New City Onboarding Banner if applicable */}
-          {isNewCity && (
-            <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-6 text-center shadow-2xs">
-              <span className="text-3xl mb-2 block">{countryObj.flag}</span>
-              <h3 className="font-extrabold text-lg text-gray-900">
-                Network Expanding to {cityName}, {countryName}!
-              </h3>
-              <p className="text-xs text-gray-600 max-w-lg mx-auto mt-1 leading-relaxed">
-                We are actively onboarding verified independent technicians, electricians, and plumbers in {cityName}. Zero commissions, 100% direct customer WhatsApp contact.
-              </p>
-              <div className="mt-4 flex items-center justify-center gap-3 flex-wrap">
+          {/* Verified Specialists Section: Render registered providers or invitation CTA */}
+          {providers.length > 0 ? (
+            <section className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-gray-950 tracking-tight">
+                    Featured Verified Specialists
+                  </h2>
+                  <p className="text-xs text-gray-500">
+                    Direct connection with zero intermediary commissions in {cityName}
+                  </p>
+                </div>
                 <Link
-                  href="/provider-dashboard.html"
-                  className="px-4 py-2 rounded-xl bg-[#006948] text-white text-xs font-bold hover:bg-[#00855d] transition-all shadow-xs"
+                  href={`/${lang}/join?country=${country}&city=${city}`}
+                  className="text-xs text-[#006948] font-bold hover:underline"
                 >
-                  Join as {cityName} Vendor (Free)
+                  + Join as Vendor
+                </Link>
+              </div>
+
+              {/* Cards: Horizontal Scroll on Mobile, 3-Col Grid on Desktop */}
+              <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 pt-0.5 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-x-visible">
+                {providers.map((pro) => {
+                  const coverImg =
+                    PROVIDER_PHOTOS[pro.slug] ||
+                    pro.avatar_url ||
+                    'https://lh3.googleusercontent.com/aida-public/AB6AXuBK9qWTJzXQzuvOCxeaY9oaT5QnMSIE_WRvPrYq3ndOxqfGwgRJiuusiLQI6ptKnL9aXydagk97uFwsxC7j-gxTH2VH5N_HAJpsT3T0CG_IE0OBqsRNY1C_6XY0VC8sNDh1YBotW-weRk3E7XwleN6ZT1cvkRynmWL_e-anI_it8xQNPs3oqJRRO7Xrk7PfW-P6i2RwcClJxEboVmdY8ZF6bL0HcCJgGu5qW0x9sje5DlC6qn7x4H7V';
+
+                  const profileLink = `/${lang}/${country}/${city}/${pro.category_id}/${pro.slug}`;
+                  const defaultTags =
+                    pro.service_area && pro.service_area.length > 0
+                      ? pro.service_area.slice(0, 3)
+                      : ['Quick Response', 'Work Guarantee', 'Verified'];
+
+                  return (
+                    <div
+                      key={pro.id}
+                      className="flex flex-col w-[290px] shrink-0 md:w-auto md:shrink bg-[#f1f3ff]/60 rounded-2xl p-4 shadow-2xs justify-between hover:shadow-md transition-all border border-gray-200/70"
+                    >
+                      <div>
+                        {/* Cover photo with rating and verified badge - Exact Legacy */}
+                        <Link
+                          href={profileLink}
+                          className="block relative w-full h-36 rounded-xl overflow-hidden mb-3 bg-gray-200 group"
+                        >
+                          <img
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            alt={pro.name}
+                            src={coverImg}
+                          />
+                          <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
+                            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+                            <span className="text-xs font-bold text-gray-900">{pro.rating}</span>
+                            <span className="text-[11px] text-gray-500">({pro.review_count})</span>
+                          </div>
+                          {pro.is_verified && (
+                            <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-[#006948] text-white px-2 py-0.5 rounded-md text-[11px] font-bold shadow-xs">
+                              <BadgeCheck className="w-3.5 h-3.5 text-white" />
+                              <span>Verified Pro</span>
+                            </div>
+                          )}
+                        </Link>
+
+                        {/* Details */}
+                        <div className="flex flex-col">
+                          <div className="flex items-center justify-between">
+                            <Link
+                              href={profileLink}
+                              className="font-bold text-base text-gray-950 truncate hover:text-[#006948] transition-colors"
+                            >
+                              {pro.name}
+                            </Link>
+                            <span className="text-[11px] text-[#006948] font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                              {pro.is_available ? 'Available' : 'Quick Reply'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#006948] font-semibold mt-0.5 truncate">
+                            {pro.trade_title}
+                          </p>
+                          <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
+                            <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                            <span className="truncate">{pro.district}, {cityName}</span>
+                          </div>
+
+                          {/* Chips */}
+                          <div className="flex flex-wrap gap-1 mt-2.5 mb-3.5">
+                            {defaultTags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="px-2 py-0.5 rounded-md bg-white border border-gray-200/70 text-gray-700 text-[11px] font-medium"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* WhatsApp Direct Action Button - Exact Legacy Full Width */}
+                      <a
+                        className="flex items-center justify-center gap-2 w-full h-11 rounded-xl bg-[#006948] text-white text-xs font-bold active:opacity-90 transition-all hover:bg-[#00855d] shadow-2xs"
+                        href={`https://wa.me/${pro.whatsapp_number.replace(/\+/g, '')}?text=${encodeURIComponent(`Salam ${pro.name}, saw your profile on Baseera ${cityName}.`)}`}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >
+                        <WhatsAppIcon className="w-4 h-4 text-white fill-current" />
+                        <span>Chat on WhatsApp</span>
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ) : (
+            /* Clean Empty State: Invite local vendors to register */
+            <section className="bg-white rounded-3xl p-8 sm:p-12 border border-gray-200/80 shadow-2xs text-center flex flex-col items-center max-w-2xl mx-auto gap-5 my-2">
+              <div className="w-16 h-16 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center text-3xl">
+                {countryObj.flag}
+              </div>
+              <div>
+                <span className="text-xs bg-emerald-50 text-[#006948] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-100">
+                  Directory Open for {cityName}
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-950 tracking-tight mt-2">
+                  Be the First Verified Specialist in {cityName}!
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-600 max-w-md mx-auto mt-2 leading-relaxed">
+                  Are you an electrician, plumber, AC technician, or specialist in {cityName}, {countryName}? Register your profile to receive direct customer leads on WhatsApp with zero commission.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <Link
+                  href={`/${lang}/join?country=${country}&city=${city}`}
+                  className="px-6 py-3 rounded-xl bg-[#006948] hover:bg-[#00855d] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-2"
+                >
+                  <span>Register as {cityName} Specialist (Free)</span>
+                  <span>→</span>
                 </Link>
                 <Link
                   href={`/${lang}`}
-                  className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-700 text-xs font-bold hover:bg-gray-50 transition-all"
+                  className="px-5 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-700 text-xs font-bold border border-gray-200 transition-colors"
                 >
-                  Browse All Countries
+                  Browse Global Directory
                 </Link>
               </div>
-            </div>
+            </section>
           )}
-
-          {/* Featured Community Specialists - Exact Legacy Card Style */}
-          <section className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-gray-950 tracking-tight">
-                  Featured Verified Specialists
-                </h2>
-                <p className="text-xs text-gray-500">
-                  {isNewCity
-                    ? `Showing verified network pros ready for service inquiries`
-                    : `Direct connection with zero intermediary commissions in ${cityName}`}
-                </p>
-              </div>
-            </div>
-
-            {/* Cards: Horizontal Scroll on Mobile, 3-Col Grid on Desktop */}
-            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 pt-0.5 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-x-visible">
-              {providers.map((pro) => {
-                const coverImg =
-                  PROVIDER_PHOTOS[pro.slug] ||
-                  pro.avatar_url ||
-                  'https://lh3.googleusercontent.com/aida-public/AB6AXuBK9qWTJzXQzuvOCxeaY9oaT5QnMSIE_WRvPrYq3ndOxqfGwgRJiuusiLQI6ptKnL9aXydagk97uFwsxC7j-gxTH2VH5N_HAJpsT3T0CG_IE0OBqsRNY1C_6XY0VC8sNDh1YBotW-weRk3E7XwleN6ZT1cvkRynmWL_e-anI_it8xQNPs3oqJRRO7Xrk7PfW-P6i2RwcClJxEboVmdY8ZF6bL0HcCJgGu5qW0x9sje5DlC6qn7x4H7V';
-
-                const profileLink = `/${lang}/${country}/${city}/${pro.category_id}/${pro.slug}`;
-                const defaultTags =
-                  pro.service_area && pro.service_area.length > 0
-                    ? pro.service_area.slice(0, 3)
-                    : ['Quick Response', 'Work Guarantee', 'Verified'];
-
-                return (
-                  <div
-                    key={pro.id}
-                    className="flex flex-col w-[290px] shrink-0 md:w-auto md:shrink bg-[#f1f3ff]/60 rounded-2xl p-4 shadow-2xs justify-between hover:shadow-md transition-all border border-gray-200/70"
-                  >
-                    <div>
-                      {/* Cover photo with rating and verified badge - Exact Legacy */}
-                      <Link
-                        href={profileLink}
-                        className="block relative w-full h-36 rounded-xl overflow-hidden mb-3 bg-gray-200 group"
-                      >
-                        <img
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          alt={pro.name}
-                          src={coverImg}
-                        />
-                        <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
-                          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
-                          <span className="text-xs font-bold text-gray-900">{pro.rating}</span>
-                          <span className="text-[11px] text-gray-500">({pro.review_count})</span>
-                        </div>
-                        {pro.is_verified && (
-                          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-[#006948] text-white px-2 py-0.5 rounded-md text-[11px] font-bold shadow-xs">
-                            <BadgeCheck className="w-3.5 h-3.5 text-white" />
-                            <span>Verified Pro</span>
-                          </div>
-                        )}
-                      </Link>
-
-                      {/* Details */}
-                      <div className="flex flex-col">
-                        <div className="flex items-center justify-between">
-                          <Link
-                            href={profileLink}
-                            className="font-bold text-base text-gray-950 truncate hover:text-[#006948] transition-colors"
-                          >
-                            {pro.name}
-                          </Link>
-                          <span className="text-[11px] text-[#006948] font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                            {pro.is_available ? 'Available' : 'Quick Reply'}
-                          </span>
-                        </div>
-                        <p className="text-xs text-[#006948] font-semibold mt-0.5 truncate">
-                          {pro.trade_title}
-                        </p>
-                        <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
-                          <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                          <span className="truncate">{pro.district}, {cityName}</span>
-                        </div>
-
-                        {/* Chips */}
-                        <div className="flex flex-wrap gap-1 mt-2.5 mb-3.5">
-                          {defaultTags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="px-2 py-0.5 rounded-md bg-white border border-gray-200/70 text-gray-700 text-[11px] font-medium"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* WhatsApp Direct Action Button - Exact Legacy Full Width */}
-                    <a
-                      className="flex items-center justify-center gap-2 w-full h-11 rounded-xl bg-[#006948] text-white text-xs font-bold active:opacity-90 transition-all hover:bg-[#00855d] shadow-2xs"
-                      href={`https://wa.me/${pro.whatsapp_number.replace(/\+/g, '')}?text=${encodeURIComponent(`Salam ${pro.name}, saw your profile on Baseera ${cityName}.`)}`}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      <WhatsAppIcon className="w-4 h-4 text-white fill-current" />
-                      <span>Chat on WhatsApp</span>
-                    </a>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
 
           {/* Exact Legacy Trust & Resource Banners */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4">

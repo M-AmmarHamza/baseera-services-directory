@@ -52,7 +52,7 @@ export default function BottomNav({ lang }: Props) {
         </Link>
 
         <Link
-          href="/provider-dashboard.html"
+          href={`/${lang}/join`}
           className="flex flex-col items-center justify-center flex-1 h-full text-gray-500 hover:text-[#006948] transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
