@@ -319,5 +319,14 @@ insert into public.providers (
     array['DHA Phase 5', 'Clifton', 'Zamzama'],
     'Authentic Karachi homemade food, daily office lunchboxes, and bulk daawat orders. 100% hygienic canola oil, premium basmati rice, and mutton biryani.',
     true, true, 550, 5.0, 210, 520
+  ),
+  (
+    'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b',
+    1, 1, 'plumbing',
+    'Saleem Akhtar (Master Plumber)', 'saleem-master-plumber', 'individual',
+    '+923129876543',
+    array['Orangi Town', 'Nazimabad', 'North Nazimabad', 'SITE Area', 'Banaras'],
+    '22+ years experience in deep underground water line leakage detection, PPRC/UPVC pipe fittings, water motor installations, and sanitary bathroom fittings across Orangi Town, Nazimabad, and SITE industrial area.',
+    true, true, 700, 4.9, 84, 215
   )
 on conflict (id) do nothing;
