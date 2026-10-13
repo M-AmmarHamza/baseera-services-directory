@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Provider Details - Baseera Karachi</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#006948",
+            "primary-dark": "#005236",
+            secondary: "#006c49",
+            "secondary-container": "#6cf8bb",
+            "on-secondary-container": "#00714d",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f9fafb"
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="bg-gray-100 font-sans antialiased text-[#111827]">
+
+  <div class="app-shell pb-24">
+    <!-- Top Header -->
+    <header id="app-header"></header>
+
+    <main class="flex-1 w-full pt-16 bg-white" id="profileContent">
+      <!-- Loading state / Filled dynamically -->
+    </main>
+
+    <!-- Sticky Bottom WhatsApp Bar -->
+    <div id="stickyCtaBar" class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 p-3 pb-safe shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+      <div class="max-w-[480px] mx-auto flex items-center gap-3">
+        <button id="stickySaveBtn" class="w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:text-emerald-700 hover:bg-gray-50 transition-colors">
+          <span class="material-symbols-outlined text-[24px]">bookmark</span>
+        </button>
+        <button id="stickyWhatsAppBtn" class="flex-1 btn-whatsapp h-12 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.41a8.176 8.176 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.45 0-2.87-.38-4.12-1.11l-.3-.17-3.12.82.83-3.04-.19-.31a8.19 8.19 0 0 1-1.25-4.43c0-4.54 3.69-8.24 8.24-8.24m4.52 11.53c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.12.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.08.15-1.18-.06-.11-.23-.17-.48-.29z"/>
+          </svg>
+          Chat on WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHeader({ title: 'Provider Details', subtitle: 'Karachi', showBack: true, backHref: 'categories.html' });
+
+      const params = new URLSearchParams(window.location.search);
+      const providerId = params.get('id') || 'tariq-electric';
+      const provider = BASEERA_DATA.providers.find(p => p.id === providerId) || BASEERA_DATA.providers[0];
+
+      renderProfile(provider);
+      setupStickyCta(provider);
+    });
+
+    function renderProfile(p) {
+      const container = document.getElementById('profileContent');
+      const isSaved = StorageService.isSaved(p.id);
+
+      const hasGallery = p.gallery && p.gallery.length > 0;
+
+      container.innerHTML = `
+        <!-- Work Gallery Carousel -->
+        ${hasGallery ? `
+          <div class="relative w-full bg-gray-100 overflow-hidden">
+            <div id="galleryTrack" class="flex w-full overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar">
+              ${p.gallery.map((g, index) => `
+                <div class="min-w-full snap-start relative aspect-[16/9]">
+                  <img src="${g.url}" alt="${g.title}" class="w-full h-full object-cover" />
+                  <div class="absolute bottom-2.5 right-2.5 bg-black/70 backdrop-blur-sm px-2.5 py-0.5 rounded-full text-white text-[11px] font-medium">
+                    ${index + 1} / ${p.gallery.length}
+                  </div>
+                  <div class="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur-sm px-2.5 py-0.5 rounded text-white text-[11px] font-medium truncate max-w-[200px]">
+                    ${g.title}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : `
+          <div class="h-20 bg-emerald-900/10 border-b border-gray-100"></div>
+        `}
+
+        <div class="px-4 pb-6">
+          <!-- Identity Card Header -->
+          <div class="flex items-start justify-between ${hasGallery ? '-mt-10' : '-mt-8'} mb-3">
+            <div class="relative">
+              <div class="w-20 h-20 rounded-full p-1 bg-white shadow-md">
+                <img src="${p.avatar}" alt="${p.name}" class="w-full h-full rounded-full object-cover bg-gray-100" />
+              </div>
+              ${p.verified ? `
+                <span class="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center ring-2 ring-white">
+                  <span class="material-symbols-outlined text-[14px] filled">check</span>
+                </span>
+              ` : ''}
+            </div>
+
+            <!-- Badges -->
+            <div class="flex items-center gap-1.5 mt-10">
+              <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-semibold">
+                <span class="material-symbols-outlined text-[15px] filled">verified_user</span>
+                ID Verified
+              </span>
+              ${p.urgentReady ? `
+                <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-800 border border-gray-200 px-2.5 py-1 rounded-full text-xs font-semibold">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 pulse-indicator"></span>
+                  Urgent Ready
+                </span>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Provider Header Info -->
+          <div>
+            <h1 class="text-xl font-bold text-gray-900 flex items-center gap-1.5">
+              ${p.name}
+            </h1>
+            <p class="text-sm font-semibold text-emerald-700 mt-0.5">${p.businessName}</p>
+            <div class="flex items-center gap-1 text-xs text-gray-500 mt-1">
+              <span class="material-symbols-outlined text-[15px] text-gray-400">location_on</span>
+              <span>${p.locality}</span>
+            </div>
+          </div>
+
+          <!-- Quick Metrics Bar -->
+          <div class="grid grid-cols-3 gap-2 py-3 mt-3 border-y border-gray-100 text-center">
+            <div>
+              <div class="text-sm font-bold text-gray-900 flex items-center justify-center gap-0.5">
+                <span class="material-symbols-outlined text-[16px] text-amber-500 filled">star</span>
+                ${p.rating}
+              </div>
+              <div class="text-[11px] text-gray-400 font-medium">${p.reviewsCount} Reviews</div>
+            </div>
+            <div>
+              <div class="text-sm font-bold text-gray-900">${p.experienceYears}+ Yrs</div>
+              <div class="text-[11px] text-gray-400 font-medium">Experience</div>
+            </div>
+            <div>
+              <div class="text-sm font-bold text-gray-900">${p.jobsCompleted}+</div>
+              <div class="text-[11px] text-gray-400 font-medium">Completed Jobs</div>
+            </div>
+          </div>
+
+          <!-- Direct Phone Call Action -->
+          <div class="flex items-center gap-2 mt-4">
+            <a href="tel:${p.phone}" class="flex-1 py-2.5 px-3 rounded-xl border border-gray-200 text-gray-700 text-xs font-semibold flex items-center justify-center gap-1.5 hover:bg-gray-50 transition-colors">
+              <span class="material-symbols-outlined text-[18px] text-gray-500">call</span>
+              Direct Call (${p.phone})
+            </a>
+          </div>
+
+          <!-- About Narrative -->
+          <div class="mt-5">
+            <h2 class="text-sm font-bold text-gray-900 mb-1.5">About Specialist</h2>
+            <p class="text-xs text-gray-600 leading-relaxed">${p.bio}</p>
+            
+            <div class="flex items-center gap-1.5 mt-3 flex-wrap">
+              ${p.tags.map(t => `
+                <span class="text-[11px] bg-gray-100 text-gray-700 px-2 py-0.5 rounded border border-gray-200 font-medium">
+                  ${t}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Working Hours & Locality -->
+          <div class="mt-5 p-3 rounded-xl bg-[#f9fafb] border border-gray-200 flex flex-col gap-2">
+            <div class="flex items-center gap-2 text-xs text-gray-700">
+              <span class="material-symbols-outlined text-[18px] text-emerald-700">schedule</span>
+              <span class="font-medium">Hours: ${p.workingHours}</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-gray-700">
+              <span class="material-symbols-outlined text-[18px] text-emerald-700">bolt</span>
+              <span class="font-medium">Response Time: Typically ${p.responseTime}</span>
+            </div>
+          </div>
+
+          <!-- Scope of Services & Rates -->
+          <div class="mt-6">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-sm font-bold text-gray-900">Services & Rates Guide</h2>
+              <span class="text-[11px] text-gray-400">Starting Estimates</span>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              ${p.services.map(s => `
+                <div class="p-3 rounded-xl border border-gray-200 bg-white flex items-center justify-between gap-3 hover:border-gray-300 transition-colors">
+                  <div class="flex-1">
+                    <h3 class="text-xs font-bold text-gray-900">${s.name}</h3>
+                    <p class="text-[11px] text-gray-500 mt-0.5">${s.desc}</p>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <div class="text-xs font-bold text-emerald-700">${s.price}</div>
+                    <button 
+                      onclick="openWhatsAppLead('${p.id}', 'Assalam-o-Alaikum ${p.name}, I am inquiring about: ${s.name}')"
+                      class="mt-1 text-[10px] text-primary font-semibold hover:underline flex items-center gap-0.5 justify-end"
+                    >
+                      Inquire <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Customer Reviews -->
+          <div class="mt-6">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-sm font-bold text-gray-900">Verified Reviews (${p.reviews.length})</h2>
+              <span class="text-xs font-semibold text-emerald-700">${p.rating} / 5.0 Rating</span>
+            </div>
+
+            <div class="flex flex-col gap-2.5">
+              ${p.reviews.map(r => `
+                <div class="p-3 rounded-xl bg-[#f9fafb] border border-gray-200">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-xs font-bold text-gray-900">${r.author}</span>
+                      <span class="text-[10px] text-gray-400">• ${r.area}</span>
+                    </div>
+                    <div class="flex items-center text-amber-500 text-xs">
+                      ${Array(r.rating).fill('<span class="material-symbols-outlined text-[14px] filled">star</span>').join('')}
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">"${r.text}"</p>
+                  <span class="text-[10px] text-gray-400 mt-1 block">${r.date}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    function setupStickyCta(p) {
+      const waBtn = document.getElementById('stickyWhatsAppBtn');
+      const saveBtn = document.getElementById('stickySaveBtn');
+      const saveIcon = saveBtn.querySelector('.material-symbols-outlined');
+
+      const isSaved = StorageService.isSaved(p.id);
+      if (isSaved) {
+        saveIcon.classList.add('text-primary', 'filled');
+      }
+
+      waBtn.addEventListener('click', () => {
+        openWhatsAppLead(p.id);
+      });
+
+      saveBtn.addEventListener('click', () => {
+        const isNowSaved = StorageService.toggleSave(p.id, p.name);
+        if (isNowSaved) {
+          saveIcon.classList.add('text-primary', 'filled');
+        } else {
+          saveIcon.classList.remove('text-primary', 'filled');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
