@@ -30,15 +30,15 @@ export default function BottomNav({ lang }: Props) {
         </Link>
 
         <Link
-          href={`/${lang}/pk/karachi/electrician`}
+          href={`/${lang}/vendors`}
           className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
-            isSearch ? 'text-[#006948] font-bold' : 'text-gray-500 hover:text-gray-900'
+            pathname.includes('/vendors') ? 'text-[#006948] font-bold' : 'text-gray-500 hover:text-gray-900'
           }`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <span className="text-[11px] mt-1">Search</span>
+          <span className="text-[11px] mt-1">Vendors</span>
         </Link>
 
         <Link
@@ -53,12 +53,14 @@ export default function BottomNav({ lang }: Props) {
 
         <Link
           href={`/${lang}/join`}
-          className="flex flex-col items-center justify-center flex-1 h-full text-gray-500 hover:text-[#006948] transition-colors"
+          className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${
+            pathname.includes('/join') ? 'text-[#006948] font-bold' : 'text-gray-500 hover:text-[#006948]'
+          }`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span className="text-[11px] mt-1">Vendors</span>
+          <span className="text-[11px] mt-1">+ List Service</span>
         </Link>
       </div>
     </nav>

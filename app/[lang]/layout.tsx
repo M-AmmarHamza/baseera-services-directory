@@ -53,8 +53,30 @@ export default async function RootLayout({
               <CitySelector lang={lang} />
             </div>
 
+            {/* Desktop Navigation Links (Legacy Exact Match) */}
+            <nav className="hidden md:flex items-center gap-6">
+              <Link
+                href={`/${lang}`}
+                className="text-xs font-semibold text-gray-700 hover:text-[#006948] transition-colors"
+              >
+                Home
+              </Link>
+              <Link
+                href={`/${lang}/vendors`}
+                className="text-xs font-semibold text-gray-700 hover:text-[#006948] transition-colors"
+              >
+                Find Services
+              </Link>
+              <Link
+                href={`/${lang}/join`}
+                className="text-xs font-bold text-[#006948] hover:text-[#00855d] transition-colors flex items-center gap-1"
+              >
+                <span>+ List Your Service</span>
+              </Link>
+            </nav>
+
             {/* Language & Regional Switcher (i18n Pill) */}
-            <div className="flex items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="flex items-center bg-gray-100 p-1 rounded-full text-xs font-semibold">
                 <Link
                   href="/en"
@@ -82,12 +104,12 @@ export default async function RootLayout({
                 </Link>
               </div>
 
-              {/* Vendor Studio Link */}
+              {/* Prominent List Your Service Action Button */}
               <Link
                 href={`/${lang}/join`}
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold bg-emerald-50 text-[#006948] px-3 py-1.5 rounded-full border border-emerald-200 hover:bg-emerald-100 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-bold bg-[#006948] hover:bg-[#00855d] text-white px-3.5 py-1.5 rounded-full transition-all shadow-2xs"
               >
-                <span>{dict.nav.vendorStudio}</span>
+                <span>+ List Service</span>
               </Link>
             </div>
           </div>

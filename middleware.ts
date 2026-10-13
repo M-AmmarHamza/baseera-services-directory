@@ -149,9 +149,17 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Case B: Just "/en/pk", "/ur/pk", or "/en/ae" (country hub without city) -> Go to primary city
+  // Case B: Handle top-level routes vs country hubs
   if (segments.length === 2) {
-    const country = segments[1].toLowerCase();
+    const secondSegment = segments[1].toLowerCase();
+    // Pass through top-level static pages like /en/join, /en/vendors
+    if (['join', 'vendors', 'search', 'services'].includes(secondSegment)) {
+      const response = NextResponse.next();
+      response.headers.set('x-baseera-lang', lang);
+      return response;
+    }
+
+    const country = secondSegment;
     const targetCity = COUNTRY_DEFAULTS[country] || (country === 'pk' ? 'karachi' : 'main-city');
     return NextResponse.redirect(
       new URL(`/${lang}/${country}/${targetCity}`, request.url),
