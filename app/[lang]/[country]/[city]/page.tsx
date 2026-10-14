@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { getProviders, CATEGORIES, getCountryByCode, getAllProviders } from '@/lib/db';
+import { getProviders, CATEGORIES, getCountryByCode, getAllProviders, getCategoryName } from '@/lib/db';
 import SearchBar from '@/components/SearchBar';
 import {
   CategoryIcon,
@@ -211,7 +211,7 @@ export default async function CityHomePage({ params }: PageProps) {
                     <CategoryIcon id={cat.id} className="w-5 h-5" />
                   </div>
                   <span className="font-bold text-xs text-gray-900 group-hover:text-[#006948] transition-colors leading-tight">
-                    {cat.name}
+                    {getCategoryName(cat, lang)}
                   </span>
                   <span className="text-[11px] text-gray-400 font-medium mt-0.5">
                     {cat.count}+ Active

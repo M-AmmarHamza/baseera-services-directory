@@ -140,28 +140,28 @@ export default async function HomePage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Horizontal Scrollable Container */}
-        <div className="flex overflow-x-auto gap-3 sm:gap-4 pb-4 scrollbar-hide snap-x scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0">
+        {/* Full Specialty Categories Grid (All 24 Categories in 3 Rows on Desktop) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-3.5">
           {CATEGORIES.map((cat) => {
             const IconComponent = CATEGORY_ICON_MAP[cat.icon] || Wrench;
             return (
               <Link
                 key={cat.id}
                 href={`/${lang}/pk/karachi/${cat.slug}`}
-                className="bg-white border border-gray-200 rounded-xl min-w-[125px] w-[125px] sm:min-w-[140px] sm:w-[140px] p-3 sm:p-4 flex flex-col items-center justify-center text-center transition-all hover:border-emerald-600 snap-start shrink-0 group cursor-pointer shadow-2xs"
+                className="flex flex-col items-center justify-center p-3 sm:p-3.5 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group cursor-pointer"
               >
                 {/* Soft circular background behind icon */}
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-50 flex items-center justify-center mb-2.5 sm:mb-3 group-hover:bg-emerald-50 transition-colors">
-                  <IconComponent className="text-emerald-700 w-5 h-5 sm:w-6 sm:h-6" />
+                <div className="w-12 h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-2 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
+                  <IconComponent className="w-5 h-5" />
                 </div>
 
                 {/* Two-line clamped Title */}
-                <span className={`text-xs sm:text-sm font-semibold text-gray-900 leading-snug line-clamp-2 ${lang === 'ur' ? 'min-h-[2.8rem] py-0.5' : 'h-8 sm:h-9'} flex items-center justify-center`}>
+                <span className={`font-bold text-xs text-gray-900 group-hover:text-[#006948] transition-colors leading-tight line-clamp-2 ${lang === 'ur' ? 'min-h-[2.5rem] py-0.5' : 'h-8 sm:h-9'} flex items-center justify-center`}>
                   {getCategoryName(cat, lang)}
                 </span>
 
                 {/* Active provider count Subtext */}
-                <span className="text-[11px] sm:text-xs text-gray-500 mt-1">
+                <span className="text-[11px] text-gray-400 font-medium mt-0.5">
                   {cat.count}+ {dict.home?.activeCount || 'Active'}
                 </span>
               </Link>
