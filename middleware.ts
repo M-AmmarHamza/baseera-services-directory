@@ -144,7 +144,7 @@ export function middleware(request: NextRequest) {
   // Handle top-level routes (e.g. /en/join, /en/vendors, /en/search)
   if (segments.length === 2) {
     const secondSegment = segments[1].toLowerCase();
-    if (['join', 'vendors', 'search', 'services'].includes(secondSegment)) {
+    if (['join', 'vendors', 'search', 'services', 'dashboard', 'blog', 'admin'].includes(secondSegment)) {
       const response = NextResponse.next();
       response.headers.set('x-baseera-lang', lang);
       return response;
