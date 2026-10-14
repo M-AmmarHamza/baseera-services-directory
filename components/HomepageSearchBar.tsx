@@ -49,13 +49,13 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
       >
         {/* Location Chip */}
         <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium text-gray-700 shrink-0">
-          <MapPin className="w-4 h-4 text-[#059669]" />
-          <span>{location}</span>
+          <MapPin className="w-4 h-4 text-[#059669] shrink-0" />
+          <span className="truncate">{location}</span>
         </div>
 
         {/* Search Input */}
-        <div className="relative flex-1 flex items-center min-w-0">
-          <Search className="w-5 h-5 text-gray-400 absolute left-3 pointer-events-none" />
+        <div className="relative flex-1 flex items-center min-w-0 bg-gray-50/50 sm:bg-transparent rounded-xl sm:rounded-none border sm:border-0 border-gray-100">
+          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 absolute left-3 pointer-events-none" />
           <input
             type="text"
             value={query}
@@ -63,14 +63,14 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
             onFocus={() => setIsFocused(true)}
             onBlur={() => setTimeout(() => setIsFocused(false), 200)}
             placeholder="Search electrician, plumber, AC specialist..."
-            className="w-full pl-10 pr-4 py-2.5 bg-transparent text-sm text-neutral-900 placeholder:text-gray-400 focus:outline-none"
+            className="w-full pl-9 sm:pl-10 pr-4 py-2.5 bg-transparent text-xs sm:text-sm text-neutral-900 placeholder:text-gray-400 focus:outline-none"
           />
         </div>
 
         {/* Action Button */}
         <button
           type="submit"
-          className="bg-[#059669] hover:bg-[#047857] text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+          className="bg-[#059669] hover:bg-[#047857] text-white text-xs sm:text-sm font-semibold px-5 sm:px-6 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-2xs active:scale-98"
         >
           <span>Find Services</span>
           <ArrowRight className="w-4 h-4" />

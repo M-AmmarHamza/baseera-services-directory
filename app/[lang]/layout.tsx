@@ -30,12 +30,12 @@ export default async function RootLayout({
       <body className="bg-[#f9f9ff] text-[#141b2b] min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-100 selection:text-emerald-900">
         {/* Global Desktop & Mobile Header */}
         <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/90 shadow-2xs">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
             
             {/* Logo & Locality */}
-            <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
-              <Link href={`/${lang}`} className="flex items-center gap-2.5 group shrink-0">
-                {/* Modern Crisp Geometric SVG Brand Icon (Zero broken image, instant retina load) */}
+            <div className="flex items-center gap-1.5 sm:gap-4 min-w-0">
+              <Link href={`/${lang}`} className="flex items-center gap-2 group shrink-0">
+                {/* Modern Crisp Geometric SVG Brand Icon */}
                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-[#059669] to-[#047857] flex items-center justify-center text-white shadow-2xs group-hover:scale-105 transition-transform shrink-0">
                   <svg
                     className="w-4 h-4 sm:w-5 sm:h-5 fill-current"
@@ -50,7 +50,7 @@ export default async function RootLayout({
                   <span className="font-extrabold text-base sm:text-lg text-gray-900 tracking-tight">
                     Baseera
                   </span>
-                  <span className="text-[9px] sm:text-[10px] text-emerald-700 font-bold tracking-widest uppercase mt-0.5">
+                  <span className="text-[9px] sm:text-[10px] text-emerald-700 font-bold tracking-widest uppercase mt-0.5 hidden xs:inline">
                     Directory
                   </span>
                 </div>
@@ -83,12 +83,12 @@ export default async function RootLayout({
             </nav>
 
             {/* Language & Action Button */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
               {/* Language Switcher Pill */}
-              <div className="flex items-center bg-gray-100/90 border border-gray-200/80 p-0.5 rounded-full text-xs font-semibold">
+              <div className="flex items-center bg-gray-100/90 border border-gray-200/80 p-0.5 rounded-full text-[11px] sm:text-xs font-semibold">
                 <Link
                   href="/en"
-                  className={`px-2 sm:px-2.5 py-1 rounded-full text-xs transition-all ${
+                  className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${
                     lang === 'en'
                       ? 'bg-white text-emerald-800 font-bold shadow-2xs'
                       : 'text-gray-500 hover:text-gray-900'
@@ -98,7 +98,7 @@ export default async function RootLayout({
                 </Link>
                 <Link
                   href="/ur"
-                  className={`px-2 sm:px-2.5 py-1 rounded-full text-xs transition-all ${
+                  className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${
                     lang === 'ur'
                       ? 'bg-white text-emerald-800 font-bold shadow-2xs font-urdu'
                       : 'text-gray-500 hover:text-gray-900 font-urdu'
@@ -108,7 +108,7 @@ export default async function RootLayout({
                 </Link>
                 <Link
                   href="/ar"
-                  className={`px-2 sm:px-2.5 py-1 rounded-full text-xs transition-all ${
+                  className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${
                     lang === 'ar'
                       ? 'bg-white text-emerald-800 font-bold shadow-2xs font-arabic'
                       : 'text-gray-500 hover:text-gray-900 font-arabic'
@@ -121,7 +121,8 @@ export default async function RootLayout({
               {/* Prominent List Your Service Action Button */}
               <Link
                 href={`/${lang}/join`}
-                className="inline-flex items-center gap-1.5 text-xs font-bold bg-[#059669] hover:bg-[#047857] text-white px-3 sm:px-4 py-2 rounded-full transition-all active:scale-95 shadow-2xs hover:shadow-xs"
+                className="inline-flex items-center justify-center gap-1.5 text-xs font-bold bg-[#059669] hover:bg-[#047857] text-white p-2 sm:px-4 sm:py-2 rounded-full transition-all active:scale-95 shadow-2xs hover:shadow-xs"
+                title="List Your Service"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span className="whitespace-nowrap hidden sm:inline">List Service</span>

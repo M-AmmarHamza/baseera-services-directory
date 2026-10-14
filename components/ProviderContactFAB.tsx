@@ -84,17 +84,17 @@ export default function ProviderContactFAB({
   };
 
   return (
-    <aside aria-label="Quick contact" className="fixed bottom-4 right-4 z-50">
+    <aside aria-label="Quick contact" className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40">
       <a
         href={directUrl}
         target={contactMethod === 'phone' ? '_self' : '_blank'}
         rel="noopener noreferrer"
         onClick={handleClick}
-        className="group flex items-center gap-2.5 bg-[#059669] hover:bg-[#047857] text-white px-5 py-3.5 rounded-full border border-emerald-700 transition-all active:scale-95 cursor-pointer"
+        className="group flex items-center gap-2 bg-[#059669] hover:bg-[#047857] text-white px-4 py-3 sm:px-5 sm:py-3.5 rounded-full border border-emerald-700 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
         aria-label={label}
       >
         <Icon className="w-5 h-5 fill-current shrink-0 group-hover:scale-110 transition-transform" />
-        <span className="text-sm font-bold tracking-tight whitespace-nowrap">
+        <span className="text-xs sm:text-sm font-bold tracking-tight whitespace-nowrap">
           {label}
         </span>
       </a>

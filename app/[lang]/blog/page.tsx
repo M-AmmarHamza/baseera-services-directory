@@ -139,7 +139,7 @@ export default async function BlogPage({ params }: Props) {
             </div>
 
             {/* Right: Solid Dark Emerald Green Background (#059669) */}
-            <div className="bg-[#059669] text-white p-8 sm:p-12 flex flex-col justify-between">
+            <div className="bg-[#059669] text-white p-5 sm:p-10 lg:p-12 flex flex-col justify-between">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/20 text-white border border-white/30 mb-4 backdrop-blur-sm">
                   <span>{featuredArticle.category}</span>
@@ -147,16 +147,16 @@ export default async function BlogPage({ params }: Props) {
                   <span>{featuredArticle.readTime}</span>
                 </div>
 
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-4 leading-snug">
+                <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-white mb-3 sm:mb-4 leading-snug">
                   {featuredArticle.title}
                 </h2>
 
-                <p className="text-sm sm:text-base text-emerald-100 font-normal leading-relaxed mb-6">
+                <p className="text-xs sm:text-base text-emerald-100 font-normal leading-relaxed mb-6">
                   {featuredArticle.excerpt}
                 </p>
               </div>
 
-              <div className="pt-6 border-t border-emerald-500/40 flex items-center justify-between">
+              <div className="pt-5 sm:pt-6 border-t border-emerald-500/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 text-xs text-emerald-100">
                   <User className="w-4 h-4 text-emerald-200" />
                   <span className="font-semibold text-white">{featuredArticle.author}</span>
@@ -166,7 +166,7 @@ export default async function BlogPage({ params }: Props) {
 
                 <Link
                   href={`/${lang}/blog/${featuredArticle.slug}`}
-                  className="bg-white hover:bg-emerald-50 text-[#059669] font-bold text-xs px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-1.5"
+                  className="bg-white hover:bg-emerald-50 text-[#059669] font-bold text-xs px-4 py-2 rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 self-start sm:self-auto shadow-2xs"
                 >
                   <span>Read Story</span>
                   <ArrowRight className="w-3.5 h-3.5" />

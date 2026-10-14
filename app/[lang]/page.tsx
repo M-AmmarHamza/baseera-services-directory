@@ -116,44 +116,44 @@ export default async function HomePage({ params }: PageProps) {
       </section>
 
       {/* 2. BROWSE BY SPECIALTY (PREMIUM HORIZONTAL SCROLLABLE SECTION) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 overflow-hidden">
         {/* Section Header */}
-        <div className="flex items-end justify-between gap-4 mb-6">
+        <div className="flex items-end justify-between gap-4 mb-5 sm:mb-6">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900">
+            <h2 className="text-xl sm:text-3xl font-bold tracking-tight text-neutral-900">
               Browse by Specialty
             </h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
               Verified community technicians &amp; specialists worldwide
             </p>
           </div>
-          <div className="text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0">
+          <div className="text-xs sm:text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0">
             {CATEGORIES.length} Categories
           </div>
         </div>
 
         {/* Horizontal Scrollable Container */}
-        <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex overflow-x-auto gap-3 sm:gap-4 pb-4 scrollbar-hide snap-x scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0">
           {CATEGORIES.map((cat) => {
             const IconComponent = CATEGORY_ICON_MAP[cat.icon] || Wrench;
             return (
               <Link
                 key={cat.id}
                 href={`/${lang}/pk/karachi/${cat.slug}`}
-                className="bg-white border border-gray-200 rounded-xl min-w-[140px] w-[140px] p-4 flex flex-col items-center justify-center text-center transition-all hover:border-emerald-600 snap-start shrink-0 group cursor-pointer"
+                className="bg-white border border-gray-200 rounded-xl min-w-[125px] w-[125px] sm:min-w-[140px] sm:w-[140px] p-3 sm:p-4 flex flex-col items-center justify-center text-center transition-all hover:border-emerald-600 snap-start shrink-0 group cursor-pointer shadow-2xs"
               >
                 {/* Soft circular background behind icon */}
-                <div className="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center mb-3 group-hover:bg-emerald-50 transition-colors">
-                  <IconComponent className="text-emerald-700 w-6 h-6" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-50 flex items-center justify-center mb-2.5 sm:mb-3 group-hover:bg-emerald-50 transition-colors">
+                  <IconComponent className="text-emerald-700 w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
 
                 {/* Two-line clamped Title */}
-                <span className="text-sm font-semibold text-gray-900 leading-tight line-clamp-2 h-9 flex items-center justify-center">
+                <span className="text-xs sm:text-sm font-semibold text-gray-900 leading-tight line-clamp-2 h-8 sm:h-9 flex items-center justify-center">
                   {cat.name}
                 </span>
 
                 {/* Active provider count Subtext */}
-                <span className="text-xs text-gray-500 mt-1">
+                <span className="text-[11px] sm:text-xs text-gray-500 mt-1">
                   {cat.count}+ Active
                 </span>
               </Link>
@@ -163,25 +163,25 @@ export default async function HomePage({ params }: PageProps) {
       </section>
 
       {/* 3. HORIZONTALLY SCROLLING FEATURED PROVIDERS */}
-      <section className="border-t border-gray-200 bg-white py-12 sm:py-16">
+      <section className="border-t border-gray-200 bg-white py-10 sm:py-16 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-6">
+          <div className="flex items-end justify-between mb-5 sm:mb-6">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-bold tracking-tight text-neutral-900">
+                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
                   Featured Providers
                 </h2>
                 <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-[#059669] border border-emerald-200">
                   Verified
                 </span>
               </div>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
                 Top-rated specialists ready for immediate direct booking
               </p>
             </div>
             <Link
               href={`/${lang}/vendors`}
-              className="text-xs font-semibold text-[#059669] hover:underline flex items-center gap-1"
+              className="text-xs font-semibold text-[#059669] hover:underline flex items-center gap-1 shrink-0"
             >
               <span>See All</span>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -189,7 +189,7 @@ export default async function HomePage({ params }: PageProps) {
           </div>
 
           {/* Horizontal Scroll Track */}
-          <div className="flex gap-4 overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide snap-x">
+          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide snap-x">
             {providers.map((provider) => {
               const cleanPhone = provider.whatsapp_number.replace(/[^0-9]/g, '');
               const whatsappLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
@@ -199,7 +199,7 @@ export default async function HomePage({ params }: PageProps) {
               return (
                 <div
                   key={provider.id}
-                  className="bg-white border border-gray-200 rounded-xl p-5 min-w-[280px] sm:min-w-[320px] max-w-[340px] snap-start flex flex-col justify-between"
+                  className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 min-w-[260px] xs:min-w-[280px] sm:min-w-[320px] max-w-[340px] snap-start flex flex-col justify-between shrink-0 shadow-2xs"
                 >
                   <div>
                     {/* Header: Avatar, Name & Verified Badge */}
@@ -207,7 +207,7 @@ export default async function HomePage({ params }: PageProps) {
                       <img
                         src={provider.avatar_url}
                         alt={provider.name}
-                        className="w-12 h-12 rounded-lg object-cover border border-gray-200 shrink-0"
+                        className="w-11 h-11 sm:w-12 sm:h-12 rounded-lg object-cover border border-gray-200 shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
@@ -230,7 +230,7 @@ export default async function HomePage({ params }: PageProps) {
                     </div>
 
                     {/* Coverage area */}
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-4">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
                       <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                       <span className="truncate">{provider.district}, Karachi</span>
                     </div>
@@ -241,7 +241,7 @@ export default async function HomePage({ params }: PageProps) {
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-3">
+                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2.5">
                     <div>
                       <span className="text-[10px] text-gray-400 uppercase font-semibold block">Visiting</span>
                       <span className="text-xs font-bold text-neutral-900">Rs. {provider.starting_price}</span>
@@ -251,7 +251,7 @@ export default async function HomePage({ params }: PageProps) {
                       href={whatsappLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-[#059669] hover:bg-[#047857] text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5"
+                      className="bg-[#059669] hover:bg-[#047857] text-white text-xs font-semibold px-3 sm:px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
                       <span>WhatsApp</span>
@@ -265,10 +265,10 @@ export default async function HomePage({ params }: PageProps) {
       </section>
 
       {/* 4. FLAT VALUE PROPOSITION */}
-      <section className="border-t border-gray-200 bg-white py-12">
+      <section className="border-t border-gray-200 bg-white py-10 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-5 border border-gray-200 rounded-xl bg-white">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            <div className="p-4 sm:p-5 border border-gray-200 rounded-xl bg-white">
               <ShieldCheck className="w-6 h-6 text-[#059669] mb-3" />
               <h3 className="text-sm font-bold text-neutral-900 mb-1">Direct Verified Karigars</h3>
               <p className="text-xs text-gray-500 leading-relaxed">
@@ -276,7 +276,7 @@ export default async function HomePage({ params }: PageProps) {
               </p>
             </div>
 
-            <div className="p-5 border border-gray-200 rounded-xl bg-white">
+            <div className="p-4 sm:p-5 border border-gray-200 rounded-xl bg-white">
               <CheckCircle2 className="w-6 h-6 text-[#059669] mb-3" />
               <h3 className="text-sm font-bold text-neutral-900 mb-1">Zero Platform Commission</h3>
               <p className="text-xs text-gray-500 leading-relaxed">
@@ -284,7 +284,7 @@ export default async function HomePage({ params }: PageProps) {
               </p>
             </div>
 
-            <div className="p-5 border border-gray-200 rounded-xl bg-white">
+            <div className="p-4 sm:p-5 border border-gray-200 rounded-xl bg-white">
               <Clock className="w-6 h-6 text-[#059669] mb-3" />
               <h3 className="text-sm font-bold text-neutral-900 mb-1">Instant WhatsApp Connection</h3>
               <p className="text-xs text-gray-500 leading-relaxed">

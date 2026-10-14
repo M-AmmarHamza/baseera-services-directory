@@ -171,16 +171,16 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
               return (
                 <div
                   key={provider.id}
-                  className="bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors flex flex-col justify-between"
+                  className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 hover:border-gray-300 transition-colors flex flex-col justify-between shadow-2xs"
                 >
                   <div>
                     {/* Top Row: Avatar, Name, Verified Badge, Rating */}
-                    <div className="flex items-start gap-4 mb-4">
+                    <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
                       <Link href={profileHref} className="shrink-0">
                         <img
                           src={provider.avatar_url}
                           alt={provider.name}
-                          className="w-16 h-16 rounded-xl object-cover border border-gray-200"
+                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border border-gray-200"
                         />
                       </Link>
 
@@ -188,7 +188,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                         <div className="flex items-center gap-1.5">
                           <Link
                             href={profileHref}
-                            className="text-base font-bold text-neutral-900 hover:text-[#059669] transition-colors truncate"
+                            className="text-sm sm:text-base font-bold text-neutral-900 hover:text-[#059669] transition-colors truncate"
                           >
                             {provider.name}
                           </Link>
@@ -208,7 +208,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                         </p>
 
                         {/* Star Rating */}
-                        <div className="flex items-center gap-1.5 mt-1.5 text-xs">
+                        <div className="flex items-center gap-1.5 mt-1 sm:mt-1.5 text-xs">
                           <div className="flex items-center gap-1 text-amber-600 font-bold">
                             <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                             <span>{provider.rating.toFixed(1)}</span>
@@ -229,7 +229,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                     </div>
 
                     {/* Short Description */}
-                    <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed mb-4">
+                    <p className="text-xs text-gray-600 line-clamp-2 sm:line-clamp-3 leading-relaxed mb-4">
                       {provider.short_bio}
                     </p>
 
@@ -252,10 +252,10 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                   </div>
 
                   {/* Bottom Action Area */}
-                  <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+                  <div className="pt-3.5 sm:pt-4 border-t border-gray-100 flex items-center justify-between gap-2.5">
                     <div>
                       <span className="text-[10px] uppercase font-bold text-gray-400 block">
-                        Starting From
+                        Visiting Charges
                       </span>
                       <span className="text-xs font-bold text-neutral-900">
                         Rs. {provider.starting_price}
@@ -267,7 +267,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                       href={directWhatsAppUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-[#059669] hover:bg-[#047857] text-white text-xs font-semibold px-4 py-2.5 rounded-lg transition-colors inline-flex items-center justify-center gap-1.5 shrink-0"
+                      className="bg-[#059669] hover:bg-[#047857] text-white text-xs font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 shadow-2xs"
                     >
                       <MessageCircle className="w-4 h-4 fill-current" />
                       <span>Chat on WhatsApp</span>

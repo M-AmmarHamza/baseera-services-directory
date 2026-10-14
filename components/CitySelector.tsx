@@ -91,11 +91,11 @@ export default function CitySelector({ lang }: CitySelectorProps) {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-gray-50/90 hover:bg-gray-100 text-gray-800 text-xs font-semibold transition-all border border-gray-200 hover:border-emerald-600 cursor-pointer shadow-2xs group"
+        className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-full bg-gray-50/90 hover:bg-gray-100 text-gray-800 text-xs font-semibold transition-all border border-gray-200 hover:border-emerald-600 cursor-pointer shadow-2xs group shrink"
         aria-expanded={isOpen}
       >
         <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0 group-hover:scale-110 transition-transform" />
-        <span className="truncate max-w-[90px] sm:max-w-[130px] font-medium text-gray-900">
+        <span className="truncate max-w-[70px] xs:max-w-[95px] sm:max-w-[130px] font-medium text-gray-900 text-[11px] sm:text-xs">
           {activeLabel}
         </span>
         <ChevronDown className="w-3 h-3 text-gray-400 shrink-0 group-hover:text-emerald-700 transition-colors" />
