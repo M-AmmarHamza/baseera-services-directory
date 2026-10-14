@@ -164,7 +164,7 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  // Handle top-level routes (e.g. /en/list-service, /en/vendors, /en/search)
+  // Handle top-level routes (e.g. /en/list-service, /en/search)
   if (segments.length === 2) {
     const secondSegment = segments[1].toLowerCase();
 
@@ -175,7 +175,12 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(targetUrl, 301);
     }
 
-    if (['list-service', 'vendors', 'search', 'services', 'dashboard', 'blog', 'admin', 'privacy', 'terms', 'about'].includes(secondSegment)) {
+    // 301 redirect removed /vendors page directly to homepage
+    if (secondSegment === 'vendors') {
+      return NextResponse.redirect(new URL(`/${lang}`, request.url), 301);
+    }
+
+    if (['list-service', 'search', 'services', 'dashboard', 'blog', 'admin', 'privacy', 'terms', 'about'].includes(secondSegment)) {
       const response = NextResponse.next();
       response.headers.set('x-baseera-lang', lang);
       return response;

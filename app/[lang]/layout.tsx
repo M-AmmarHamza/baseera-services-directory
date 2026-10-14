@@ -71,7 +71,7 @@ export default async function RootLayout({
                 {dict.header?.home || 'Home'}
               </Link>
               <Link
-                href={`/${lang}/vendors`}
+                href={`/${lang}#categories`}
                 className="text-sm font-semibold text-gray-600 hover:text-emerald-700 transition-colors"
               >
                 {dict.header?.findServices || 'Find Services'}
@@ -161,7 +161,7 @@ export default async function RootLayout({
                     </Link>
                   </li>
                   <li>
-                    <Link href={`/${lang}/vendors`} className="hover:text-emerald-700 transition-colors">
+                    <Link href={`/${lang}#categories`} className="hover:text-emerald-700 transition-colors">
                       {dict.footer?.findSpecialists || 'Find Specialists'}
                     </Link>
                   </li>

@@ -13,7 +13,7 @@ export default function BottomNav({ lang }: Props) {
   const pathname = usePathname();
 
   const isHome = pathname === `/${lang}` || pathname === `/${lang}/`;
-  const isSearch = pathname.includes('/search') || pathname.includes('/vendors');
+  const isSearch = pathname.includes('/search');
   const isSaved = pathname.includes('/saved');
   const isProfile = pathname.includes('/list-service') || pathname.includes('/join') || pathname.includes('/profile');
 
@@ -49,7 +49,7 @@ export default function BottomNav({ lang }: Props) {
     },
     {
       label: t.search,
-      href: `/${lang}/vendors`,
+      href: `/${lang}/pk/karachi/search`,
       icon: Search,
       isActive: isSearch,
     },

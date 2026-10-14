@@ -35,6 +35,7 @@ import {
   Clock,
 } from 'lucide-react';
 import HomepageSearchBar from '@/components/HomepageSearchBar';
+import FeaturedProvidersSlider from '@/components/FeaturedProvidersSlider';
 import { getAllProviders, CATEGORIES, getCategoryName } from '@/lib/db';
 import { getDictionary } from '@/lib/get-dictionary';
 
@@ -124,7 +125,7 @@ export default async function HomePage({ params }: PageProps) {
       </section>
 
       {/* 2. BROWSE BY SPECIALTY (PREMIUM HORIZONTAL SCROLLABLE SECTION) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 overflow-hidden">
+      <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 overflow-hidden scroll-mt-20">
         {/* Section Header */}
         <div className="flex items-end justify-between gap-4 mb-5 sm:mb-6">
           <div>
@@ -170,105 +171,27 @@ export default async function HomePage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* 3. HORIZONTALLY SCROLLING FEATURED PROVIDERS */}
+      {/* 3. CONTINUOUS SLIDING 20 FEATURED PROVIDERS */}
       <section className="border-t border-gray-200 bg-white py-10 sm:py-16 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-5 sm:mb-6">
+          <div className="flex items-end justify-between mb-6 sm:mb-8">
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl sm:text-2xl font-semibold leading-snug tracking-tight text-neutral-900">
                   {dict.home?.featuredProviders || 'Featured Providers'}
                 </h2>
-                <span className="px-2.5 py-0.5 rounded text-xs font-medium bg-emerald-50 text-[#059669] border border-emerald-200">
-                  {dict.home?.verified || 'Verified'}
+                <span className="px-2.5 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200">
+                  {dict.home?.verified || 'Verified (20 Specialists)'}
                 </span>
               </div>
               <p className="text-sm text-gray-500 mt-1">
                 {dict.home?.featuredSubtitle || 'Top-rated specialists ready for immediate direct booking'}
               </p>
             </div>
-            <Link
-              href={`/${lang}/vendors`}
-              className="text-sm font-semibold text-[#059669] hover:underline flex items-center gap-1 shrink-0"
-            >
-              <span>{dict.home?.seeAll || 'See All'}</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </Link>
           </div>
 
-          {/* Horizontal Scroll Track */}
-          <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide snap-x">
-            {providers.map((provider) => {
-              const cleanPhone = provider.whatsapp_number.replace(/[^0-9]/g, '');
-              const whatsappLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-                `Hello ${provider.name}, I saw your verified profile on Baseera. I need service assistance.`
-              )}`;
-
-              return (
-                <div
-                  key={provider.id}
-                  className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 min-w-[260px] xs:min-w-[280px] sm:min-w-[320px] max-w-[340px] snap-start flex flex-col justify-between shrink-0 shadow-2xs"
-                >
-                  <div>
-                    {/* Header: Avatar, Name & Verified Badge */}
-                    <div className="flex items-start gap-3 mb-3">
-                      <img
-                        src={provider.avatar_url}
-                        alt={provider.name}
-                        className="w-11 h-11 sm:w-12 sm:h-12 rounded-lg object-cover border border-gray-200 shrink-0"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <h3 className="text-lg font-semibold leading-snug text-neutral-900 truncate">
-                            {provider.name}
-                          </h3>
-                          {provider.is_verified && (
-                            <BadgeCheck className="w-4 h-4 text-[#059669] shrink-0" />
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-500 truncate mt-0.5">
-                          {provider.trade_title}
-                        </p>
-                        <div className="flex items-center gap-1 mt-1 text-sm text-amber-600 font-semibold">
-                          <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                          <span>{provider.rating.toFixed(1)}</span>
-                          <span className="text-gray-400 font-normal">({provider.review_count})</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Coverage area */}
-                    <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
-                      <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                      <span className="truncate">{provider.district}, Karachi</span>
-                    </div>
-
-                    <p className="text-sm sm:text-base text-gray-600 line-clamp-2 leading-relaxed mb-4">
-                      {provider.short_bio}
-                    </p>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2.5">
-                    <div>
-                      <span className="text-xs text-gray-500 uppercase font-medium block">{dict.home?.visiting || 'Visiting'}</span>
-                      <span className="text-sm font-semibold text-neutral-900">Rs. {provider.starting_price}</span>
-                    </div>
-
-                    <a
-                      href={whatsappLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-[#059669] hover:bg-[#047857] text-white text-xs font-medium px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      <span>{dict.home?.whatsapp || 'WhatsApp'}</span>
-                    </a>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {/* Smooth Auto-Sliding Infinite Carousel with Direct Profile Navigation */}
+          <FeaturedProvidersSlider providers={providers} lang={lang} />
         </div>
       </section>
 

@@ -150,10 +150,10 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href={`/${lang}/vendors`}
+                href={`/${lang}`}
                 className="w-full sm:w-auto bg-white hover:bg-gray-50 border border-gray-200 text-neutral-900 text-sm font-semibold px-5 py-3 rounded-xl transition-colors inline-flex items-center justify-center"
               >
-                Browse All Cities
+                Browse All Services
               </Link>
             </div>
           </div>

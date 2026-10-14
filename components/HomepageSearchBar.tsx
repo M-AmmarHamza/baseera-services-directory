@@ -74,7 +74,7 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
     if (matchedCategory) {
       router.push(`/${lang}/pk/karachi/${matchedCategory.category}`);
     } else {
-      router.push(`/${lang}/vendors?q=${encodeURIComponent(query)}`);
+      router.push(`/${lang}/pk/karachi/search?q=${encodeURIComponent(query)}`);
     }
   };
 
