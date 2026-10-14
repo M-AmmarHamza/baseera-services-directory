@@ -54,28 +54,28 @@ export default async function HomePage({ params }: PageProps) {
   // 3x3 Flat Grid Categories
   const categories = [
     {
-      id: 'electrician',
-      name: 'Electrician',
-      desc: 'DB panels, inverter wiring & emergency power faults',
-      icon: Zap,
-      count: '42+ Specialists',
-      slug: 'electrician',
-    },
-    {
-      id: 'plumbing',
-      name: 'Plumber',
-      desc: 'Underground leaks, sweet water motors & fittings',
-      icon: Wrench,
-      count: '38+ Specialists',
-      slug: 'plumbing',
-    },
-    {
       id: 'ac',
       name: 'AC & Cooling',
       desc: 'Inverter gas charging, PCB cards & jet servicing',
       icon: Wind,
-      count: '54+ Specialists',
-      slug: 'ac',
+      count: '58+ Specialists',
+      slug: 'ac-repair',
+    },
+    {
+      id: 'electrician',
+      name: 'Electrician & Wiring',
+      desc: 'DB panels, inverter wiring & emergency power faults',
+      icon: Zap,
+      count: '42+ Specialists',
+      slug: 'electrician-services',
+    },
+    {
+      id: 'plumbing',
+      name: 'Plumbing & Boring',
+      desc: 'Underground leaks, sweet water motors & fittings',
+      icon: Wrench,
+      count: '37+ Specialists',
+      slug: 'plumbing-services',
     },
     {
       id: 'cleaning',
@@ -83,7 +83,7 @@ export default async function HomePage({ params }: PageProps) {
       desc: 'Deep home sanitization, sofa & carpet shampooing',
       icon: Sparkles,
       count: '29+ Specialists',
-      slug: 'cleaning',
+      slug: 'home-cleaning',
     },
     {
       id: 'carpenter',
@@ -91,7 +91,7 @@ export default async function HomePage({ params }: PageProps) {
       desc: 'Custom furniture, door lock installation & repairs',
       icon: Hammer,
       count: '25+ Specialists',
-      slug: 'carpenter',
+      slug: 'carpenter-services',
     },
     {
       id: 'painter',
@@ -99,7 +99,7 @@ export default async function HomePage({ params }: PageProps) {
       desc: 'Interior wall paint, damp proofing & deco polish',
       icon: Paintbrush,
       count: '31+ Specialists',
-      slug: 'painter',
+      slug: 'painting-services',
     },
     {
       id: 'generator',
@@ -107,15 +107,15 @@ export default async function HomePage({ params }: PageProps) {
       desc: 'Gas/petrol generator tuning, AVR & self starter',
       icon: Cpu,
       count: '19+ Specialists',
-      slug: 'generator',
+      slug: 'generator-services',
     },
     {
       id: 'cctv',
       name: 'CCTV & Security',
       desc: 'HD IP camera installation, DVR setup & remote view',
       icon: Video,
-      count: '22+ Specialists',
-      slug: 'cctv',
+      count: '31+ Specialists',
+      slug: 'cctv-security',
     },
     {
       id: 'appliances',
@@ -123,7 +123,7 @@ export default async function HomePage({ params }: PageProps) {
       desc: 'Automatic washing machines, refrigerators & ovens',
       icon: Tv,
       count: '36+ Specialists',
-      slug: 'appliances',
+      slug: 'appliance-repair',
     },
   ];
 

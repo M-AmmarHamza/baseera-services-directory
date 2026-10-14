@@ -46,17 +46,32 @@ const COUNTRY_DEFAULT_CITIES: Record<string, string> = {
 
 // Legacy profile mappings for SEO redirects
 const LEGACY_PROVIDER_MAP: Record<string, { category: string; slug: string }> = {
-  'tariq-electric': { category: 'electrician', slug: 'tariq-mahmood' },
-  'tariq-mahmood': { category: 'electrician', slug: 'tariq-mahmood' },
-  'irfan-electrician': { category: 'electrician', slug: 'tariq-mahmood' },
-  'saleem-master-plumber': { category: 'plumbing', slug: 'saleem-master-plumber' },
-  'master-plumber-saleem': { category: 'plumbing', slug: 'saleem-master-plumber' },
-  'raheem-plumber': { category: 'plumbing', slug: 'raheem-plumber' },
-  'asif-electric-works': { category: 'electrician', slug: 'asif-electric-works' },
-  'kashif-ali': { category: 'ac', slug: 'kashif-ali' },
-  'karachi-cooling-expert': { category: 'ac', slug: 'kashif-ali' },
-  'farzana-kitchen': { category: 'food', slug: 'farzana-kitchen' },
-  'rashid-al-nuaimi': { category: 'ac', slug: 'rashid-al-nuaimi' },
+  'tariq-electric': { category: 'electrician-services', slug: 'tariq-mahmood' },
+  'tariq-mahmood': { category: 'electrician-services', slug: 'tariq-mahmood' },
+  'irfan-electrician': { category: 'electrician-services', slug: 'tariq-mahmood' },
+  'saleem-master-plumber': { category: 'plumbing-services', slug: 'saleem-master-plumber' },
+  'master-plumber-saleem': { category: 'plumbing-services', slug: 'saleem-master-plumber' },
+  'raheem-plumber': { category: 'plumbing-services', slug: 'raheem-plumber' },
+  'asif-electric-works': { category: 'electrician-services', slug: 'asif-electric-works' },
+  'kashif-ali': { category: 'ac-repair', slug: 'kashif-ali' },
+  'karachi-cooling-expert': { category: 'ac-repair', slug: 'kashif-ali' },
+  'farzana-kitchen': { category: 'home-chef', slug: 'farzana-kitchen' },
+  'rashid-al-nuaimi': { category: 'ac-repair', slug: 'rashid-al-nuaimi' },
+};
+
+// SEO Slug redirects for legacy or short category names
+const SHORT_CATEGORY_REDIRECTS: Record<string, string> = {
+  ac: 'ac-repair',
+  food: 'home-chef',
+  electrician: 'electrician-services',
+  plumbing: 'plumbing-services',
+  generator: 'generator-services',
+  solar: 'solar-energy',
+  cctv: 'cctv-security',
+  cleaning: 'home-cleaning',
+  carpenter: 'carpenter-services',
+  painter: 'painting-services',
+  appliances: 'appliance-repair',
 };
 
 export function middleware(request: NextRequest) {
@@ -96,7 +111,8 @@ export function middleware(request: NextRequest) {
   }
 
   if (pathname.includes('categories.html')) {
-    const targetCat = searchParams.get('cat') || searchParams.get('category');
+    const rawCat = searchParams.get('cat') || searchParams.get('category') || '';
+    const targetCat = SHORT_CATEGORY_REDIRECTS[rawCat.toLowerCase()] || rawCat;
     return NextResponse.redirect(
       new URL(`/${DEFAULT_LOCALE}/${geoCountry}/${detectedCitySlug}${targetCat ? `/${targetCat}` : ''}`, request.url),
       308
@@ -157,6 +173,19 @@ export function middleware(request: NextRequest) {
       new URL(`/${lang}/${country}/${targetCity}`, request.url),
       308
     );
+  }
+
+  // Canonical SEO Category Slug Redirects (e.g., /pk/karachi/ac -> /pk/karachi/ac-repair)
+  if (segments.length >= 4 && !['blog', 'admin', 'dashboard'].includes(segments[1])) {
+    const rawCategory = segments[3].toLowerCase();
+    const canonicalCategory = SHORT_CATEGORY_REDIRECTS[rawCategory];
+    if (canonicalCategory && canonicalCategory !== rawCategory) {
+      const canonicalSegments = [...segments];
+      canonicalSegments[3] = canonicalCategory;
+      const targetUrl = new URL(`/${canonicalSegments.join('/')}`, request.url);
+      targetUrl.search = request.nextUrl.search;
+      return NextResponse.redirect(targetUrl, 308);
+    }
   }
 
   // Downstream path sanitization for ASCII slugs

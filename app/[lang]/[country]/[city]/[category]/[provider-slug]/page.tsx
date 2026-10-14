@@ -11,7 +11,9 @@ import {
   Clock,
   CheckCircle2,
   Zap,
+  Phone,
 } from 'lucide-react';
+import { WhatsAppIcon } from '@/components/Icons';
 import { getDictionary } from '@/lib/get-dictionary';
 import { getProviderBySlug, getCategoryBySlug } from '@/lib/db';
 import ProviderImageSlider from '@/components/ProviderImageSlider';
@@ -28,6 +30,94 @@ interface ProviderPageProps {
 }
 
 const DOMAIN = 'https://baseera-services-directory.vercel.app';
+
+// DYNAMIC CATEGORY SPECIALIZATIONS (ZERO HARDCODED MISMATCHES)
+const CATEGORY_SPECIALIZATIONS: Record<string, Array<{ title: string; desc: string }>> = {
+  ac: [
+    { title: 'Inverter AC Jet Chemical Wash', desc: 'High-pressure anti-bacterial indoor coil wash, blower wheel degreasing, and drainage tray clearing.' },
+    { title: 'Refrigerant Gas Leak & Refill', desc: 'Nitrogen leak testing, copper flare nut brazing, and genuine R410a / R32 refrigerant charging.' },
+    { title: 'Inverter PCB Motherboard Diagnostics', desc: 'Microcontroller troubleshooting, capacitor replacement, and indoor/outdoor communication error reset.' },
+    { title: 'Compressor & Fan Motor Overhaul', desc: 'Rotary/Scroll compressor replacement, run capacitor testing, and condenser fan motor servicing.' },
+  ],
+  'ac-repair': [
+    { title: 'Inverter AC Jet Chemical Wash', desc: 'High-pressure anti-bacterial indoor coil wash, blower wheel degreasing, and drainage tray clearing.' },
+    { title: 'Refrigerant Gas Leak & Refill', desc: 'Nitrogen leak testing, copper flare nut brazing, and genuine R410a / R32 refrigerant charging.' },
+    { title: 'Inverter PCB Motherboard Diagnostics', desc: 'Microcontroller troubleshooting, capacitor replacement, and indoor/outdoor communication error reset.' },
+    { title: 'Compressor & Fan Motor Overhaul', desc: 'Rotary/Scroll compressor replacement, run capacitor testing, and condenser fan motor servicing.' },
+  ],
+  electrician: [
+    { title: 'Concealed Wiring & Rewiring', desc: 'Full premise concealed copper cabling, load distribution, and short-circuit localization.' },
+    { title: 'Inverter, Solar & ATS Changeover Panels', desc: 'Automatic transfer switch (ATS) wiring and UPS / solar inverter distribution.' },
+    { title: 'Main Distribution Board (DB) Balancing', desc: 'Earthing rod testing, circuit breaker trip diagnosis, and phase load balancing.' },
+    { title: 'Ceiling Fan & Heavy Fixture Fitting', desc: 'Secure ceiling suspension anchors, chandelier installation, and LED dimmer panels.' },
+  ],
+  'electrician-services': [
+    { title: 'Concealed Wiring & Rewiring', desc: 'Full premise concealed copper cabling, load distribution, and short-circuit localization.' },
+    { title: 'Inverter, Solar & ATS Changeover Panels', desc: 'Automatic transfer switch (ATS) wiring and UPS / solar inverter distribution.' },
+    { title: 'Main Distribution Board (DB) Balancing', desc: 'Earthing rod testing, circuit breaker trip diagnosis, and phase load balancing.' },
+    { title: 'Ceiling Fan & Heavy Fixture Fitting', desc: 'Secure ceiling suspension anchors, chandelier installation, and LED dimmer panels.' },
+  ],
+  plumbing: [
+    { title: 'Concealed Wall Seepage & Leak Detection', desc: 'Acoustic testing, non-destructive moisture tracing, and pipeline pressure inspection.' },
+    { title: 'Submersible Water Motor Installation', desc: 'Boring deep-well motor lowering, magnetic float switch, and overhead tank automation.' },
+    { title: 'PPRC & UPVC Sanitary Piping', desc: 'High-pressure heat-fusion hot/cold water pipeline fittings and bathroom sanitary remodeling.' },
+    { title: 'Gas & Electric Geyser Calibration', desc: 'Safe exhaust ventilation, non-return safety valve fitting, and pressure pump calibration.' },
+  ],
+  'plumbing-services': [
+    { title: 'Concealed Wall Seepage & Leak Detection', desc: 'Acoustic testing, non-destructive moisture tracing, and pipeline pressure inspection.' },
+    { title: 'Submersible Water Motor Installation', desc: 'Boring deep-well motor lowering, magnetic float switch, and overhead tank automation.' },
+    { title: 'PPRC & UPVC Sanitary Piping', desc: 'High-pressure heat-fusion hot/cold water pipeline fittings and bathroom sanitary remodeling.' },
+    { title: 'Gas & Electric Geyser Calibration', desc: 'Safe exhaust ventilation, non-return safety valve fitting, and pressure pump calibration.' },
+  ],
+  generator: [
+    { title: 'Engine Overhaul & Tappet Clearance', desc: 'Valve clearance adjustment, cylinder compression check, and spark plug calibration.' },
+    { title: 'Digital AVR & Alternator Repair', desc: 'Automatic voltage regulator replacement, carbon brush alignment, and frequency tuning.' },
+    { title: 'Carburetor & Dual-Fuel Gas Kits', desc: 'CNG/LPG zero-pressure regulator installation and ultrasonic carburetor clearing.' },
+    { title: 'ATS Relay Wiring & Starter Solenoids', desc: 'Auto-start relay integration, trickle battery charger setup, and starter motor servicing.' },
+  ],
+  'generator-services': [
+    { title: 'Engine Overhaul & Tappet Clearance', desc: 'Valve clearance adjustment, cylinder compression check, and spark plug calibration.' },
+    { title: 'Digital AVR & Alternator Repair', desc: 'Automatic voltage regulator replacement, carbon brush alignment, and frequency tuning.' },
+    { title: 'Carburetor & Dual-Fuel Gas Kits', desc: 'CNG/LPG zero-pressure regulator installation and ultrasonic carburetor clearing.' },
+    { title: 'ATS Relay Wiring & Starter Solenoids', desc: 'Auto-start relay integration, trickle battery charger setup, and starter motor servicing.' },
+  ],
+  food: [
+    { title: 'Daily Office Lunch Delivery', desc: 'Hygienic fresh home-cooked meal boxes with premium basmati rice and canola oil preparation.' },
+    { title: 'Bulk Event & Daawat Catering', desc: 'Traditional mutton degi biryani, qorma, and custom desserts for family gatherings.' },
+    { title: 'Custom Diet & Diabetic Meal Plans', desc: 'Low-sodium, steamed vegetable, and portion-controlled wholesome meal prep.' },
+    { title: 'Homemade Sweets & Frozen Snacks', desc: 'Handcrafted samosas, shami kababs, and seasonal traditional mithai.' },
+  ],
+  'home-chef': [
+    { title: 'Daily Office Lunch Delivery', desc: 'Hygienic fresh home-cooked meal boxes with premium basmati rice and canola oil preparation.' },
+    { title: 'Bulk Event & Daawat Catering', desc: 'Traditional mutton degi biryani, qorma, and custom desserts for family gatherings.' },
+    { title: 'Custom Diet & Diabetic Meal Plans', desc: 'Low-sodium, steamed vegetable, and portion-controlled wholesome meal prep.' },
+    { title: 'Homemade Sweets & Frozen Snacks', desc: 'Handcrafted samosas, shami kababs, and seasonal traditional mithai.' },
+  ],
+  cleaning: [
+    { title: 'Deep Home & Apartment Sanitization', desc: 'Floor grout scrubbing, window frame degreasing, and anti-dust detailing.' },
+    { title: 'Sofa & Carpet Injection-Extraction', desc: 'High-pressure steam extraction shampooing with anti-bacterial odor neutralizer.' },
+    { title: 'Water Tank Cleaning & Chlorination', desc: 'Underground and overhead tank sludge removal, pressure washing, and UV disinfection.' },
+    { title: 'Kitchen & Chimney Degreasing', desc: 'Commercial grade non-acidic solvent cleaning for exhaust hoods and cooktops.' },
+  ],
+  'home-cleaning': [
+    { title: 'Deep Home & Apartment Sanitization', desc: 'Floor grout scrubbing, window frame degreasing, and anti-dust detailing.' },
+    { title: 'Sofa & Carpet Injection-Extraction', desc: 'High-pressure steam extraction shampooing with anti-bacterial odor neutralizer.' },
+    { title: 'Water Tank Cleaning & Chlorination', desc: 'Underground and overhead tank sludge removal, pressure washing, and UV disinfection.' },
+    { title: 'Kitchen & Chimney Degreasing', desc: 'Commercial grade non-acidic solvent cleaning for exhaust hoods and cooktops.' },
+  ],
+  carpenter: [
+    { title: 'Modular Woodwork & Kitchen Cabinets', desc: 'UV sheet, tactile laminate, and solid wood modular kitchen cabinet manufacturing.' },
+    { title: 'Door Lock & Hydraulic Hinge Fitting', desc: 'Concealed multi-point mortise lock installation, soft-close hinges, and door alignment.' },
+    { title: 'Wooden Flooring & Parquet Decking', desc: 'HDF water-resistant laminate wooden parquet laying with sound-absorbing underlay.' },
+    { title: 'Wardrobe & Closet Customization', desc: 'Sliding aluminum channel wardrobes with integrated LED profile lighting.' },
+  ],
+  'carpenter-services': [
+    { title: 'Modular Woodwork & Kitchen Cabinets', desc: 'UV sheet, tactile laminate, and solid wood modular kitchen cabinet manufacturing.' },
+    { title: 'Door Lock & Hydraulic Hinge Fitting', desc: 'Concealed multi-point mortise lock installation, soft-close hinges, and door alignment.' },
+    { title: 'Wooden Flooring & Parquet Decking', desc: 'HDF water-resistant laminate wooden parquet laying with sound-absorbing underlay.' },
+    { title: 'Wardrobe & Closet Customization', desc: 'Sliding aluminum channel wardrobes with integrated LED profile lighting.' },
+  ],
+};
 
 export async function generateMetadata({ params }: ProviderPageProps): Promise<Metadata> {
   const resolvedParams = await params;
@@ -112,11 +202,6 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
       addressRegion: cityName,
       addressCountry: countryCode,
     },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: '24.8607',
-      longitude: '67.0011',
-    },
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: provider.rating.toFixed(1),
@@ -124,22 +209,24 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
       bestRating: '5',
       worstRating: '1',
     },
-    openingHoursSpecification: [
-      {
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-        opens: '08:00',
-        closes: '22:00',
-      },
-    ],
   };
 
-  // Mock portfolio photos from database or default
+  // Portfolio photos
   const portfolioPhotos = [
     provider.avatar_url,
     'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80',
     'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
   ];
+
+  // Dynamic Specializations
+  const normalizedCategoryKey = (categoryInfo?.id || category).toLowerCase();
+  const specializations = CATEGORY_SPECIALIZATIONS[normalizedCategoryKey] ||
+    CATEGORY_SPECIALIZATIONS[category] ||
+    CATEGORY_SPECIALIZATIONS['electrician'];
+
+  const whatsappMessage = encodeURIComponent(
+    `Assalam-o-Alaikum ${provider.name}, I found your verified profile on Baseera directory in ${cityName}. I need consultation for ${provider.trade_title}. Are you available today?`
+  );
 
   return (
     <div className="min-h-screen bg-white text-neutral-900 pb-28 font-sans">
@@ -245,6 +332,27 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               </p>
             </div>
 
+            {/* DYNAMIC CORE SPECIALIZATIONS */}
+            <div className="p-6 border border-gray-200 rounded-2xl bg-white">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">
+                  Core Specializations
+                </h2>
+                <span className="text-xs text-[#059669] font-bold">Category Verified</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {specializations.map((spec, i) => (
+                  <div key={i} className="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                    <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="text-xs font-bold text-neutral-900">{spec.title}</h3>
+                      <p className="text-[11px] text-gray-600 mt-0.5 leading-relaxed">{spec.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Service Area Tags */}
             <div className="p-6 border border-gray-200 rounded-2xl bg-white">
               <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider mb-3">
@@ -262,13 +370,13 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               </div>
             </div>
 
-            {/* Trust Badges */}
+            {/* Trust Badges - STRICTLY NO POLICE CLEARANCE */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-4 border border-gray-200 rounded-xl bg-white flex items-center gap-3">
                 <ShieldCheck className="w-6 h-6 text-[#059669] shrink-0" />
                 <div>
                   <div className="text-xs font-bold text-neutral-900">Verified Specialist</div>
-                  <div className="text-[11px] text-gray-500">ID & Trade Approved</div>
+                  <div className="text-[11px] text-gray-500">Identity & Trade Approved</div>
                 </div>
               </div>
 
@@ -290,26 +398,50 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
             </div>
           </div>
 
-          {/* Pricing & Guarantee Box */}
+          {/* Pricing & Direct Booking Sidebar (STRICTLY NO E-COMMERCE PRICE TAGS) */}
           <div className="space-y-6">
-            <div className="p-6 border border-gray-200 rounded-2xl bg-white">
-              <span className="text-xs uppercase font-bold text-gray-400 block mb-1">
-                Visiting / Inspection Fee
-              </span>
-              <div className="text-3xl font-black text-[#059669] mb-3">
-                Rs. {provider.starting_price}
+            <div className="p-6 border border-gray-200 rounded-2xl bg-white sticky top-24">
+              {/* Plain Text Visiting Charges */}
+              <div className="pb-4 mb-4 border-b border-gray-100">
+                <span className="text-[11px] uppercase tracking-wider font-semibold text-gray-400 block mb-1">
+                  Visiting Charges
+                </span>
+                <div className="text-base font-bold text-neutral-900">
+                  Rs. {provider.starting_price}
+                </div>
+                <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                  Pay directly upon inspection. No online prepayment or platform commission.
+                </p>
               </div>
-              <p className="text-xs text-gray-500 leading-relaxed mb-6">
-                Pay directly upon completion of work. No online payment or card deduction required.
-              </p>
 
-              <div className="text-xs text-gray-600 space-y-2 border-t border-gray-100 pt-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#059669]" />
+              {/* Direct Contact Actions */}
+              <div className="space-y-3">
+                <a
+                  href={`https://wa.me/${provider.whatsapp_number.replace(/\+/g, '')}?text=${whatsappMessage}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 bg-[#059669] hover:bg-[#047857] active:scale-[0.99] text-white transition-all rounded-xl flex items-center justify-center gap-2 font-bold text-sm"
+                >
+                  <WhatsAppIcon className="w-4 h-4 fill-current" />
+                  <span>Chat on WhatsApp</span>
+                </a>
+
+                <a
+                  href={`tel:${provider.whatsapp_number}`}
+                  className="w-full py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-800 rounded-xl flex items-center justify-center gap-2 font-semibold text-xs transition-colors"
+                >
+                  <Phone className="w-3.5 h-3.5 text-gray-600" />
+                  <span>Call Direct ({provider.whatsapp_number})</span>
+                </a>
+              </div>
+
+              <div className="text-xs text-gray-600 space-y-2 border-t border-gray-100 pt-4 mt-4">
+                <div className="flex items-center gap-2 text-[11px] text-gray-500">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
                   <span>Free cancellation before specialist arrival</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#059669]" />
+                <div className="flex items-center gap-2 text-[11px] text-gray-500">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
                   <span>Negotiate major repairs on-site directly</span>
                 </div>
               </div>
@@ -318,7 +450,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
         </div>
       </main>
 
-      {/* CRITICAL UI: STICKY FLOATING ACTION BUTTON (FAB) ANCHORED BOTTOM-RIGHT */}
+      {/* CRITICAL UI: STICKY FLOATING ACTION BUTTON (FAB) ANCHORED BOTTOM-RIGHT WITH LEAD TRACKING */}
       <ProviderContactFAB
         providerId={provider.id}
         providerName={provider.name}

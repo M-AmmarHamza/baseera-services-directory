@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
+import { CATEGORIES, CITIES, COUNTRIES } from '@/lib/db';
 
 const DOMAIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://baseera-services-directory.vercel.app';
 const SUPPORTED_LOCALES = ['en', 'ur', 'ar'];
@@ -26,13 +27,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     supabase.from('providers').select('id, slug, city_id, category_id, is_verified, updated_at').eq('is_verified', true),
   ]);
 
-  const countryCodeMap = new Map((countries || []).map((c) => [c.id, (c.code || 'pk').toLowerCase()]));
-  const cityMap = new Map((cities || []).map((city) => [city.id, { slug: city.slug, countryId: city.country_id }]));
-  const categoryMap = new Map((categories || []).map((cat) => [cat.id, cat.slug]));
+  const activeCountries = countries && countries.length > 0 ? countries : COUNTRIES.map((c, i) => ({ id: i + 1, code: c.code }));
+  const activeCities = cities && cities.length > 0 ? cities : CITIES.map((c, i) => ({ id: i + 1, slug: c.slug, country_id: 1, countryCode: c.countryCode }));
+  const activeCategories = categories && categories.length > 0 ? categories : CATEGORIES.map((cat) => ({ id: cat.id, slug: cat.slug }));
+
+  const countryCodeMap = new Map<any, string>();
+  for (const c of activeCountries as any[]) {
+    countryCodeMap.set(c.id, (c.code || 'pk').toLowerCase());
+  }
+
+  const cityMap = new Map<any, { slug: string; countryId: any }>();
+  for (const city of activeCities as any[]) {
+    cityMap.set(city.id, { slug: city.slug, countryId: city.country_id });
+  }
+
+  const categoryMap = new Map<any, string>();
+  for (const cat of activeCategories as any[]) {
+    categoryMap.set(cat.id, cat.slug);
+  }
 
   // 2. Dynamic City Hub Landing Pages
-  for (const city of cities || []) {
-    const countryCode = countryCodeMap.get(city.country_id) || 'pk';
+  for (const city of activeCities) {
+    const countryCode = (city as any).countryCode || countryCodeMap.get((city as any).country_id) || 'pk';
     for (const lang of SUPPORTED_LOCALES) {
       sitemapEntries.push({
         url: `${DOMAIN}/${lang}/${countryCode}/${city.slug}`,
@@ -47,8 +63,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
 
-    // 3. City + Category Programmatic Silos
-    for (const cat of categories || []) {
+    // 3. City + Category Programmatic Silos (Full Descriptive SEO Slugs)
+    for (const cat of activeCategories) {
       for (const lang of SUPPORTED_LOCALES) {
         sitemapEntries.push({
           url: `${DOMAIN}/${lang}/${countryCode}/${city.slug}/${cat.slug}`,

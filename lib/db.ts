@@ -308,20 +308,40 @@ export function getCitiesByCountry(countryCode: string): City[] {
   return [{ slug: 'main-city', name: 'Main City', countryCode: norm }];
 }
 
-export const CATEGORIES = [
-  { id: 'electrician', slug: 'electrician', name: 'Electrician & Wiring', icon: 'bolt', count: 42 },
-  { id: 'ac', slug: 'ac-repair', name: 'AC & Refrigeration', icon: 'mode_fan', count: 58 },
-  { id: 'plumbing', slug: 'plumbing', name: 'Plumbing & Boring', icon: 'plumbing', count: 37 },
-  { id: 'generator', slug: 'generators', name: 'Generator Technicians', icon: 'power', count: 19 },
-  { id: 'solar', slug: 'solar-energy', name: 'Solar Energy & Net Metering', icon: 'solar_power', count: 26 },
-  { id: 'cctv', slug: 'cctv-security', name: 'CCTV & Home Security', icon: 'videocam', count: 31 },
-  { id: 'ro-water', slug: 'ro-plants', name: 'RO Plants & Filters', icon: 'water_drop', count: 22 },
-  { id: 'food', slug: 'home-chefs', name: 'Home Chefs & Catering', icon: 'restaurant', count: 45 },
+export interface CategoryDef {
+  id: string;
+  slug: string;
+  aliases: string[];
+  name: string;
+  icon: string;
+  count: number;
+}
+
+export const CATEGORIES: CategoryDef[] = [
+  { id: 'electrician', slug: 'electrician-services', aliases: ['electrician', 'electrician-services', 'electricians'], name: 'Electrician & Wiring', icon: 'bolt', count: 42 },
+  { id: 'ac', slug: 'ac-repair', aliases: ['ac', 'ac-repair', 'ac-technician', 'ac-services'], name: 'AC & Refrigeration', icon: 'mode_fan', count: 58 },
+  { id: 'plumbing', slug: 'plumbing-services', aliases: ['plumbing', 'plumbing-services', 'plumbers'], name: 'Plumbing & Boring', icon: 'plumbing', count: 37 },
+  { id: 'generator', slug: 'generator-services', aliases: ['generator', 'generators', 'generator-services'], name: 'Generator Technicians', icon: 'power', count: 19 },
+  { id: 'solar', slug: 'solar-energy', aliases: ['solar', 'solar-energy', 'solar-services'], name: 'Solar Energy & Net Metering', icon: 'solar_power', count: 26 },
+  { id: 'cctv', slug: 'cctv-security', aliases: ['cctv', 'cctv-security', 'security-cameras'], name: 'CCTV & Home Security', icon: 'videocam', count: 31 },
+  { id: 'ro-water', slug: 'ro-water-filter', aliases: ['ro-water', 'ro-plants', 'ro-water-filter'], name: 'RO Plants & Filters', icon: 'water_drop', count: 22 },
+  { id: 'food', slug: 'home-chef', aliases: ['food', 'home-chef', 'home-chefs', 'catering'], name: 'Home Chefs & Catering', icon: 'restaurant', count: 45 },
+  { id: 'cleaning', slug: 'home-cleaning', aliases: ['cleaning', 'home-cleaning', 'deep-cleaning'], name: 'Home Cleaning Services', icon: 'sparkles', count: 29 },
+  { id: 'carpenter', slug: 'carpenter-services', aliases: ['carpenter', 'carpenter-services', 'carpentry'], name: 'Carpenter & Woodwork', icon: 'hammer', count: 25 },
+  { id: 'painter', slug: 'painting-services', aliases: ['painter', 'painting-services', 'paint'], name: 'Painting & Waterproofing', icon: 'paintbrush', count: 31 },
+  { id: 'appliances', slug: 'appliance-repair', aliases: ['appliances', 'appliance-repair'], name: 'Appliance Repair', icon: 'tv', count: 36 },
 ];
 
-export function getCategoryBySlug(slug: string) {
+export function getCategoryBySlug(slug: string): CategoryDef | null {
   const normalized = slug.toLowerCase();
-  return CATEGORIES.find((c) => c.slug.toLowerCase() === normalized || c.id.toLowerCase() === normalized) || null;
+  return (
+    CATEGORIES.find(
+      (c) =>
+        c.slug.toLowerCase() === normalized ||
+        c.id.toLowerCase() === normalized ||
+        c.aliases.includes(normalized)
+    ) || null
+  );
 }
 
 function mapDbProvider(row: any, fallbackCity: string = 'karachi'): Provider {
@@ -393,6 +413,7 @@ export async function getProviders(citySlug: string, categorySlug?: string): Pro
     const catMatch =
       p.category_id.toLowerCase() === categorySlug.toLowerCase() ||
       (category && p.category_id.toLowerCase() === category.id.toLowerCase()) ||
+      (category && category.aliases?.includes(p.category_id.toLowerCase())) ||
       p.slug.includes(categorySlug);
     return cityMatch && catMatch;
   });
