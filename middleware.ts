@@ -137,11 +137,11 @@ export function middleware(request: NextRequest) {
   const firstSegment = segments[0]?.toLowerCase();
   const isSupportedLocale = SUPPORTED_LOCALES.includes(firstSegment);
 
-  // 3. Auto-redirect root "/" to the IP-detected localized path (e.g. baseera.com/en/ae/dubai)
+  // 3. Auto-redirect root "/" to default language main homepage (e.g. baseera.com/en)
   if (pathname === '/' || pathname === '/index.html') {
     return NextResponse.redirect(
-      new URL(`/${DEFAULT_LOCALE}/${geoCountry}/${detectedCitySlug}`, request.url),
-      307 // Temporary redirect based on dynamic user IP
+      new URL(`/${DEFAULT_LOCALE}`, request.url),
+      307
     );
   }
 
@@ -155,19 +155,13 @@ export function middleware(request: NextRequest) {
 
   const lang = firstSegment;
 
-  // If visiting "/en", "/ur", "/ar" directly without country/city, auto-redirect based on IP
-  if (segments.length === 1) {
-    // Check if query string requested the global directory view explicitly
-    if (searchParams.get('view') === 'global') {
-      const response = NextResponse.next();
-      response.headers.set('x-baseera-lang', lang);
-      return response;
-    }
-
-    return NextResponse.redirect(
-      new URL(`/${lang}/${geoCountry}/${detectedCitySlug}`, request.url),
-      307
-    );
+  // Serve Main Homepage on direct language paths (/en, /ur, /ar) without forcing city redirect
+  if (segments.length === 1 && isSupportedLocale) {
+    const response = NextResponse.next();
+    response.headers.set('x-baseera-lang', lang);
+    response.headers.set('x-baseera-country', geoCountry);
+    response.headers.set('x-baseera-city', detectedCitySlug);
+    return response;
   }
 
   // Handle top-level routes (e.g. /en/join, /en/vendors, /en/search)
