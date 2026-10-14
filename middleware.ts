@@ -173,7 +173,7 @@ export function middleware(request: NextRequest) {
   // Handle top-level routes (e.g. /en/join, /en/vendors, /en/search)
   if (segments.length === 2) {
     const secondSegment = segments[1].toLowerCase();
-    if (['join', 'vendors', 'search', 'services', 'dashboard', 'blog', 'admin'].includes(secondSegment)) {
+    if (['join', 'vendors', 'search', 'services', 'dashboard', 'blog', 'admin', 'privacy', 'terms', 'about'].includes(secondSegment)) {
       const response = NextResponse.next();
       response.headers.set('x-baseera-lang', lang);
       return response;
@@ -189,7 +189,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Canonical SEO Category Slug Redirects (e.g., /pk/karachi/ac -> /pk/karachi/ac-repair)
-  if (segments.length >= 4 && !['blog', 'admin', 'dashboard'].includes(segments[1])) {
+  if (segments.length >= 4 && !['blog', 'admin', 'dashboard', 'privacy', 'terms', 'about'].includes(segments[1])) {
     const rawCategory = segments[3].toLowerCase();
     const canonicalCategory = SHORT_CATEGORY_REDIRECTS[rawCategory];
     if (canonicalCategory && canonicalCategory !== rawCategory) {

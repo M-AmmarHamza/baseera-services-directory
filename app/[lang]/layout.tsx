@@ -133,23 +133,61 @@ export default async function RootLayout({
         {/* Dynamic Page Content */}
         <main className="flex-1 w-full">{children}</main>
 
-        {/* Global Footer with Cross-Region Hreflang Links */}
-        <footer className="bg-white border-t border-gray-200 py-12 mt-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-gray-500">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-gray-900">Baseera</span>
-              <span>•</span>
-              <span>{dict.common.zeroCommission}</span>
+        {/* Global Footer with Tagline, Legal Pages & Cross-Region Hreflang Links */}
+        <footer className="bg-white border-t border-gray-200 pt-10 pb-20 md:pb-10 mt-16 font-sans">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Top row: Brand & Tagline + Institutional Legal Pages */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-gray-100">
+              {/* Brand & Tagline */}
+              <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+                <span className="font-extrabold text-neutral-900 tracking-tight">Baseera</span>
+                <span className="text-gray-300">•</span>
+                <span className="text-gray-600 font-medium">
+                  Zero intermediary commission. 100% direct connection.
+                </span>
+              </div>
+
+              {/* Legal & Directory Links */}
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-gray-500">
+                <Link href={`/${lang}/about`} className="hover:text-emerald-700 transition-colors">
+                  About Us
+                </Link>
+                <Link href={`/${lang}/privacy`} className="hover:text-emerald-700 transition-colors">
+                  Privacy Policy
+                </Link>
+                <Link href={`/${lang}/terms`} className="hover:text-emerald-700 transition-colors">
+                  Terms &amp; Conditions
+                </Link>
+                <Link href={`/${lang}/join`} className="hover:text-emerald-700 font-semibold text-[#059669] transition-colors">
+                  + List Service
+                </Link>
+              </div>
             </div>
 
-            {/* Cross-Region Links */}
-            <div className="flex flex-wrap items-center gap-4 text-xs font-medium">
-              <span className="text-gray-400">Global Hubs:</span>
-              <Link href="/en/pk/karachi" className="hover:text-emerald-700">🇵🇰 Karachi</Link>
-              <Link href="/en/pk/lahore" className="hover:text-emerald-700">🇵🇰 Lahore</Link>
-              <Link href="/en/ae/dubai" className="hover:text-emerald-700">🇦🇪 Dubai</Link>
-              <Link href="/en/ae/sharjah/electrician" className="hover:text-emerald-700">🇦🇪 Sharjah</Link>
-              <Link href="/en/sa/riyadh" className="hover:text-emerald-700">🇸🇦 Riyadh</Link>
+            {/* Bottom row: Global Hubs & Copyright */}
+            <div className="pt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-gray-400">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="font-semibold text-gray-500">Global Hubs:</span>
+                <Link href={`/${lang}/pk/karachi`} className="hover:text-emerald-700 transition-colors">
+                  Karachi (PK)
+                </Link>
+                <Link href={`/${lang}/pk/lahore`} className="hover:text-emerald-700 transition-colors">
+                  Lahore (PK)
+                </Link>
+                <Link href={`/${lang}/pk/islamabad`} className="hover:text-emerald-700 transition-colors">
+                  Islamabad (PK)
+                </Link>
+                <Link href={`/${lang}/ae/dubai`} className="hover:text-emerald-700 transition-colors">
+                  Dubai (AE)
+                </Link>
+                <Link href={`/${lang}/sa/riyadh`} className="hover:text-emerald-700 transition-colors">
+                  Riyadh (SA)
+                </Link>
+              </div>
+
+              <div>
+                &copy; {new Date().getFullYear()} Baseera Local Services Directory. All rights reserved.
+              </div>
             </div>
           </div>
         </footer>
