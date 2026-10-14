@@ -16,7 +16,11 @@ export interface Provider {
   district: string;
   service_area: string[];
   whatsapp_number: string;
+  phone_number?: string;
+  telegram_handle?: string;
+  preferred_contact?: string;
   avatar_url: string;
+  cover_url?: string;
   short_bio: string;
   starting_price: number;
   rating: number;

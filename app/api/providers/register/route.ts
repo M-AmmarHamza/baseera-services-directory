@@ -11,6 +11,9 @@ export async function POST(request: NextRequest) {
     const {
       name,
       whatsapp_number,
+      phone_number,
+      telegram_handle,
+      preferred_contact = 'whatsapp',
       country_code = 'pk',
       city_name = 'karachi',
       category_id = 'electrician',
@@ -19,12 +22,16 @@ export async function POST(request: NextRequest) {
       service_area = [],
       starting_price = 500,
       profile_type = 'individual',
+      avatar_url,
+      cover_url,
       lang = 'en',
     } = body;
 
-    if (!name || !whatsapp_number) {
+    const contactMethod = (whatsapp_number || phone_number || telegram_handle || '').trim();
+
+    if (!name || !contactMethod) {
       return NextResponse.json(
-        { error: 'Name and WhatsApp number are required' },
+        { error: 'Name and at least one contact channel (WhatsApp, Phone, or Telegram) are required.' },
         { status: 400 }
       );
     }
@@ -132,9 +139,10 @@ export async function POST(request: NextRequest) {
         name: name.trim(),
         slug: uniqueSlug,
         profile_type: profile_type === 'shop' ? 'shop' : 'individual',
-        whatsapp_number: whatsapp_number.trim(),
+        whatsapp_number: (whatsapp_number || phone_number || telegram_handle || '').trim(),
+        avatar_url: avatar_url?.trim() || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,
         service_area: serviceAreaArray,
-        short_bio: short_bio?.trim() || `${resolvedTradeTitle} serving ${cleanCityName}. Direct WhatsApp inquiries with zero commission.`,
+        short_bio: short_bio?.trim() || `${resolvedTradeTitle} serving ${cleanCityName}. Direct communication with zero commission.`,
         is_verified: true, // auto-verified for seamless dynamic creation
         is_available: true,
         starting_price: Number(starting_price) || 500,

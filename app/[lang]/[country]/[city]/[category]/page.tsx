@@ -114,7 +114,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
 
             {/* List Your Business Button */}
             <Link
-              href={`/${lang}/join?country=${country}&city=${city}&category=${category}`}
+              href={`/${lang}/list-service?country=${country}&city=${city}&category=${category}`}
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:border-[#059669] hover:text-[#059669] text-xs font-semibold text-neutral-900 transition-colors shrink-0"
             >
               <PlusCircle className="w-4 h-4 text-[#059669]" />
@@ -143,7 +143,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
-                href={`/${lang}/join?country=${country}&city=${city}&category=${category}`}
+                href={`/${lang}/list-service?country=${country}&city=${city}&category=${category}`}
                 className="w-full sm:w-auto bg-[#059669] hover:bg-[#047857] text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors inline-flex items-center justify-center gap-2"
               >
                 <span>Register Your Business</span>

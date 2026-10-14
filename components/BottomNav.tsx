@@ -15,7 +15,7 @@ export default function BottomNav({ lang }: Props) {
   const isHome = pathname === `/${lang}` || pathname === `/${lang}/`;
   const isSearch = pathname.includes('/search') || pathname.includes('/vendors');
   const isSaved = pathname.includes('/saved');
-  const isProfile = pathname.includes('/join') || pathname.includes('/profile');
+  const isProfile = pathname.includes('/list-service') || pathname.includes('/join') || pathname.includes('/profile');
 
   const labels = {
     ur: {
@@ -61,7 +61,7 @@ export default function BottomNav({ lang }: Props) {
     },
     {
       label: t.profile,
-      href: `/${lang}/join`,
+      href: `/${lang}/list-service`,
       icon: User,
       isActive: isProfile,
     },

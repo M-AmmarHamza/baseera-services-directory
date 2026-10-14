@@ -5,6 +5,7 @@ import { getDictionary } from '@/lib/get-dictionary';
 import { Plus } from 'lucide-react';
 import CitySelector from '@/components/CitySelector';
 import BottomNav from '@/components/BottomNav';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { tajawal, inter } from '@/app/fonts';
 
 export async function generateStaticParams() {
@@ -85,43 +86,12 @@ export default async function RootLayout({
 
             {/* Language & Action Button */}
             <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-              {/* Language Switcher Pill */}
-              <div className="flex items-center bg-gray-100/90 border border-gray-200/80 p-0.5 rounded-full text-[11px] sm:text-xs font-semibold">
-                <Link
-                  href="/en"
-                  className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${
-                    lang === 'en'
-                      ? 'bg-white text-emerald-800 font-bold shadow-2xs'
-                      : 'text-gray-500 hover:text-gray-900'
-                  }`}
-                >
-                  EN
-                </Link>
-                <Link
-                  href="/ur"
-                  className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${
-                    lang === 'ur'
-                      ? 'bg-white text-emerald-800 font-bold shadow-2xs font-urdu'
-                      : 'text-gray-500 hover:text-gray-900 font-urdu'
-                  }`}
-                >
-                  اردو
-                </Link>
-                <Link
-                  href="/ar"
-                  className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${
-                    lang === 'ar'
-                      ? 'bg-white text-emerald-800 font-bold shadow-2xs font-arabic'
-                      : 'text-gray-500 hover:text-gray-900 font-arabic'
-                  }`}
-                >
-                  العربية
-                </Link>
-              </div>
+              {/* Dynamic Path-Preserving Language Switcher */}
+              <LanguageSwitcher currentLang={lang} />
 
               {/* Prominent List Your Service Action Button */}
               <Link
-                href={`/${lang}/join`}
+                href={`/${lang}/list-service`}
                 className="inline-flex items-center justify-center gap-1.5 text-xs font-bold bg-[#059669] hover:bg-[#047857] text-white p-2 sm:px-4 sm:py-2 rounded-full transition-all active:scale-95 shadow-2xs hover:shadow-xs"
                 title={dict.header?.listService || 'List Service'}
               >
@@ -171,7 +141,7 @@ export default async function RootLayout({
 
                 <div className="pt-1">
                   <Link
-                    href={`/${lang}/join`}
+                    href={`/${lang}/list-service`}
                     className="inline-flex items-center gap-1.5 text-xs font-bold bg-[#059669] hover:bg-[#047857] text-white px-3.5 py-1.5 rounded-full transition-all shadow-2xs"
                   >
                     <span>{dict.footer?.listServiceBtn || '+ List Your Service'}</span>
@@ -201,7 +171,7 @@ export default async function RootLayout({
                     </Link>
                   </li>
                   <li>
-                    <Link href={`/${lang}/join`} className="hover:text-emerald-700 transition-colors">
+                    <Link href={`/${lang}/list-service`} className="hover:text-emerald-700 transition-colors">
                       {dict.footer?.providerRegistration || 'Provider Registration'}
                     </Link>
                   </li>

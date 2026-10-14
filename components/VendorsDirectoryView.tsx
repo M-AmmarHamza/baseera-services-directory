@@ -86,7 +86,7 @@ export default function VendorsDirectoryView({ initialProviders, lang }: Props) 
 
           <div className="flex items-center gap-2.5 shrink-0">
             <Link
-              href={`/${lang}/join`}
+              href={`/${lang}/list-service`}
               className="px-4 py-2.5 rounded-xl bg-[#006948] hover:bg-[#00855d] text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5"
             >
               <span>+ List Your Service (Free)</span>
@@ -347,7 +347,7 @@ export default function VendorsDirectoryView({ initialProviders, lang }: Props) 
             </p>
           </div>
           <Link
-            href={`/${lang}/join`}
+            href={`/${lang}/list-service`}
             className="px-6 py-3 rounded-xl bg-white text-[#006948] font-bold text-xs hover:bg-emerald-50 transition-colors shadow-sm shrink-0"
           >
             Create Your Vendor Listing →

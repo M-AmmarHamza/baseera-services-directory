@@ -234,7 +234,7 @@ export default async function CityHomePage({ params }: PageProps) {
                   </p>
                 </div>
                 <Link
-                  href={`/${lang}/join?country=${country}&city=${city}`}
+                  href={`/${lang}/list-service?country=${country}&city=${city}`}
                   className="text-xs text-[#006948] font-bold hover:underline"
                 >
                   + Join as Vendor

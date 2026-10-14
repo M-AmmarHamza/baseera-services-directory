@@ -115,7 +115,7 @@ export default async function AboutPage({ params }: PageProps) {
               Join thousands of verified technicians growing their direct customer base on Baseera. Registration takes less than 3 minutes.
             </p>
             <Link
-              href={`/${lang}/join`}
+              href={`/${lang}/list-service`}
               className="inline-flex items-center gap-2 bg-[#059669] hover:bg-[#047857] text-white px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-2xs"
             >
               <span>List Your Service Free</span>
