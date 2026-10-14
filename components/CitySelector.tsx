@@ -47,7 +47,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
   const currentCountry = COUNTRIES.find((c) => c.code === currentCountryCode);
   const currentCity = CITIES.find((c) => c.slug === currentCitySlug && c.countryCode === currentCountryCode);
 
-  let activeLabel = 'Global Hub';
+  let activeLabel = lang === 'ur' ? 'عالمی مرکز' : lang === 'ar' ? 'الدليل العام' : 'Global Hub';
   let activeFlag = '🌍';
 
   if (currentCity && currentCountry) {
@@ -106,14 +106,16 @@ export default function CitySelector({ lang }: CitySelectorProps) {
         <div className="absolute start-0 mt-2 w-72 bg-white rounded-xl border border-gray-200 py-2 z-50 animate-in fade-in-50 zoom-in-95 duration-100">
           {/* Header & Global link */}
           <div className="px-3 pb-2 border-b border-gray-100 flex items-center justify-between">
-            <span className="text-xs font-bold text-neutral-900">Select City</span>
+            <span className="text-xs font-bold text-neutral-900">
+              {lang === 'ur' ? 'شہر منتخب کریں' : lang === 'ar' ? 'اختر المدينة' : 'Select City'}
+            </span>
             <Link
               href={`/${lang}`}
               onClick={() => setIsOpen(false)}
               className="text-[11px] text-[#059669] font-semibold hover:underline flex items-center gap-1"
             >
               <Globe className="w-3 h-3" />
-              Global Hub
+              <span>{lang === 'ur' ? 'عالمی مرکز' : lang === 'ar' ? 'الدليل العام' : 'Global Hub'}</span>
             </Link>
           </div>
 
@@ -125,7 +127,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search city (e.g. Dubai, Karachi)..."
+                placeholder={lang === 'ur' ? 'شہر تلاش کریں (مثلاً کراچی، دبئی)...' : lang === 'ar' ? 'ابحث عن مدينة (مثل دبي، كراتشي)...' : 'Search city (e.g. Dubai, Karachi)...'}
                 className="w-full bg-transparent focus:outline-none placeholder-gray-400 text-xs"
               />
               {search && (
@@ -173,7 +175,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
               })
             ) : (
               <div className="py-4 text-center text-xs text-gray-400">
-                No matching location found
+                {lang === 'ur' ? 'کوئی شہر نہیں ملا' : lang === 'ar' ? 'لم يتم العثور على نتائج' : 'No matching location found'}
               </div>
             )}
           </div>
@@ -197,8 +199,12 @@ export default function CitySelector({ lang }: CitySelectorProps) {
             {/* Sheet Header */}
             <div className="px-4 pb-3 border-b border-gray-100 flex items-center justify-between shrink-0">
               <div>
-                <h3 className="text-sm font-bold text-neutral-900">Select Operating City</h3>
-                <p className="text-[11px] text-gray-500">Filter services by your local region</p>
+                <h3 className="text-sm font-bold text-neutral-900">
+                  {lang === 'ur' ? 'شہر منتخب کریں' : lang === 'ar' ? 'اختر المدينة' : 'Select Operating City'}
+                </h3>
+                <p className="text-[11px] text-gray-500">
+                  {lang === 'ur' ? 'اپنے علاقے کے لحاظ سے سروسز تلاش کریں' : lang === 'ar' ? 'تصفية الخدمات حسب منطقتك' : 'Filter services by your local region'}
+                </p>
               </div>
               <button
                 type="button"
@@ -217,7 +223,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search city (e.g. Karachi, Dubai, Riyadh)..."
+                  placeholder={lang === 'ur' ? 'شہر تلاش کریں (مثلاً کراچی، دبئی، ریاض)...' : lang === 'ar' ? 'ابحث عن مدينة (مثل دبي، الرياض، كراتشي)...' : 'Search city (e.g. Karachi, Dubai, Riyadh)...'}
                   className="w-full bg-transparent focus:outline-none placeholder-gray-400 text-xs"
                 />
                 {search && (
@@ -239,9 +245,11 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                 >
                   <div className="flex items-center gap-2">
                     <Globe className="w-4 h-4" />
-                    <span>Global Directory Hub</span>
+                    <span>{lang === 'ur' ? 'عالمی مرکز' : lang === 'ar' ? 'الدليل العام' : 'Global Directory Hub'}</span>
                   </div>
-                  <span className="text-[10px] font-normal uppercase">Worldwide</span>
+                  <span className="text-[10px] font-normal uppercase">
+                    {lang === 'ur' ? 'دنیا بھر میں' : lang === 'ar' ? 'عالمي' : 'Worldwide'}
+                  </span>
                 </Link>
               </div>
 

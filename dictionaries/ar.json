@@ -15,21 +15,79 @@
     "callDirect": "اتصال مباشر",
     "zeroCommission": "بدون أي عمولة وسيط. اتصال مباشر 100% بين العميل والمهني."
   },
+  "header": {
+    "brandName": "بصيرة",
+    "directory": "الدليل",
+    "home": "الرئيسية",
+    "findServices": "البحث عن الخدمات",
+    "blog": "المقالات",
+    "listService": "أضف خدمتك",
+    "selectCity": "اختر المدينة",
+    "globalHub": "الدليل العام"
+  },
   "nav": {
     "home": "الرئيسية",
-    "explore": "استكشف",
-    "savedPros": "المحفوظة",
-    "guides": "أدلة وتوجيهات",
-    "vendorStudio": "استوديو المهنيين",
-    "account": "الحساب"
+    "explore": "بحث",
+    "savedPros": "المحفوظات",
+    "guides": "دليل",
+    "vendorStudio": "استوديو الخدمات",
+    "account": "حسابي"
   },
   "home": {
-    "heroTitle": "اعثر على أفضل المهنيين المعتمدين في",
-    "heroSubtitle": "حجز مباشر وسريع عبر واتساب بدون أي رسوم وساطة أو تأخير.",
-    "popularSpecialties": "الخدمات الأكثر طلباً",
-    "featuredPros": "أمهر الحرفيين والخبراء",
-    "whyTrust": "لماذا يثق سكان المنطقة في بصيرة؟"
+    "badge": "دليل الفنيين والحرفيين المباشر",
+    "heroTitle": "اعثر على خدمات موثوقة في منطقتك",
+    "heroSubtitle": "تواصل مباشرة مع فنيين معتمدين في مدينتك. بدون رسوم حجز، تواصل مباشر عبر واتساب، وتقييمات موثقة.",
+    "searchPlaceholder": "ابحث عن كهربائي، سباك، فني تكييف...",
+    "findServicesBtn": "بحث عن خدمة",
+    "popular": "الأكثر طلباً:",
+    "browseBySpecialty": "تصفح حسب التخصص",
+    "specialtySubtitle": "فنيون وخبراء معتمدون في جميع أنحاء المنطقة",
+    "categoriesCount": "تصنيفات",
+    "activeCount": "نشط",
+    "featuredProviders": "أبرز المهنيين",
+    "featuredSubtitle": "خبراء حاصلون على أعلى التقييمات ومتاحون للتواصل الفوري",
+    "seeAll": "عرض الكل",
+    "verified": "موثق",
+    "visiting": "رسوم الكشف",
+    "whatsapp": "واتساب",
+    "valProp1Title": "حرفيون موثقون مباشرة",
+    "valProp1Desc": "يخضع كل فني للتحقق من الهوية والخبرة المهنية قبل منحه الشارة الخضراء.",
+    "valProp2Title": "بدون أي عمولة وساطة",
+    "valProp2Desc": "لا توجد رسوم خفية أو وسطاء. 100% من أتعاب العمل تذهب مباشرة إلى الفني.",
+    "valProp3Title": "تواصل فوري عبر واتساب",
+    "valProp3Desc": "تحدث مع الفني مباشرة، أرسل صور العطل، وحدد الموعد المناسب لك بكل سهولة."
   },
+  "bottomNav": {
+    "home": "الرئيسية",
+    "search": "بحث",
+    "saved": "المحفوظة",
+    "profile": "حسابي"
+  },
+  "footer": {
+    "tagline": "بدون أي عمولة وسيط. اتصال مباشر 100%.",
+    "aboutDesc": "ربط الفنيين المعتمدين والمنازل مباشرة عبر واتساب بدون أي رسوم إضافية.",
+    "listServiceBtn": "+ أضف خدمتك مجاناً",
+    "colDirectory": "الدليل",
+    "colCompany": "الشركة والقانونية",
+    "colTopCities": "أهم المدن",
+    "home": "الرئيسية",
+    "findSpecialists": "البحث عن حرفيين",
+    "guides": "أدلة ومقالات",
+    "providerRegistration": "تسجيل مزودي الخدمة",
+    "aboutUs": "من نحن",
+    "privacyPolicy": "سياسة الخصوصية",
+    "terms": "الشروط والأحكام",
+    "copyright": "دليل بصيرة للخدمات المحلية. جميع الحقوق محفوظة.",
+    "subline": "دليل الحرفيين المباشر • بدون أي رسوم وساطة"
+  },
+  "popularSearches": [
+    { "title": "فني تكييف", "category": "ac-technician" },
+    { "title": "كهربائي", "category": "electrician" },
+    { "title": "سباك", "category": "plumber" },
+    { "title": "نجار", "category": "carpenter" },
+    { "title": "دهان", "category": "painter" },
+    { "title": "طاهي منزلي", "category": "home-chef" }
+  ],
   "category": {
     "titleTemplate": "أفضل {count} {category} معتمدين في {city}، {country}",
     "subtitleTemplate": "فنيون محترفون تم التحقق من هوياتهم للطوارئ والأعمال المجدولة.",
@@ -46,10 +104,10 @@
     "contactSupport": "هل تحتاج إلى خدمة طارئة الآن؟ تواصل مع منسقنا عبر واتساب."
   },
   "profile": {
-    "verifiedBadge": "تم التحقق من الهوية والسجل المهني",
+    "verifiedBadge": "موثق من قبل بصيرة",
     "coverageAreas": "نطاق التغطية والمناطق",
     "coreServices": "الخدمات والتخصصات الأساسية",
-    "pricingFrom": "يبدأ السعر من",
+    "pricingFrom": "رسوم الكشف",
     "customerReviews": "تقييمات وآراء العملاء",
     "writeReview": "أضف تقييمك",
     "reportProfile": "إبلاغ عن الحساب"

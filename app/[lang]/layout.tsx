@@ -48,10 +48,10 @@ export default async function RootLayout({
 
                 <div className="flex flex-col leading-none">
                   <span className="font-extrabold text-base sm:text-lg text-gray-900 tracking-tight">
-                    Baseera
+                    {dict.header?.brandName || 'Baseera'}
                   </span>
                   <span className="text-[9px] sm:text-[10px] text-emerald-700 font-bold tracking-widest uppercase mt-0.5 hidden xs:inline">
-                    Directory
+                    {dict.header?.directory || 'Directory'}
                   </span>
                 </div>
               </Link>
@@ -66,19 +66,19 @@ export default async function RootLayout({
                 href={`/${lang}`}
                 className="text-xs font-semibold text-gray-600 hover:text-emerald-700 transition-colors"
               >
-                Home
+                {dict.header?.home || 'Home'}
               </Link>
               <Link
                 href={`/${lang}/vendors`}
                 className="text-xs font-semibold text-gray-600 hover:text-emerald-700 transition-colors"
               >
-                Find Services
+                {dict.header?.findServices || 'Find Services'}
               </Link>
               <Link
                 href={`/${lang}/blog`}
                 className="text-xs font-semibold text-gray-600 hover:text-emerald-700 transition-colors"
               >
-                Blog
+                {dict.header?.blog || 'Blog'}
               </Link>
             </nav>
 
@@ -122,10 +122,10 @@ export default async function RootLayout({
               <Link
                 href={`/${lang}/join`}
                 className="inline-flex items-center justify-center gap-1.5 text-xs font-bold bg-[#059669] hover:bg-[#047857] text-white p-2 sm:px-4 sm:py-2 rounded-full transition-all active:scale-95 shadow-2xs hover:shadow-xs"
-                title="List Your Service"
+                title={dict.header?.listService || 'List Service'}
               >
                 <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span className="whitespace-nowrap hidden sm:inline">List Service</span>
+                <span className="whitespace-nowrap hidden sm:inline">{dict.header?.listService || 'List Service'}</span>
               </Link>
             </div>
           </div>
@@ -152,20 +152,20 @@ export default async function RootLayout({
                   </div>
                   <div className="flex flex-col leading-none">
                     <span className="font-extrabold text-base text-gray-900 tracking-tight">
-                      Baseera
+                      {dict.header?.brandName || 'Baseera'}
                     </span>
                     <span className="text-[9px] text-emerald-700 font-bold tracking-widest uppercase mt-0.5">
-                      Directory
+                      {dict.header?.directory || 'Directory'}
                     </span>
                   </div>
                 </Link>
 
                 <p className="text-xs sm:text-sm font-semibold text-neutral-900">
-                  Zero intermediary commission. 100% direct connection.
+                  {dict.footer?.tagline || 'Zero intermediary commission. 100% direct connection.'}
                 </p>
 
                 <p className="text-xs text-gray-500 leading-relaxed max-w-sm">
-                  Connecting verified local specialists and households with direct WhatsApp communication and zero platform markups.
+                  {dict.footer?.aboutDesc || 'Connecting verified local specialists and households with direct WhatsApp communication and zero platform markups.'}
                 </p>
 
                 <div className="pt-1">
@@ -173,7 +173,7 @@ export default async function RootLayout({
                     href={`/${lang}/join`}
                     className="inline-flex items-center gap-1.5 text-xs font-bold bg-[#059669] hover:bg-[#047857] text-white px-3.5 py-1.5 rounded-full transition-all shadow-2xs"
                   >
-                    <span>+ List Your Service</span>
+                    <span>{dict.footer?.listServiceBtn || '+ List Your Service'}</span>
                   </Link>
                 </div>
               </div>
@@ -181,27 +181,27 @@ export default async function RootLayout({
               {/* Column 2: Directory */}
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                  Directory
+                  {dict.footer?.colDirectory || 'Directory'}
                 </h3>
                 <ul className="space-y-2 text-xs text-gray-500">
                   <li>
                     <Link href={`/${lang}`} className="hover:text-emerald-700 transition-colors">
-                      Home
+                      {dict.footer?.home || 'Home'}
                     </Link>
                   </li>
                   <li>
                     <Link href={`/${lang}/vendors`} className="hover:text-emerald-700 transition-colors">
-                      Find Specialists
+                      {dict.footer?.findSpecialists || 'Find Specialists'}
                     </Link>
                   </li>
                   <li>
                     <Link href={`/${lang}/blog`} className="hover:text-emerald-700 transition-colors">
-                      Guides &amp; Articles
+                      {dict.footer?.guides || 'Guides & Articles'}
                     </Link>
                   </li>
                   <li>
                     <Link href={`/${lang}/join`} className="hover:text-emerald-700 transition-colors">
-                      Provider Registration
+                      {dict.footer?.providerRegistration || 'Provider Registration'}
                     </Link>
                   </li>
                 </ul>
@@ -210,22 +210,22 @@ export default async function RootLayout({
               {/* Column 3: Company & Legal */}
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                  Company &amp; Legal
+                  {dict.footer?.colCompany || 'Company & Legal'}
                 </h3>
                 <ul className="space-y-2 text-xs text-gray-500">
                   <li>
                     <Link href={`/${lang}/about`} className="hover:text-emerald-700 transition-colors">
-                      About Us
+                      {dict.footer?.aboutUs || 'About Us'}
                     </Link>
                   </li>
                   <li>
                     <Link href={`/${lang}/privacy`} className="hover:text-emerald-700 transition-colors">
-                      Privacy Policy
+                      {dict.footer?.privacyPolicy || 'Privacy Policy'}
                     </Link>
                   </li>
                   <li>
                     <Link href={`/${lang}/terms`} className="hover:text-emerald-700 transition-colors">
-                      Terms &amp; Conditions
+                      {dict.footer?.terms || 'Terms & Conditions'}
                     </Link>
                   </li>
                 </ul>
@@ -234,32 +234,32 @@ export default async function RootLayout({
               {/* Column 4: Top Cities */}
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                  Top Cities
+                  {dict.footer?.colTopCities || 'Top Cities'}
                 </h3>
                 <ul className="space-y-2 text-xs text-gray-500">
                   <li>
                     <Link href={`/${lang}/pk/karachi`} className="hover:text-emerald-700 transition-colors">
-                      Karachi
+                      {lang === 'ur' ? 'کراچی' : lang === 'ar' ? 'كراتشي' : 'Karachi'}
                     </Link>
                   </li>
                   <li>
                     <Link href={`/${lang}/pk/lahore`} className="hover:text-emerald-700 transition-colors">
-                      Lahore
+                      {lang === 'ur' ? 'لاہور' : lang === 'ar' ? 'لاهور' : 'Lahore'}
                     </Link>
                   </li>
                   <li>
                     <Link href={`/${lang}/pk/islamabad`} className="hover:text-emerald-700 transition-colors">
-                      Islamabad
+                      {lang === 'ur' ? 'اسلام آباد' : lang === 'ar' ? 'إسلام آباد' : 'Islamabad'}
                     </Link>
                   </li>
                   <li>
                     <Link href={`/${lang}/ae/dubai`} className="hover:text-emerald-700 transition-colors">
-                      Dubai
+                      {lang === 'ur' ? 'دبئی' : lang === 'ar' ? 'دبي' : 'Dubai'}
                     </Link>
                   </li>
                   <li>
                     <Link href={`/${lang}/sa/riyadh`} className="hover:text-emerald-700 transition-colors">
-                      Riyadh
+                      {lang === 'ur' ? 'ریاض' : lang === 'ar' ? 'الرياض' : 'Riyadh'}
                     </Link>
                   </li>
                 </ul>
@@ -269,10 +269,10 @@ export default async function RootLayout({
             {/* Bottom Copyright & Single Clean Subline */}
             <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
               <p>
-                &copy; {new Date().getFullYear()} Baseera Local Services Directory. All rights reserved.
+                &copy; {new Date().getFullYear()} {dict.footer?.copyright || 'Baseera Local Services Directory. All rights reserved.'}
               </p>
               <p className="text-[11px] text-gray-400">
-                Direct Karigar Directory • Zero Intermediary Fees
+                {dict.footer?.subline || 'Direct Karigar Directory • Zero Intermediary Fees'}
               </p>
             </div>
           </div>

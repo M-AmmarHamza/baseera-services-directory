@@ -35,7 +35,8 @@ import {
   Clock,
 } from 'lucide-react';
 import HomepageSearchBar from '@/components/HomepageSearchBar';
-import { getAllProviders, CATEGORIES } from '@/lib/db';
+import { getAllProviders, CATEGORIES, getCategoryName } from '@/lib/db';
+import { getDictionary } from '@/lib/get-dictionary';
 
 interface PageProps {
   params: Promise<{
@@ -74,9 +75,14 @@ const CATEGORY_ICON_MAP: Record<string, React.ComponentType<{ className?: string
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
+  const dict = await getDictionary(lang);
+  const brand = dict?.header?.brandName || 'Baseera';
+  const title = dict?.home?.heroTitle ? `${dict.home.heroTitle} | ${brand}` : 'Find Trusted Local Services | Baseera Directory';
+  const description = dict?.home?.heroSubtitle || 'Connect directly with verified electricians, plumbers, AC technicians, and local specialists. Zero platform commissions, 100% direct contact.';
+
   return {
-    title: 'Find Trusted Local Services | Baseera Directory',
-    description: 'Connect directly with verified electricians, plumbers, AC technicians, and local specialists. Zero platform commissions, 100% direct contact.',
+    title,
+    description,
     alternates: {
       canonical: `${DOMAIN}/${lang}`,
       languages: {
@@ -90,7 +96,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HomePage({ params }: PageProps) {
   const { lang } = await params;
+  const dict = await getDictionary(lang);
   const providers = await getAllProviders();
+  const defaultLocation = lang === 'ur' ? 'کراچی، پاکستان' : lang === 'ar' ? 'دبي، الإمارات' : 'Karachi, PK';
 
   return (
     <div className="min-h-screen bg-white text-neutral-900 pb-20 md:pb-12">
@@ -99,19 +107,19 @@ export default async function HomePage({ params }: PageProps) {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-6">
             <span className="w-2 h-2 rounded-full bg-[#059669]" />
-            Direct Karigar &amp; Specialist Directory
+            <span>{dict.home?.badge || 'Direct Karigar & Specialist Directory'}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-neutral-900 leading-[1.15] mb-4">
-            Find Trusted Local Services
+            {dict.home?.heroTitle || 'Find Trusted Local Services'}
           </h1>
 
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-8 font-normal leading-relaxed">
-            Connect directly with verified specialists in your area. Zero booking fees, direct WhatsApp communication, and verified ratings.
+            {dict.home?.heroSubtitle || 'Connect directly with verified specialists in your area. Zero booking fees, direct WhatsApp communication, and verified ratings.'}
           </p>
 
           {/* Large Search Bar with Fuzzy Concept & Location Chip */}
-          <HomepageSearchBar lang={lang} defaultLocation="Karachi, PK" />
+          <HomepageSearchBar lang={lang} defaultLocation={defaultLocation} />
         </div>
       </section>
 
@@ -121,14 +129,14 @@ export default async function HomePage({ params }: PageProps) {
         <div className="flex items-end justify-between gap-4 mb-5 sm:mb-6">
           <div>
             <h2 className="text-xl sm:text-3xl font-bold tracking-tight text-neutral-900">
-              Browse by Specialty
+              {dict.home?.browseBySpecialty || 'Browse by Specialty'}
             </h2>
             <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
-              Verified community technicians &amp; specialists worldwide
+              {dict.home?.specialtySubtitle || 'Verified community technicians & specialists worldwide'}
             </p>
           </div>
           <div className="text-xs sm:text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0">
-            {CATEGORIES.length} Categories
+            {CATEGORIES.length} {dict.home?.categoriesCount || 'Categories'}
           </div>
         </div>
 
@@ -149,12 +157,12 @@ export default async function HomePage({ params }: PageProps) {
 
                 {/* Two-line clamped Title */}
                 <span className="text-xs sm:text-sm font-semibold text-gray-900 leading-tight line-clamp-2 h-8 sm:h-9 flex items-center justify-center">
-                  {cat.name}
+                  {getCategoryName(cat, lang)}
                 </span>
 
                 {/* Active provider count Subtext */}
                 <span className="text-[11px] sm:text-xs text-gray-500 mt-1">
-                  {cat.count}+ Active
+                  {cat.count}+ {dict.home?.activeCount || 'Active'}
                 </span>
               </Link>
             );
@@ -169,21 +177,21 @@ export default async function HomePage({ params }: PageProps) {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
-                  Featured Providers
+                  {dict.home?.featuredProviders || 'Featured Providers'}
                 </h2>
                 <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-[#059669] border border-emerald-200">
-                  Verified
+                  {dict.home?.verified || 'Verified'}
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
-                Top-rated specialists ready for immediate direct booking
+                {dict.home?.featuredSubtitle || 'Top-rated specialists ready for immediate direct booking'}
               </p>
             </div>
             <Link
               href={`/${lang}/vendors`}
               className="text-xs font-semibold text-[#059669] hover:underline flex items-center gap-1 shrink-0"
             >
-              <span>See All</span>
+              <span>{dict.home?.seeAll || 'See All'}</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
@@ -243,7 +251,7 @@ export default async function HomePage({ params }: PageProps) {
                   {/* Actions */}
                   <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2.5">
                     <div>
-                      <span className="text-[10px] text-gray-400 uppercase font-semibold block">Visiting</span>
+                      <span className="text-[10px] text-gray-400 uppercase font-semibold block">{dict.home?.visiting || 'Visiting'}</span>
                       <span className="text-xs font-bold text-neutral-900">Rs. {provider.starting_price}</span>
                     </div>
 
@@ -254,7 +262,7 @@ export default async function HomePage({ params }: PageProps) {
                       className="bg-[#059669] hover:bg-[#047857] text-white text-xs font-semibold px-3 sm:px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
-                      <span>WhatsApp</span>
+                      <span>{dict.home?.whatsapp || 'WhatsApp'}</span>
                     </a>
                   </div>
                 </div>
@@ -270,25 +278,25 @@ export default async function HomePage({ params }: PageProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             <div className="p-4 sm:p-5 border border-gray-200 rounded-xl bg-white">
               <ShieldCheck className="w-6 h-6 text-[#059669] mb-3" />
-              <h3 className="text-sm font-bold text-neutral-900 mb-1">Direct Verified Karigars</h3>
+              <h3 className="text-sm font-bold text-neutral-900 mb-1">{dict.home?.valProp1Title || 'Direct Verified Karigars'}</h3>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Specialists submit national identification and technical proof before receiving the green verified badge.
+                {dict.home?.valProp1Desc || 'Specialists submit national identification and technical proof before receiving the green verified badge.'}
               </p>
             </div>
 
             <div className="p-4 sm:p-5 border border-gray-200 rounded-xl bg-white">
               <CheckCircle2 className="w-6 h-6 text-[#059669] mb-3" />
-              <h3 className="text-sm font-bold text-neutral-900 mb-1">Zero Platform Commission</h3>
+              <h3 className="text-sm font-bold text-neutral-900 mb-1">{dict.home?.valProp2Title || 'Zero Platform Commission'}</h3>
               <p className="text-xs text-gray-500 leading-relaxed">
-                No middleman fee or surcharge. 100% of your payment goes directly to the service specialist upon completion.
+                {dict.home?.valProp2Desc || 'No middleman fee or surcharge. 100% of your payment goes directly to the service specialist upon completion.'}
               </p>
             </div>
 
             <div className="p-4 sm:p-5 border border-gray-200 rounded-xl bg-white">
               <Clock className="w-6 h-6 text-[#059669] mb-3" />
-              <h3 className="text-sm font-bold text-neutral-900 mb-1">Instant WhatsApp Connection</h3>
+              <h3 className="text-sm font-bold text-neutral-900 mb-1">{dict.home?.valProp3Title || 'Instant WhatsApp Connection'}</h3>
               <p className="text-xs text-gray-500 leading-relaxed">
-                Chat or call specialists directly to discuss fault descriptions, share photos, and agree on timing.
+                {dict.home?.valProp3Desc || 'Chat or call specialists directly to discuss fault descriptions, share photos, and agree on timing.'}
               </p>
             </div>
           </div>

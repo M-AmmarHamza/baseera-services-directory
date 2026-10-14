@@ -15,6 +15,16 @@
     "callDirect": "Call Direct",
     "zeroCommission": "Zero intermediary commission. 100% direct connection."
   },
+  "header": {
+    "brandName": "Baseera",
+    "directory": "Directory",
+    "home": "Home",
+    "findServices": "Find Services",
+    "blog": "Blog",
+    "listService": "List Service",
+    "selectCity": "Select City",
+    "globalHub": "Global Hub"
+  },
   "nav": {
     "home": "Home",
     "explore": "Explore",
@@ -24,12 +34,60 @@
     "account": "Profile"
   },
   "home": {
-    "heroTitle": "Find Verified Local Experts in",
-    "heroSubtitle": "Direct WhatsApp booking with certified tradesmen. No middleman markup.",
-    "popularSpecialties": "Popular Specialties",
-    "featuredPros": "Top Rated Specialists",
-    "whyTrust": "Why Karachi & Gulf Residents Rely on Baseera"
+    "badge": "Direct Karigar & Specialist Directory",
+    "heroTitle": "Find Trusted Local Services",
+    "heroSubtitle": "Connect directly with verified specialists in your area. Zero booking fees, direct WhatsApp communication, and verified ratings.",
+    "searchPlaceholder": "Search electrician, plumber, AC specialist...",
+    "findServicesBtn": "Find Services",
+    "popular": "Popular:",
+    "browseBySpecialty": "Browse by Specialty",
+    "specialtySubtitle": "Verified community technicians & specialists worldwide",
+    "categoriesCount": "Categories",
+    "activeCount": "Active",
+    "featuredProviders": "Featured Providers",
+    "featuredSubtitle": "Top-rated specialists ready for immediate direct booking",
+    "seeAll": "See All",
+    "verified": "Verified",
+    "visiting": "Visiting",
+    "whatsapp": "WhatsApp",
+    "valProp1Title": "Direct Verified Karigars",
+    "valProp1Desc": "Specialists submit national identification and technical proof before receiving the green verified badge.",
+    "valProp2Title": "Zero Platform Commission",
+    "valProp2Desc": "No middleman fee or surcharge. 100% of your payment goes directly to the service specialist upon completion.",
+    "valProp3Title": "Instant WhatsApp Connection",
+    "valProp3Desc": "Chat or call specialists directly to discuss fault descriptions, share photos, and agree on timing."
   },
+  "bottomNav": {
+    "home": "Home",
+    "search": "Search",
+    "saved": "Saved",
+    "profile": "Profile"
+  },
+  "footer": {
+    "tagline": "Zero intermediary commission. 100% direct connection.",
+    "aboutDesc": "Connecting verified local specialists and households with direct WhatsApp communication and zero platform markups.",
+    "listServiceBtn": "+ List Your Service",
+    "colDirectory": "Directory",
+    "colCompany": "Company & Legal",
+    "colTopCities": "Top Cities",
+    "home": "Home",
+    "findSpecialists": "Find Specialists",
+    "guides": "Guides & Articles",
+    "providerRegistration": "Provider Registration",
+    "aboutUs": "About Us",
+    "privacyPolicy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "copyright": "Baseera Local Services Directory. All rights reserved.",
+    "subline": "Direct Karigar Directory • Zero Intermediary Fees"
+  },
+  "popularSearches": [
+    { "title": "AC Technician", "category": "ac-technician" },
+    { "title": "Electrician", "category": "electrician" },
+    { "title": "Plumber", "category": "plumber" },
+    { "title": "Carpenter", "category": "carpenter" },
+    { "title": "Painter", "category": "painter" },
+    { "title": "Home Chef", "category": "home-chef" }
+  ],
   "category": {
     "titleTemplate": "Top {count} Verified {category} in {city}, {country}",
     "subtitleTemplate": "Hand-verified specialists ready for emergency and scheduled jobs.",
@@ -46,10 +104,10 @@
     "contactSupport": "Looking for urgent service? WhatsApp our regional coordinator."
   },
   "profile": {
-    "verifiedBadge": "ID & Police Verified",
+    "verifiedBadge": "Verified by Baseera",
     "coverageAreas": "Coverage Neighborhoods",
     "coreServices": "Services & Specializations",
-    "pricingFrom": "Starting from",
+    "pricingFrom": "Visiting Charges",
     "customerReviews": "Customer Reviews",
     "writeReview": "Write a Review",
     "reportProfile": "Report Listing"

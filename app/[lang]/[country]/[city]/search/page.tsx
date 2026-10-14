@@ -71,7 +71,7 @@ export default async function SearchResultsPage({
       {/* Breadcrumb Navigation */}
       <nav aria-label="Breadcrumb" className="flex items-center text-xs font-semibold text-gray-500 gap-1.5 overflow-x-auto whitespace-nowrap py-1">
         <Link href={`/${lang}/pk/karachi`} className="hover:text-emerald-800 transition-colors">
-          {dict.nav.home}
+          {dict.header?.home || dict.nav?.home || "Home"}
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
         <Link href={`/${lang}/${country}/${city}`} className="hover:text-emerald-800 transition-colors">

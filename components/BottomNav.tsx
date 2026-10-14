@@ -17,27 +17,50 @@ export default function BottomNav({ lang }: Props) {
   const isSaved = pathname.includes('/saved');
   const isProfile = pathname.includes('/join') || pathname.includes('/profile');
 
+  const labels = {
+    ur: {
+      home: 'ہوم',
+      search: 'تلاش',
+      saved: 'محفوظ',
+      profile: 'پروفائل',
+    },
+    ar: {
+      home: 'الرئيسية',
+      search: 'بحث',
+      saved: 'المحفوظات',
+      profile: 'حسابي',
+    },
+    en: {
+      home: 'Home',
+      search: 'Search',
+      saved: 'Saved',
+      profile: 'Profile',
+    },
+  };
+
+  const t = labels[lang as 'ur' | 'ar'] || labels.en;
+
   const navItems = [
     {
-      label: 'Home',
+      label: t.home,
       href: `/${lang}`,
       icon: Home,
       isActive: isHome,
     },
     {
-      label: 'Search',
+      label: t.search,
       href: `/${lang}/vendors`,
       icon: Search,
       isActive: isSearch,
     },
     {
-      label: 'Saved',
+      label: t.saved,
       href: `/${lang}/saved`,
       icon: Bookmark,
       isActive: isSaved,
     },
     {
-      label: 'Profile',
+      label: t.profile,
       href: `/${lang}/join`,
       icon: User,
       isActive: isProfile,
