@@ -176,11 +176,11 @@ const CATEGORY_SPECIALIZATIONS: Record<string, Array<{ title: string; desc: stri
     { title: 'Custom Diet & Diabetic Meal Plans', desc: 'Low-sodium, steamed vegetable, and portion-controlled wholesome meal prep.' },
     { title: 'Homemade Sweets & Frozen Snacks', desc: 'Handcrafted samosas, shami kababs, and seasonal traditional mithai.' },
   ],
-  'event-decorator': [
-    { title: 'Bespoke Floral & Balloon Arch Backdrops', desc: 'Premium organic balloon garlands, fresh flower wall installations, and metallic shimmer walls.' },
-    { title: 'Ambient Stage & Mood Lighting Arrangements', desc: 'Warm fairy lights, LED uplighting, neon signage lettering, and spotlighting.' },
-    { title: 'Theme Birthday, Mehndi & Daawat Styling', desc: 'Custom cake tables, dessert plinths, printed welcome boards, and bespoke table runners.' },
-    { title: 'Fast Setup & Post-Event Dismantling', desc: 'Professional punctual venue transformation with zero damage to walls or furniture.' },
+  'interior-designer': [
+    { title: 'Complete Residential & Commercial Interior Design', desc: 'Space planning, architectural layout design, mood boards, and 3D photorealistic visualization.' },
+    { title: 'False Ceiling & Architectural Lighting Concepts', desc: 'Gypsum false ceiling designs, cove lighting, architectural profile lights, and spotlighting.' },
+    { title: 'Bespoke Furniture Design & Material Sourcing', desc: 'Custom luxury sofas, media walls, walk-in closets, kitchen cabinetry, and premium wood veneers.' },
+    { title: 'Turnkey Project Execution & Site Supervision', desc: 'End-to-end renovation management, contractor oversight, material quality checks, and timely handover.' },
   ],
   'movers-packers': [
     { title: 'Multi-Layer Furniture Protective Wrapping', desc: 'High-density bubble wrap, stretch film, corrugated sheets, and corner edge guards.' },

@@ -23,7 +23,8 @@ import {
   Camera,
   Key,
   Utensils,
-  PartyPopper,
+  PaintRoller,
+  Sofa,
   Truck,
   Star,
   BadgeCheck,
@@ -70,7 +71,8 @@ const CATEGORY_ICON_MAP: Record<string, React.ComponentType<{ className?: string
   Camera,
   Key,
   Utensils,
-  PartyPopper,
+  PaintRoller,
+  Sofa,
   Truck,
 };
 

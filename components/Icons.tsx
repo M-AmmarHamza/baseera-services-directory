@@ -29,6 +29,8 @@ import {
   ThumbsUp,
   Briefcase,
   Globe,
+  PaintRoller,
+  Sofa,
 } from 'lucide-react';
 
 export {
@@ -61,6 +63,8 @@ export {
   ThumbsUp,
   Briefcase,
   Globe,
+  PaintRoller,
+  Sofa,
 };
 
 // Official Brand WhatsApp SVG Icon
@@ -98,6 +102,9 @@ export function CategoryIcon({ id, className = 'w-6 h-6' }: { id: string; classN
   }
   if (norm.includes('food') || norm.includes('chef') || norm === 'restaurant') {
     return <UtensilsCrossed className={className} />;
+  }
+  if (norm.includes('interior') || norm.includes('design') || norm.includes('decor')) {
+    return <PaintRoller className={className} />;
   }
   return <Briefcase className={className} />;
 }

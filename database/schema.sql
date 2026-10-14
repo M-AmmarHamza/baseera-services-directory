@@ -290,7 +290,7 @@ insert into public.categories (id, name, slug, icon, active_count) values
   ('cctv-installer', 'CCTV Installer', 'cctv-installer', 'Camera', 31),
   ('locksmith', 'Locksmith', 'locksmith', 'Key', 16),
   ('home-chef', 'Home Chef', 'home-chef', 'Utensils', 45),
-  ('event-decorator', 'Home Event Decorator', 'event-decorator', 'PartyPopper', 18),
+  ('interior-designer', 'Interior Designer', 'interior-designer', 'PaintRoller', 24),
   ('movers-packers', 'Movers & Packers', 'movers-packers', 'Truck', 27)
 on conflict (id) do nothing;
 
@@ -302,7 +302,10 @@ insert into public.category_translations (category_id, lang, name, description) 
   ('ac', 'en', 'AC & Refrigeration', 'Inverter AC jet chemical servicing, genuine gas refilling'),
   ('ac', 'ur', 'اے سی سروس اور ریفریجریشن', 'انورٹر اے سی جیٹ واش، گیس چارجنگ اور پی سی بی ریپئرنگ'),
   ('plumbing', 'en', 'Plumbing & Boring', 'Underground leak detection, sweet water motor installation'),
-  ('plumbing', 'ur', 'پلمبر اور بورنگ موٹر', 'پانی کے پائپ کی لیکیج، میٹھے پانی کی لائن اور سبمرسیبل موٹر')
+  ('plumbing', 'ur', 'پلمبر اور بورنگ موٹر', 'پانی کے پائپ کی لیکیج، میٹھے پانی کی لائن اور سبمرسیبل موٹر'),
+  ('interior-designer', 'en', 'Interior Designer', 'Space planning, 3D visualization, false ceiling, and luxury renovation'),
+  ('interior-designer', 'ur', 'انٹیریئر ڈیزائنر', 'گھر اور کمروں کا جدید ڈیزائن، فال سیلنگ اور تھری ڈی ماڈلنگ'),
+  ('interior-designer', 'ar', 'مصمم ديكور داخلي', 'تخطيط المساحات والديكور الداخلي والتصميم ثلاثي الأبعاد')
 on conflict do nothing;
 
 -- Sample Verified Providers with English Transliterated Slugs

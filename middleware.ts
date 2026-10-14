@@ -85,6 +85,10 @@ const SHORT_CATEGORY_REDIRECTS: Record<string, string> = {
   painting: 'painter',
   appliances: 'washing-machine-repair',
   'appliance-repair': 'washing-machine-repair',
+  'event-decorator': 'interior-designer',
+  'home-event-decorator': 'interior-designer',
+  'interior-design': 'interior-designer',
+  'interior-decorator': 'interior-designer',
 };
 
 export function middleware(request: NextRequest) {
