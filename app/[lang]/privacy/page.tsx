@@ -52,7 +52,7 @@ export default async function PrivacyPolicyPage({ params }: PageProps) {
             <ShieldCheck className="w-4 h-4" />
             <span>Data Transparency &amp; Protection</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-neutral-900 mb-2">
             Privacy Policy
           </h1>
           <p className="text-sm text-gray-500">
@@ -64,33 +64,33 @@ export default async function PrivacyPolicyPage({ params }: PageProps) {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           <div className="p-4 border border-gray-200 rounded-xl bg-gray-50/50">
             <EyeOff className="w-5 h-5 text-[#059669] mb-2" />
-            <h2 className="text-xs font-bold text-neutral-900">Zero Data Monetization</h2>
-            <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+            <h3 className="text-base font-semibold text-neutral-900 leading-snug">Zero Data Monetization</h3>
+            <p className="text-sm text-gray-600 mt-1 leading-relaxed">
               We never sell, rent, or trade your personal contact details to advertising brokers.
             </p>
           </div>
 
           <div className="p-4 border border-gray-200 rounded-xl bg-gray-50/50">
             <Lock className="w-5 h-5 text-[#059669] mb-2" />
-            <h2 className="text-xs font-bold text-neutral-900">No Mandatory Customer Sign-Up</h2>
-            <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+            <h3 className="text-base font-semibold text-neutral-900 leading-snug">No Mandatory Sign-Up</h3>
+            <p className="text-sm text-gray-600 mt-1 leading-relaxed">
               Browse services and contact technicians directly on WhatsApp without creating an account.
             </p>
           </div>
 
           <div className="p-4 border border-gray-200 rounded-xl bg-gray-50/50">
             <CheckCircle2 className="w-5 h-5 text-[#059669] mb-2" />
-            <h2 className="text-xs font-bold text-neutral-900">Direct Client-to-Worker Deals</h2>
-            <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+            <h3 className="text-base font-semibold text-neutral-900 leading-snug">Direct Deals</h3>
+            <p className="text-sm text-gray-600 mt-1 leading-relaxed">
               All communications and pricing agreements happen directly off-platform between both parties.
             </p>
           </div>
         </div>
 
         {/* Policy Body */}
-        <div className="space-y-8 text-sm text-gray-700 leading-relaxed">
+        <div className="space-y-8 text-base text-gray-700 leading-relaxed">
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               1. Overview &amp; Mission
             </h2>
             <p>
@@ -99,7 +99,7 @@ export default async function PrivacyPolicyPage({ params }: PageProps) {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               2. Information We Collect
             </h2>
             <div className="space-y-3">
@@ -120,7 +120,7 @@ export default async function PrivacyPolicyPage({ params }: PageProps) {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               3. How We Use Information
             </h2>
             <p className="mb-2">We use the collected information exclusively to:</p>
@@ -133,7 +133,7 @@ export default async function PrivacyPolicyPage({ params }: PageProps) {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               4. Payment &amp; Financial Information
             </h2>
             <p>
@@ -142,7 +142,7 @@ export default async function PrivacyPolicyPage({ params }: PageProps) {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               5. Data Security &amp; Storage
             </h2>
             <p>
@@ -151,7 +151,7 @@ export default async function PrivacyPolicyPage({ params }: PageProps) {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               6. Profile Deletion &amp; Updates
             </h2>
             <p>
@@ -160,7 +160,7 @@ export default async function PrivacyPolicyPage({ params }: PageProps) {
           </section>
 
           <section className="pt-4 border-t border-gray-200">
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               7. Contact Us
             </h2>
             <p className="text-gray-600">

@@ -95,7 +95,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
         aria-expanded={isOpen}
       >
         <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0 group-hover:scale-110 transition-transform" />
-        <span className="truncate max-w-[70px] xs:max-w-[95px] sm:max-w-[130px] font-medium text-gray-900 text-[11px] sm:text-xs">
+        <span className="truncate max-w-[70px] xs:max-w-[95px] sm:max-w-[130px] font-medium text-gray-900 text-xs">
           {activeLabel}
         </span>
         <ChevronDown className="w-3 h-3 text-gray-400 shrink-0 group-hover:text-emerald-700 transition-colors" />
@@ -112,7 +112,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
             <Link
               href={`/${lang}`}
               onClick={() => setIsOpen(false)}
-              className="text-[11px] text-[#059669] font-semibold hover:underline flex items-center gap-1"
+              className="text-xs text-[#059669] font-semibold hover:underline flex items-center gap-1"
             >
               <Globe className="w-3 h-3" />
               <span>{lang === 'ur' ? 'عالمی مرکز' : lang === 'ar' ? 'الدليل العام' : 'Global Hub'}</span>
@@ -145,7 +145,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                 const countryCities = CITIES.filter((c) => c.countryCode === country.code);
                 return (
                   <div key={country.code} className="py-1.5 px-3">
-                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-gray-500 mb-1">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 mb-1">
                       <span>{country.flag}</span>
                       <span>{country.name}</span>
                     </div>
@@ -202,7 +202,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                 <h3 className="text-sm font-bold text-neutral-900">
                   {lang === 'ur' ? 'شہر منتخب کریں' : lang === 'ar' ? 'اختر المدينة' : 'Select Operating City'}
                 </h3>
-                <p className="text-[11px] text-gray-500">
+                <p className="text-xs text-gray-500">
                   {lang === 'ur' ? 'اپنے علاقے کے لحاظ سے سروسز تلاش کریں' : lang === 'ar' ? 'تصفية الخدمات حسب منطقتك' : 'Filter services by your local region'}
                 </p>
               </div>
@@ -247,7 +247,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                     <Globe className="w-4 h-4" />
                     <span>{lang === 'ur' ? 'عالمی مرکز' : lang === 'ar' ? 'الدليل العام' : 'Global Directory Hub'}</span>
                   </div>
-                  <span className="text-[10px] font-normal uppercase">
+                  <span className="text-xs font-medium uppercase">
                     {lang === 'ur' ? 'دنیا بھر میں' : lang === 'ar' ? 'عالمي' : 'Worldwide'}
                   </span>
                 </Link>

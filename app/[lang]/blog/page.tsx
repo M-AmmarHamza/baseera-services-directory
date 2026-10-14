@@ -115,10 +115,10 @@ export default async function BlogPage({ params }: Props) {
               <BookOpen className="w-3.5 h-3.5" />
               <span>PakMarket Editorial Style</span>
             </div>
-            <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-neutral-900">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-neutral-900">
               Baseera Journal
             </h1>
-            <p className="text-sm sm:text-base text-gray-500 mt-2 font-normal leading-relaxed">
+            <p className="text-base text-gray-600 mt-2 font-normal leading-relaxed">
               Technical trade guides, troubleshooting advice from master karigars, and transparent local service insights.
             </p>
           </div>
@@ -147,11 +147,11 @@ export default async function BlogPage({ params }: Props) {
                   <span>{featuredArticle.readTime}</span>
                 </div>
 
-                <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-white mb-3 sm:mb-4 leading-snug">
+                <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-white mb-3 sm:mb-4 leading-snug">
                   {featuredArticle.title}
                 </h2>
 
-                <p className="text-xs sm:text-base text-emerald-100 font-normal leading-relaxed mb-6">
+                <p className="text-base text-emerald-100 font-normal leading-relaxed mb-6">
                   {featuredArticle.excerpt}
                 </p>
               </div>
@@ -166,7 +166,7 @@ export default async function BlogPage({ params }: Props) {
 
                 <Link
                   href={`/${lang}/blog/${featuredArticle.slug}`}
-                  className="bg-white hover:bg-emerald-50 text-[#059669] font-bold text-xs px-4 py-2 rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 self-start sm:self-auto shadow-2xs"
+                  className="bg-white hover:bg-emerald-50 text-[#059669] font-semibold text-sm px-4 py-2 rounded-xl transition-colors inline-flex items-center justify-center gap-1.5 self-start sm:self-auto shadow-2xs"
                 >
                   <span>Read Story</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -180,10 +180,10 @@ export default async function BlogPage({ params }: Props) {
         <section>
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-neutral-900">
+              <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 leading-snug">
                 Latest Stories
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-sm text-gray-500 mt-0.5">
                 Expert maintenance and trade breakdowns updated weekly
               </p>
             </div>
@@ -193,7 +193,7 @@ export default async function BlogPage({ params }: Props) {
             {stories.map((story) => (
               <article
                 key={story.id}
-                className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-colors"
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col justify-between hover:border-gray-300 transition-colors shadow-2xs"
               >
                 <div>
                   {/* Article Thumbnail */}
@@ -207,12 +207,12 @@ export default async function BlogPage({ params }: Props) {
 
                   <div className="p-5">
                     {/* Light Green Category Tag */}
-                    <span className="inline-block px-2.5 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-2.5">
+                    <span className="inline-block px-2.5 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-2.5">
                       {story.category}
                     </span>
 
                     {/* Bold Title */}
-                    <h3 className="text-base font-bold text-neutral-900 tracking-tight leading-snug mb-2">
+                    <h3 className="text-lg font-semibold text-neutral-900 tracking-tight leading-snug mb-2">
                       <Link
                         href={`/${lang}/blog/${story.slug}`}
                         className="hover:text-[#059669] transition-colors"
@@ -222,7 +222,7 @@ export default async function BlogPage({ params }: Props) {
                     </h3>
 
                     {/* 2-line gray excerpt */}
-                    <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                    <p className="text-base text-gray-600 line-clamp-2 leading-relaxed">
                       {story.excerpt}
                     </p>
                   </div>
@@ -230,13 +230,13 @@ export default async function BlogPage({ params }: Props) {
 
                 {/* Footer: Read More Link in Emerald Green */}
                 <div className="px-5 pb-5 pt-3 border-t border-gray-100 flex items-center justify-between">
-                  <span className="text-[11px] text-gray-400 font-medium">
+                  <span className="text-xs text-gray-500 font-medium">
                     {story.readTime}
                   </span>
 
                   <Link
                     href={`/${lang}/blog/${story.slug}`}
-                    className="text-xs font-semibold text-[#059669] hover:text-[#047857] inline-flex items-center gap-1 transition-colors"
+                    className="text-sm font-semibold text-[#059669] hover:text-[#047857] inline-flex items-center gap-1 transition-colors"
                   >
                     <span>Read More</span>
                     <ArrowRight className="w-3.5 h-3.5" />

@@ -52,7 +52,7 @@ export default async function RootLayout({
                   <span className="font-extrabold text-base sm:text-lg text-gray-900 tracking-tight">
                     {dict.header?.brandName || 'Baseera'}
                   </span>
-                  <span className="text-[9px] sm:text-[10px] text-emerald-700 font-bold tracking-widest uppercase mt-0.5 hidden xs:inline">
+                  <span className="text-xs text-emerald-700 font-bold tracking-widest uppercase mt-0.5 hidden xs:inline">
                     {dict.header?.directory || 'Directory'}
                   </span>
                 </div>
@@ -66,19 +66,19 @@ export default async function RootLayout({
             <nav className="hidden md:flex items-center gap-6">
               <Link
                 href={`/${lang}`}
-                className="text-xs font-semibold text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm font-semibold text-gray-600 hover:text-emerald-700 transition-colors"
               >
                 {dict.header?.home || 'Home'}
               </Link>
               <Link
                 href={`/${lang}/vendors`}
-                className="text-xs font-semibold text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm font-semibold text-gray-600 hover:text-emerald-700 transition-colors"
               >
                 {dict.header?.findServices || 'Find Services'}
               </Link>
               <Link
                 href={`/${lang}/blog`}
-                className="text-xs font-semibold text-gray-600 hover:text-emerald-700 transition-colors"
+                className="text-sm font-semibold text-gray-600 hover:text-emerald-700 transition-colors"
               >
                 {dict.header?.blog || 'Blog'}
               </Link>
@@ -125,17 +125,17 @@ export default async function RootLayout({
                     <span className="font-extrabold text-base text-gray-900 tracking-tight">
                       {dict.header?.brandName || 'Baseera'}
                     </span>
-                    <span className="text-[9px] text-emerald-700 font-bold tracking-widest uppercase mt-0.5">
+                    <span className="text-xs text-emerald-700 font-bold tracking-widest uppercase mt-0.5">
                       {dict.header?.directory || 'Directory'}
                     </span>
                   </div>
                 </Link>
 
-                <p className="text-xs sm:text-sm font-semibold text-neutral-900">
+                <p className="text-sm font-semibold text-neutral-900">
                   {dict.footer?.tagline || 'Zero intermediary commission. 100% direct connection.'}
                 </p>
 
-                <p className="text-xs text-gray-500 leading-relaxed max-w-sm">
+                <p className="text-sm text-gray-500 leading-relaxed max-w-sm">
                   {dict.footer?.aboutDesc || 'Connecting verified local specialists and households with direct WhatsApp communication and zero platform markups.'}
                 </p>
 
@@ -151,10 +151,10 @@ export default async function RootLayout({
 
               {/* Column 2: Directory */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
                   {dict.footer?.colDirectory || 'Directory'}
                 </h3>
-                <ul className="space-y-2 text-xs text-gray-500">
+                <ul className="space-y-2 text-sm text-gray-600">
                   <li>
                     <Link href={`/${lang}`} className="hover:text-emerald-700 transition-colors">
                       {dict.footer?.home || 'Home'}
@@ -180,10 +180,10 @@ export default async function RootLayout({
 
               {/* Column 3: Company & Legal */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
                   {dict.footer?.colCompany || 'Company & Legal'}
                 </h3>
-                <ul className="space-y-2 text-xs text-gray-500">
+                <ul className="space-y-2 text-sm text-gray-600">
                   <li>
                     <Link href={`/${lang}/about`} className="hover:text-emerald-700 transition-colors">
                       {dict.footer?.aboutUs || 'About Us'}
@@ -204,10 +204,10 @@ export default async function RootLayout({
 
               {/* Column 4: Top Cities */}
               <div className="space-y-3">
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
                   {dict.footer?.colTopCities || 'Top Cities'}
                 </h3>
-                <ul className="space-y-2 text-xs text-gray-500">
+                <ul className="space-y-2 text-sm text-gray-600">
                   <li>
                     <Link href={`/${lang}/pk/karachi`} className="hover:text-emerald-700 transition-colors">
                       {lang === 'ur' ? 'کراچی' : lang === 'ar' ? 'كراتشي' : 'Karachi'}
@@ -238,11 +238,11 @@ export default async function RootLayout({
             </div>
 
             {/* Bottom Copyright & Single Clean Subline */}
-            <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
+            <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
               <p>
                 &copy; {new Date().getFullYear()} {dict.footer?.copyright || 'Baseera Local Services Directory. All rights reserved.'}
               </p>
-              <p className="text-[11px] text-gray-400">
+              <p className="text-xs text-gray-500">
                 {dict.footer?.subline || 'Direct Karigar Directory • Zero Intermediary Fees'}
               </p>
             </div>

@@ -162,7 +162,7 @@ export default function AdminApprovalDashboard() {
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Admin Moderation Gate</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-neutral-900">
               Provider Verification Queue
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">
@@ -171,7 +171,7 @@ export default function AdminApprovalDashboard() {
           </div>
 
           <div className="flex items-center gap-2 text-xs">
-            <span className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 font-mono text-[11px]">
+            <span className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 font-mono text-xs">
               UUID: {AUTHORIZED_ADMIN_UUID.slice(0, 14)}...
             </span>
           </div>
@@ -229,7 +229,7 @@ export default function AdminApprovalDashboard() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-200 text-[11px] font-bold text-gray-500 uppercase tracking-wider bg-white">
+                  <tr className="border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider bg-white">
                     <th className="py-3.5 px-6">Business Name</th>
                     <th className="py-3.5 px-6">City</th>
                     <th className="py-3.5 px-6">Phone / WhatsApp</th>

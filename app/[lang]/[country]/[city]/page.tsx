@@ -125,10 +125,10 @@ export default async function CityHomePage({ params }: PageProps) {
               </span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl text-gray-950 tracking-tight font-extrabold leading-tight mt-1 mb-3">
+            <h1 className="text-2xl sm:text-3xl text-gray-950 tracking-tight font-bold leading-tight mt-1 mb-3">
               Find Trusted Local Services in {cityName}
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-6 max-w-2xl">
+            <p className="text-base text-gray-600 leading-relaxed mb-6 max-w-2xl">
               Connect directly with verified local specialists across {cityName} without intermediaries, commissions, or delay.
             </p>
 
@@ -188,11 +188,11 @@ export default async function CityHomePage({ params }: PageProps) {
           <section className="flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-gray-950 tracking-tight">
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-950 tracking-tight leading-snug">
                   Browse by Specialty
                 </h2>
-                <p className="text-xs text-gray-500 font-medium">
-                  Verified community technicians & cooks
+                <p className="text-sm text-gray-500 font-medium">
+                  Verified community technicians &amp; cooks
                 </p>
               </div>
               <span className="text-xs text-[#006948] font-bold">
@@ -213,7 +213,7 @@ export default async function CityHomePage({ params }: PageProps) {
                   <span className="font-bold text-xs text-gray-900 group-hover:text-[#006948] transition-colors leading-tight">
                     {getCategoryName(cat, lang)}
                   </span>
-                  <span className="text-[11px] text-gray-400 font-medium mt-0.5">
+                  <span className="text-xs text-gray-400 font-medium mt-0.5">
                     {cat.count}+ Active
                   </span>
                 </Link>
@@ -226,16 +226,16 @@ export default async function CityHomePage({ params }: PageProps) {
             <section className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-gray-950 tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-950 tracking-tight leading-snug">
                     Featured Verified Specialists
                   </h2>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm text-gray-500">
                     Direct connection with zero intermediary commissions in {cityName}
                   </p>
                 </div>
                 <Link
                   href={`/${lang}/list-service?country=${country}&city=${city}`}
-                  className="text-xs text-[#006948] font-bold hover:underline"
+                  className="text-sm text-[#006948] font-bold hover:underline"
                 >
                   + Join as Vendor
                 </Link>
@@ -274,10 +274,10 @@ export default async function CityHomePage({ params }: PageProps) {
                           <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
                             <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
                             <span className="text-xs font-bold text-gray-900">{pro.rating}</span>
-                            <span className="text-[11px] text-gray-500">({pro.review_count})</span>
+                            <span className="text-xs text-gray-500">({pro.review_count})</span>
                           </div>
                           {pro.is_verified && (
-                            <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-[#006948] text-white px-2 py-0.5 rounded-md text-[11px] font-bold shadow-xs">
+                            <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-[#006948] text-white px-2 py-0.5 rounded-md text-xs font-medium shadow-xs">
                               <BadgeCheck className="w-3.5 h-3.5 text-white" />
                               <span>Verified Pro</span>
                             </div>
@@ -287,20 +287,19 @@ export default async function CityHomePage({ params }: PageProps) {
                         {/* Details */}
                         <div className="flex flex-col">
                           <div className="flex items-center justify-between">
-                            <Link
-                              href={profileLink}
-                              className="font-bold text-base text-gray-950 truncate hover:text-[#006948] transition-colors"
-                            >
-                              {pro.name}
-                            </Link>
-                            <span className="text-[11px] text-[#006948] font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <h3 className="font-semibold text-lg text-gray-950 truncate hover:text-[#006948] transition-colors leading-snug">
+                              <Link href={profileLink}>
+                                {pro.name}
+                              </Link>
+                            </h3>
+                            <span className="text-xs text-[#006948] font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                               {pro.is_available ? 'Available' : 'Quick Reply'}
                             </span>
                           </div>
-                          <p className="text-xs text-[#006948] font-semibold mt-0.5 truncate">
+                          <p className="text-sm text-[#006948] font-semibold mt-0.5 truncate">
                             {pro.trade_title}
                           </p>
-                          <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
+                          <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
                             <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                             <span className="truncate">{pro.district}, {cityName}</span>
                           </div>
@@ -310,7 +309,7 @@ export default async function CityHomePage({ params }: PageProps) {
                             {defaultTags.map((tag) => (
                               <span
                                 key={tag}
-                                className="px-2 py-0.5 rounded-md bg-white border border-gray-200/70 text-gray-700 text-[11px] font-medium"
+                                className="px-2 py-0.5 rounded-md bg-white border border-gray-200/70 text-gray-700 text-xs font-medium"
                               >
                                 {tag}
                               </span>
@@ -321,7 +320,7 @@ export default async function CityHomePage({ params }: PageProps) {
 
                       {/* WhatsApp Direct Action Button - Exact Legacy Full Width */}
                       <a
-                        className="flex items-center justify-center gap-2 w-full h-11 rounded-xl bg-[#006948] text-white text-xs font-bold active:opacity-90 transition-all hover:bg-[#00855d] shadow-2xs"
+                        className="flex items-center justify-center gap-2 w-full h-11 rounded-xl bg-[#006948] text-white text-sm font-semibold active:opacity-90 transition-all hover:bg-[#00855d] shadow-2xs"
                         href={`https://wa.me/${pro.whatsapp_number.replace(/\+/g, '')}?text=${encodeURIComponent(`Salam ${pro.name}, saw your profile on Baseera ${cityName}.`)}`}
                         rel="noopener noreferrer"
                         target="_blank"

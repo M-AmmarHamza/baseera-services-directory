@@ -52,7 +52,7 @@ export default async function TermsAndConditionsPage({ params }: PageProps) {
             <Scale className="w-4 h-4" />
             <span>Community Agreement</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-neutral-900 mb-2">
             Terms &amp; Conditions
           </h1>
           <p className="text-sm text-gray-500">
@@ -64,33 +64,33 @@ export default async function TermsAndConditionsPage({ params }: PageProps) {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           <div className="p-4 border border-gray-200 rounded-xl bg-gray-50/50">
             <Handshake className="w-5 h-5 text-[#059669] mb-2" />
-            <h2 className="text-xs font-bold text-neutral-900">Direct Contractor Relationship</h2>
-            <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+            <h3 className="text-base font-semibold text-neutral-900 leading-snug">Direct Contractor Relationship</h3>
+            <p className="text-sm text-gray-600 mt-1 leading-relaxed">
               Service technicians are independent tradespeople, not employees or agents of Baseera.
             </p>
           </div>
 
           <div className="p-4 border border-gray-200 rounded-xl bg-gray-50/50">
             <CheckCircle2 className="w-5 h-5 text-[#059669] mb-2" />
-            <h2 className="text-xs font-bold text-neutral-900">Zero Middleman Surcharge</h2>
-            <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+            <h3 className="text-base font-semibold text-neutral-900 leading-snug">Zero Middleman Surcharge</h3>
+            <p className="text-sm text-gray-600 mt-1 leading-relaxed">
               Baseera does not take commissions from technician wages or customer repair bills.
             </p>
           </div>
 
           <div className="p-4 border border-gray-200 rounded-xl bg-gray-50/50">
             <ShieldAlert className="w-5 h-5 text-[#059669] mb-2" />
-            <h2 className="text-xs font-bold text-neutral-900">On-Site Agreement</h2>
-            <p className="text-[11px] text-gray-500 mt-0.5 leading-relaxed">
+            <h3 className="text-base font-semibold text-neutral-900 leading-snug">On-Site Agreement</h3>
+            <p className="text-sm text-gray-600 mt-1 leading-relaxed">
               Inspect work and agree on parts and labor pricing directly prior to work commencement.
             </p>
           </div>
         </div>
 
         {/* Terms Body */}
-        <div className="space-y-8 text-sm text-gray-700 leading-relaxed">
+        <div className="space-y-8 text-base text-gray-700 leading-relaxed">
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               1. Acceptance of Terms
             </h2>
             <p>
@@ -99,7 +99,7 @@ export default async function TermsAndConditionsPage({ params }: PageProps) {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               2. Nature of the Platform
             </h2>
             <p className="mb-2">
@@ -115,7 +115,7 @@ export default async function TermsAndConditionsPage({ params }: PageProps) {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               3. Service Provider Obligations
             </h2>
             <p className="mb-2">Providers who list their services on Baseera agree to:</p>
@@ -129,7 +129,7 @@ export default async function TermsAndConditionsPage({ params }: PageProps) {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               4. Customer Guidelines &amp; Precautions
             </h2>
             <p>
@@ -138,7 +138,7 @@ export default async function TermsAndConditionsPage({ params }: PageProps) {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               5. Limitation of Liability
             </h2>
             <p>
@@ -147,7 +147,7 @@ export default async function TermsAndConditionsPage({ params }: PageProps) {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               6. Content Removal &amp; Profile Suspension
             </h2>
             <p>
@@ -156,7 +156,7 @@ export default async function TermsAndConditionsPage({ params }: PageProps) {
           </section>
 
           <section className="pt-4 border-t border-gray-200">
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               7. Contact &amp; Inquiries
             </h2>
             <p className="text-gray-600">

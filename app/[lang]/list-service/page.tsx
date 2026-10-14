@@ -256,7 +256,7 @@ function ListServiceContent({ lang }: { lang: string }) {
 
           {/* Form Language Selector (Ensures URL structure remains clean) */}
           <div className="flex items-center bg-white border border-gray-200/90 rounded-full p-1 shadow-2xs text-xs font-semibold">
-            <span className="text-gray-400 text-[10px] uppercase font-bold px-2 hidden xs:inline">
+            <span className="text-gray-500 text-xs uppercase font-bold px-2 hidden xs:inline">
               {lang === 'ur' ? 'زبان:' : lang === 'ar' ? 'اللغة:' : 'Language:'}
             </span>
             <button
@@ -306,10 +306,10 @@ function ListServiceContent({ lang }: { lang: string }) {
               <span className="text-xs bg-emerald-50 text-[#006948] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-100">
                 🎉 {lang === 'ur' ? 'پروفائل لائیو ہو گیا!' : 'Profile Created & Live!'}
               </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-950 mt-3 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-gray-950 mt-3">
                 {lang === 'ur' ? `بصیرہ پر خوش آمدید، ${name}!` : `Welcome to Baseera, ${name}!`}
               </h1>
-              <p className="text-xs sm:text-sm text-gray-600 mt-2 max-w-md mx-auto leading-relaxed">
+              <p className="text-base text-gray-600 mt-2 max-w-md mx-auto leading-relaxed">
                 {lang === 'ur'
                   ? 'آپ کا پروفائل کامیابی سے بن چکا ہے۔ اب کسٹمرز آپ سے بغیر کسی کمیشن کے براہِ راست رابطہ کر سکتے ہیں۔'
                   : 'Your public service page has been created dynamically. Customers can now discover your services and contact you directly with zero commission.'}
@@ -317,7 +317,7 @@ function ListServiceContent({ lang }: { lang: string }) {
             </div>
 
             <div className="w-full bg-[#f1f3ff] rounded-2xl p-4 flex flex-col gap-2 text-start border border-gray-200/70">
-              <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
                 {lang === 'ur' ? 'آپ کا پبلک لنک:' : 'Your Public URL:'}
               </span>
               <code className="text-xs font-mono text-[#006948] break-all font-semibold">
@@ -328,7 +328,7 @@ function ListServiceContent({ lang }: { lang: string }) {
             <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
               <Link
                 href={createdProfile.publicUrl}
-                className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#006948] hover:bg-[#00855d] text-white font-bold text-xs shadow-xs transition-all text-center flex items-center justify-center gap-2"
+                className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#006948] hover:bg-[#00855d] text-white font-semibold text-sm shadow-xs transition-all text-center flex items-center justify-center gap-2"
               >
                 <span>{lang === 'ur' ? 'پبلک پروفائل دیکھیں' : 'View My Public Profile Page'}</span>
                 <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
@@ -337,7 +337,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                 href={`https://wa.me/?text=${encodeURIComponent(`I have published my service profile on Baseera directory! View my page: https://baseera-services-directory.vercel.app${createdProfile.publicUrl}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto py-3 px-5 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-bold text-xs shadow-xs transition-all flex items-center justify-center gap-2"
+                className="w-full sm:w-auto py-3 px-5 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-semibold text-sm shadow-xs transition-all flex items-center justify-center gap-2"
               >
                 <WhatsAppIcon className="w-4 h-4 text-white fill-current" />
                 <span>{lang === 'ur' ? 'واٹس ایپ پر شیئر کریں' : 'Share on WhatsApp'}</span>
@@ -360,14 +360,14 @@ function ListServiceContent({ lang }: { lang: string }) {
                   {lang === 'ur' ? 'فوری پبلک لسٹنگ' : 'Instant Public Profile'}
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-950 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-gray-950">
                 {lang === 'ur'
                   ? 'بطور سروس پرووائیڈر / کاریگر رجسٹر ہوں'
                   : lang === 'ar'
                   ? 'سجل كفني أو مقدم خدمة محلي'
                   : 'Register as a Local Specialist'}
               </h1>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-relaxed">
+              <p className="text-base text-gray-600 mt-1 leading-relaxed">
                 {lang === 'ur'
                   ? 'بصیرہ پر اپنی سروس کا پروفائل شائع کریں اور اپنے شہر کے گاہکوں سے براہِ راست رابطہ حاصل کریں۔'
                   : 'Publish your service profile on Baseera. Customers in your city connect directly with you without any agency cut.'}
@@ -384,7 +384,7 @@ function ListServiceContent({ lang }: { lang: string }) {
               
               {/* Full Name */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-gray-900">
+                <label className="text-sm font-semibold text-gray-900">
                   {lang === 'ur' ? 'پورا نام / کاروباری نام *' : 'Full Name / Business Name *'}
                 </label>
                 <input
@@ -393,17 +393,17 @@ function ListServiceContent({ lang }: { lang: string }) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={lang === 'ur' ? 'مثلاً: طارق محمود یا الرحمٰن الیکٹریکل ورکس' : 'e.g. Tariq Mahmood or Al-Rehman Electrical Works'}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all"
                 />
               </div>
 
               {/* Contact Channel Selector & Number */}
               <div className="flex flex-col gap-2 p-4 rounded-2xl bg-slate-50 border border-gray-200">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-gray-900">
+                  <label className="text-sm font-semibold text-gray-900">
                     {lang === 'ur' ? 'رابطے کا بنیادی ذریعہ اور نمبر *' : 'Primary Contact Channel & Details *'}
                   </label>
-                  <span className="text-[11px] text-[#006948] font-bold">
+                  <span className="text-xs text-[#006948] font-bold">
                     {lang === 'ur' ? 'براہِ راست کسٹمر رابطہ' : 'Direct Customer Leads'}
                   </span>
                 </div>
@@ -488,7 +488,7 @@ function ListServiceContent({ lang }: { lang: string }) {
 
                 {/* Secondary / Alternate Phone Number (Optional) */}
                 <div className="mt-1">
-                  <label className="text-[11px] font-semibold text-gray-600 block mb-1">
+                  <label className="text-xs font-semibold text-gray-700 block mb-1">
                     {lang === 'ur' ? 'متبادل فون نمبر (اختیاری):' : 'Alternative / Direct Call Number (Optional):'}
                   </label>
                   <input
@@ -496,10 +496,10 @@ function ListServiceContent({ lang }: { lang: string }) {
                     value={secondaryPhone}
                     onChange={(e) => setSecondaryPhone(e.target.value)}
                     placeholder="e.g. +92 300 9876543"
-                    className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] transition-all"
+                    className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] transition-all"
                   />
                 </div>
-                <span className="text-[10px] text-gray-400">
+                <span className="text-xs text-gray-500">
                   {lang === 'ur'
                     ? 'کسٹمرز کے رابطہ بٹن اس نمبر پر ڈائریکٹ کال یا میسج کھولیں گے۔'
                     : 'Customer inquiry buttons on your profile will connect directly via your chosen method.'}
@@ -509,13 +509,13 @@ function ListServiceContent({ lang }: { lang: string }) {
               {/* Country & City */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-gray-900">
+                  <label className="text-sm font-semibold text-gray-900">
                     {lang === 'ur' ? 'ملک *' : 'Country *'}
                   </label>
                   <select
                     value={countryCode}
                     onChange={(e) => setCountryCode(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-900 focus:outline-none focus:border-[#006948] focus:bg-white transition-all cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-[#006948] focus:bg-white transition-all cursor-pointer"
                   >
                     {COUNTRIES.map((c) => (
                       <option key={c.code} value={c.code}>
@@ -526,7 +526,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-gray-900">
+                  <label className="text-sm font-semibold text-gray-900">
                     {lang === 'ur' ? 'شہر کا نام *' : 'City Name *'}
                   </label>
                   <input
@@ -535,7 +535,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                     value={cityName}
                     onChange={(e) => setCityName(e.target.value)}
                     placeholder="e.g. Karachi, Lahore, Dubai, London..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all capitalize"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all capitalize"
                   />
                 </div>
               </div>
@@ -543,13 +543,13 @@ function ListServiceContent({ lang }: { lang: string }) {
               {/* Category & Classification */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-gray-900">
+                  <label className="text-sm font-semibold text-gray-900">
                     {lang === 'ur' ? 'بنیادی سروس کیٹیگری *' : 'Primary Service Category *'}
                   </label>
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-900 focus:outline-none focus:border-[#006948] focus:bg-white transition-all cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-[#006948] focus:bg-white transition-all cursor-pointer"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat.id} value={cat.id}>
@@ -560,13 +560,13 @@ function ListServiceContent({ lang }: { lang: string }) {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-gray-900">
+                  <label className="text-sm font-semibold text-gray-900">
                     {lang === 'ur' ? 'پروفائل کی قسم' : 'Profile Classification'}
                   </label>
                   <select
                     value={profileType}
                     onChange={(e) => setProfileType(e.target.value as any)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-900 focus:outline-none focus:border-[#006948] focus:bg-white transition-all cursor-pointer"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-[#006948] focus:bg-white transition-all cursor-pointer"
                   >
                     <option value="individual">
                       {lang === 'ur' ? 'انفرادی کاریگر / آزاد ماہر (Freelance Karigar)' : 'Individual Karigar / Freelance Master'}
@@ -581,7 +581,7 @@ function ListServiceContent({ lang }: { lang: string }) {
               {/* Trade Title / Headline + Explanation Helper */}
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
+                  <label className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">
                     <span>{lang === 'ur' ? 'ٹریڈ ٹائٹل / ہیڈلائن' : 'Trade Title / Headline'}</span>
                     <button
                       type="button"
@@ -592,7 +592,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                       <HelpCircle className="w-3.5 h-3.5" />
                     </button>
                   </label>
-                  <span className="text-[10px] text-gray-400 font-medium">
+                  <span className="text-xs text-gray-500 font-medium">
                     {lang === 'ur' ? 'سرچ لسٹ اور پروفائل کے لیے' : 'Appears under your name'}
                   </span>
                 </div>
@@ -606,12 +606,12 @@ function ListServiceContent({ lang }: { lang: string }) {
                       ? 'مثلاً: ماسٹر انورٹر الیکٹریشن اور سولر ڈی بی اسپیشلسٹ'
                       : 'e.g. Master Inverter Electrician & Solar DB Specialist'
                   }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all font-medium"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all font-medium"
                 />
 
                 {/* Explainer Box for Trade Title */}
                 {showTradeTitleHelp && (
-                  <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-[11px] text-emerald-950 flex flex-col gap-1">
+                  <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-200/80 text-xs text-emerald-950 flex flex-col gap-1">
                     <p className="font-bold text-emerald-900">
                       💡 {lang === 'ur' ? 'Trade Title / Headline کس لیے استعمال ہوتی ہے؟' : 'What is Trade Title / Headline used for?'}
                     </p>
@@ -627,11 +627,11 @@ function ListServiceContent({ lang }: { lang: string }) {
               {/* IMAGE UPLOADS: Profile Picture & Cover Photo (Max 10MB each, JPG/PNG/JPEG/WEBP) */}
               <div className="flex flex-col gap-3 p-4 rounded-2xl bg-slate-50 border border-gray-200">
                 <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-gray-900">
+                  <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-900">
                     <ImageIcon className="w-4 h-4 text-[#006948]" />
                     <span>{lang === 'ur' ? 'پروفائل تصویر اور کور فوٹو' : 'Profile Picture & Cover Photo'}</span>
                   </div>
-                  <span className="text-[10px] text-gray-500 font-medium">
+                  <span className="text-xs text-gray-500 font-medium">
                     {lang === 'ur' ? 'زیادہ سے زیادہ 10 MB فی تصویر • JPG, PNG, JPEG, WEBP' : 'Max 10MB each • JPG, PNG, JPEG, WEBP'}
                   </span>
                 </div>
@@ -640,7 +640,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                   
                   {/* 1. Profile Picture (Avatar) */}
                   <div className="flex flex-col gap-2">
-                    <label className="text-[11px] font-bold text-gray-700">
+                    <label className="text-xs font-semibold text-gray-700">
                       {lang === 'ur' ? '1. پروفائل تصویر (Avatar / Logo):' : '1. Profile Picture (Avatar / Face):'}
                     </label>
 
@@ -670,7 +670,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                           <span className="text-xs font-semibold text-gray-700">
                             {lang === 'ur' ? 'تصویر منتخب کریں' : 'Upload Profile Photo'}
                           </span>
-                          <span className="text-[10px] text-gray-400 mt-0.5">
+                          <span className="text-xs text-gray-500 mt-0.5">
                             JPG, PNG, WEBP (Max 10MB)
                           </span>
                         </label>
@@ -685,13 +685,13 @@ function ListServiceContent({ lang }: { lang: string }) {
                       />
                     </div>
                     {avatarError && (
-                      <span className="text-[10px] text-red-600 font-semibold">{avatarError}</span>
+                      <span className="text-xs text-red-600 font-semibold">{avatarError}</span>
                     )}
                   </div>
 
                   {/* 2. Cover Photo (Banner) */}
                   <div className="flex flex-col gap-2">
-                    <label className="text-[11px] font-bold text-gray-700">
+                    <label className="text-xs font-semibold text-gray-700">
                       {lang === 'ur' ? '2. کور بینر (Cover Banner / Workshop):' : '2. Cover Banner (Shop / Workshop):'}
                     </label>
 
@@ -721,7 +721,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                           <span className="text-xs font-semibold text-gray-700">
                             {lang === 'ur' ? 'کور بینر اپ لوڈ کریں' : 'Upload Cover Banner'}
                           </span>
-                          <span className="text-[10px] text-gray-400 mt-0.5">
+                          <span className="text-xs text-gray-500 mt-0.5">
                             JPG, PNG, WEBP (Max 10MB)
                           </span>
                         </label>
@@ -736,7 +736,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                       />
                     </div>
                     {coverError && (
-                      <span className="text-[10px] text-red-600 font-semibold">{coverError}</span>
+                      <span className="text-xs text-red-600 font-semibold">{coverError}</span>
                     )}
                   </div>
 
@@ -745,7 +745,7 @@ function ListServiceContent({ lang }: { lang: string }) {
 
               {/* Service Areas */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-gray-900">
+                <label className="text-sm font-semibold text-gray-900">
                   {lang === 'ur' ? 'سروس کوریج کے علاقے / محلے' : 'Service Coverage Areas / Neighborhoods'}
                 </label>
                 <input
@@ -757,13 +757,13 @@ function ListServiceContent({ lang }: { lang: string }) {
                       ? 'مثلاً: کلفٹن، ڈی ایچ اے، پی ای سی ایچ ایس، گلشن (کوما سے الگ کریں)'
                       : 'e.g. Clifton, DHA Phases 1-8, PECHS, Gulshan (comma separated)'
                   }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all"
                 />
               </div>
 
               {/* Visiting Charges (Plain Text, Zero Heavy Pricing) */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-gray-900">
+                <label className="text-sm font-semibold text-gray-900">
                   {lang === 'ur' ? 'وزٹنگ چارجز / فیس (اختیاری)' : 'Visiting Charges (Optional)'}
                 </label>
                 <input
@@ -771,9 +771,9 @@ function ListServiceContent({ lang }: { lang: string }) {
                   value={startingPrice}
                   onChange={(e) => setStartingPrice(e.target.value)}
                   placeholder="e.g. Rs. 800 or AED 100"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all"
                 />
-                <span className="text-[10px] text-gray-400">
+                <span className="text-xs text-gray-500">
                   {lang === 'ur'
                     ? 'یہ صرف معلومات کے لیے ہے، بصیرہ پر کوئی آن لائن پیمنٹ یا فکسڈ ای کامرس ریٹ نہیں ہے۔'
                     : 'This is strictly for initial consultation estimate. No online payment or fixed e-commerce checkout.'}
@@ -782,7 +782,7 @@ function ListServiceContent({ lang }: { lang: string }) {
 
               {/* Short Bio */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-gray-900">
+                <label className="text-sm font-semibold text-gray-900">
                   {lang === 'ur' ? 'مختصر تعارف / خصوصیات' : 'Short Bio / Specializations'}
                 </label>
                 <textarea
@@ -794,7 +794,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                       ? 'اپنے تجربے، مہارت، اوزار اور سروس کی وارنٹی کے بارے میں بتائیں...'
                       : 'Describe your years of experience, tools, guarantees, and key specialties...'
                   }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all resize-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all resize-none"
                 />
               </div>
 
@@ -820,7 +820,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                 )}
               </button>
 
-              <p className="text-[11px] text-gray-400 text-center">
+              <p className="text-xs text-gray-500 text-center leading-relaxed">
                 {lang === 'ur'
                   ? 'پروفائل شائع کرنے پر آپ کا رابطہ نمبر گاہکوں کے لیے دستیاب ہوگا تاکہ وہ براہِ راست رابطہ کر سکیں۔ صفر کمیشن۔'
                   : 'By publishing, you agree that your contact channel will be displayed publicly to allow customers to reach you directly. Zero commission.'}

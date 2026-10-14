@@ -104,10 +104,10 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                 <span className="w-2 h-2 rounded-full bg-[#059669]" />
                 <span>{providers.length} Verified Specialists Available</span>
               </div>
-              <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-neutral-900">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-neutral-900">
                 Top {categoryName} in {cityName}
               </h1>
-              <p className="text-sm text-gray-600 mt-1 max-w-2xl">
+              <p className="text-base text-gray-600 mt-1 max-w-2xl leading-relaxed">
                 Compare verified specialist profiles, ratings, service areas, and connect directly on WhatsApp with zero middlemen commission.
               </p>
             </div>
@@ -115,7 +115,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
             {/* List Your Business Button */}
             <Link
               href={`/${lang}/list-service?country=${country}&city=${city}&category=${category}`}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:border-[#059669] hover:text-[#059669] text-xs font-semibold text-neutral-900 transition-colors shrink-0"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:border-[#059669] hover:text-[#059669] text-sm font-semibold text-neutral-900 transition-colors shrink-0"
             >
               <PlusCircle className="w-4 h-4 text-[#059669]" />
               <span>List Your Service in {cityName}</span>
@@ -133,11 +133,11 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
               <Sparkles className="w-7 h-7" />
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-extrabold text-neutral-900 mb-2">
+            <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900 mb-2 leading-snug">
               We are launching in {cityName} soon! Register your business now.
             </h2>
 
-            <p className="text-sm text-gray-600 max-w-md mx-auto mb-6 leading-relaxed">
+            <p className="text-base text-gray-600 max-w-md mx-auto mb-6 leading-relaxed">
               Be among the first verified {categoryName.toLowerCase()} in {cityName}. Gain direct client inquiries straight to your WhatsApp with zero platform commission.
             </p>
 
@@ -186,12 +186,11 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <Link
-                            href={profileHref}
-                            className="text-sm sm:text-base font-bold text-neutral-900 hover:text-[#059669] transition-colors truncate"
-                          >
-                            {provider.name}
-                          </Link>
+                          <h3 className="font-semibold text-lg text-neutral-900 hover:text-[#059669] transition-colors truncate leading-snug">
+                            <Link href={profileHref}>
+                              {provider.name}
+                            </Link>
+                          </h3>
                           {/* Green "Verified" Badge */}
                           {provider.is_verified && (
                             <span
@@ -203,12 +202,12 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                           )}
                         </div>
 
-                        <p className="text-xs font-medium text-gray-500 truncate mt-0.5">
+                        <p className="text-sm font-medium text-gray-600 truncate mt-0.5">
                           {provider.trade_title}
                         </p>
 
                         {/* Star Rating */}
-                        <div className="flex items-center gap-1.5 mt-1 sm:mt-1.5 text-xs">
+                        <div className="flex items-center gap-1.5 mt-1 sm:mt-1.5 text-sm">
                           <div className="flex items-center gap-1 text-amber-600 font-bold">
                             <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                             <span>{provider.rating.toFixed(1)}</span>
@@ -221,7 +220,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                     </div>
 
                     {/* Location & Coverage */}
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
+                    <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
                       <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                       <span className="truncate">
                         {provider.district}, {cityName}
@@ -229,7 +228,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                     </div>
 
                     {/* Short Description */}
-                    <p className="text-xs text-gray-600 line-clamp-2 sm:line-clamp-3 leading-relaxed mb-4">
+                    <p className="text-base text-gray-600 line-clamp-2 sm:line-clamp-3 leading-relaxed mb-4">
                       {provider.short_bio}
                     </p>
 
@@ -238,13 +237,13 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                       {provider.service_area.slice(0, 3).map((area, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-0.5 bg-gray-50 text-gray-600 border border-gray-200 rounded text-[10px] font-medium"
+                          className="px-2 py-0.5 bg-gray-50 text-gray-600 border border-gray-200 rounded text-xs font-medium"
                         >
                           {area}
                         </span>
                       ))}
                       {provider.service_area.length > 3 && (
-                        <span className="px-1.5 py-0.5 text-gray-400 text-[10px]">
+                        <span className="px-1.5 py-0.5 text-gray-400 text-xs font-medium">
                           +{provider.service_area.length - 3} more
                         </span>
                       )}
@@ -254,10 +253,10 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                   {/* Bottom Action Area */}
                   <div className="pt-3.5 sm:pt-4 border-t border-gray-100 flex items-center justify-between gap-2.5">
                     <div>
-                      <span className="text-[10px] uppercase font-bold text-gray-400 block">
+                      <span className="text-xs uppercase font-bold text-gray-400 block">
                         Visiting Charges
                       </span>
-                      <span className="text-xs font-bold text-neutral-900">
+                      <span className="text-sm font-bold text-neutral-900">
                         Rs. {provider.starting_price}
                       </span>
                     </div>
@@ -267,7 +266,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                       href={directWhatsAppUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-[#059669] hover:bg-[#047857] text-white text-xs font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 shadow-2xs"
+                      className="bg-[#059669] hover:bg-[#047857] text-white text-sm font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 shadow-2xs"
                     >
                       <MessageCircle className="w-4 h-4 fill-current" />
                       <span>Chat on WhatsApp</span>

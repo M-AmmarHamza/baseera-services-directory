@@ -81,7 +81,7 @@ export default function BottomNav({ lang }: Props) {
               }`}
             >
               <Icon className={`w-5 h-5 ${item.isActive ? 'stroke-[2.2] scale-105' : 'stroke-[1.8]'} transition-transform`} />
-              <span className="text-[10px] mt-0.5">{item.label}</span>
+              <span className="text-xs mt-0.5">{item.label}</span>
             </Link>
           );
         })}

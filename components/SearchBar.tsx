@@ -69,25 +69,25 @@ export default function SearchBar({
 
       {/* Popular quick searches */}
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-emerald-100/90 font-medium">
-        <span className="text-[11px] text-emerald-200">Popular:</span>
+        <span className="text-xs text-emerald-200 font-semibold">Popular:</span>
         <button
           type="button"
           onClick={() => handleQuickFilter('plumber in orangi')}
-          className="bg-white/10 hover:bg-white/20 text-white px-2.5 py-1 rounded-lg text-[11px] transition-colors"
+          className="bg-white/15 hover:bg-white/25 text-white px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
         >
           Plumber in Orangi
         </button>
         <button
           type="button"
           onClick={() => handleQuickFilter('electrician in pechs')}
-          className="bg-white/10 hover:bg-white/20 text-white px-2.5 py-1 rounded-lg text-[11px] transition-colors"
+          className="bg-white/15 hover:bg-white/25 text-white px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
         >
           Electrician in PECHS
         </button>
         <button
           type="button"
           onClick={() => handleQuickFilter('ac repair gulshan')}
-          className="bg-white/10 hover:bg-white/20 text-white px-2.5 py-1 rounded-lg text-[11px] transition-colors"
+          className="bg-white/15 hover:bg-white/25 text-white px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
         >
           AC in Gulshan
         </button>

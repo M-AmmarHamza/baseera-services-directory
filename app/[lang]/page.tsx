@@ -110,11 +110,11 @@ export default async function HomePage({ params }: PageProps) {
             <span>{dict.home?.badge || 'Direct Karigar & Specialist Directory'}</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-neutral-900 leading-[1.15] mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 leading-tight mb-4">
             {dict.home?.heroTitle || 'Find Trusted Local Services'}
           </h1>
 
-          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-8 font-normal leading-relaxed">
+          <p className="text-base text-gray-600 max-w-2xl mx-auto mb-8 leading-relaxed">
             {dict.home?.heroSubtitle || 'Connect directly with verified specialists in your area. Zero booking fees, direct WhatsApp communication, and verified ratings.'}
           </p>
 
@@ -128,14 +128,14 @@ export default async function HomePage({ params }: PageProps) {
         {/* Section Header */}
         <div className="flex items-end justify-between gap-4 mb-5 sm:mb-6">
           <div>
-            <h2 className="text-xl sm:text-3xl font-bold tracking-tight text-neutral-900">
+            <h2 className="text-xl sm:text-2xl font-semibold leading-snug tracking-tight text-neutral-900">
               {dict.home?.browseBySpecialty || 'Browse by Specialty'}
             </h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+            <p className="text-sm text-gray-500 mt-1">
               {dict.home?.specialtySubtitle || 'Verified community technicians & specialists worldwide'}
             </p>
           </div>
-          <div className="text-xs sm:text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0">
+          <div className="text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0">
             {CATEGORIES.length} {dict.home?.categoriesCount || 'Categories'}
           </div>
         </div>
@@ -161,7 +161,7 @@ export default async function HomePage({ params }: PageProps) {
                 </span>
 
                 {/* Active provider count Subtext */}
-                <span className="text-[11px] text-gray-400 font-medium mt-0.5">
+                <span className="text-xs text-gray-500 font-medium mt-0.5">
                   {cat.count}+ {dict.home?.activeCount || 'Active'}
                 </span>
               </Link>
@@ -176,20 +176,20 @@ export default async function HomePage({ params }: PageProps) {
           <div className="flex items-end justify-between mb-5 sm:mb-6">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
+                <h2 className="text-xl sm:text-2xl font-semibold leading-snug tracking-tight text-neutral-900">
                   {dict.home?.featuredProviders || 'Featured Providers'}
                 </h2>
-                <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-[#059669] border border-emerald-200">
+                <span className="px-2.5 py-0.5 rounded text-xs font-medium bg-emerald-50 text-[#059669] border border-emerald-200">
                   {dict.home?.verified || 'Verified'}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+              <p className="text-sm text-gray-500 mt-1">
                 {dict.home?.featuredSubtitle || 'Top-rated specialists ready for immediate direct booking'}
               </p>
             </div>
             <Link
               href={`/${lang}/vendors`}
-              className="text-xs font-semibold text-[#059669] hover:underline flex items-center gap-1 shrink-0"
+              className="text-sm font-semibold text-[#059669] hover:underline flex items-center gap-1 shrink-0"
             >
               <span>{dict.home?.seeAll || 'See All'}</span>
               <ChevronRight className="w-3.5 h-3.5" />
@@ -219,17 +219,17 @@ export default async function HomePage({ params }: PageProps) {
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <h3 className="text-sm font-bold text-neutral-900 truncate">
+                          <h3 className="text-lg font-semibold leading-snug text-neutral-900 truncate">
                             {provider.name}
                           </h3>
                           {provider.is_verified && (
                             <BadgeCheck className="w-4 h-4 text-[#059669] shrink-0" />
                           )}
                         </div>
-                        <p className="text-xs text-gray-500 truncate mt-0.5 font-medium">
+                        <p className="text-sm text-gray-500 truncate mt-0.5">
                           {provider.trade_title}
                         </p>
-                        <div className="flex items-center gap-1 mt-1 text-xs text-amber-600 font-semibold">
+                        <div className="flex items-center gap-1 mt-1 text-sm text-amber-600 font-semibold">
                           <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                           <span>{provider.rating.toFixed(1)}</span>
                           <span className="text-gray-400 font-normal">({provider.review_count})</span>
@@ -238,12 +238,12 @@ export default async function HomePage({ params }: PageProps) {
                     </div>
 
                     {/* Coverage area */}
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
+                    <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
                       <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                       <span className="truncate">{provider.district}, Karachi</span>
                     </div>
 
-                    <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mb-4">
+                    <p className="text-sm sm:text-base text-gray-600 line-clamp-2 leading-relaxed mb-4">
                       {provider.short_bio}
                     </p>
                   </div>
@@ -251,15 +251,15 @@ export default async function HomePage({ params }: PageProps) {
                   {/* Actions */}
                   <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2.5">
                     <div>
-                      <span className="text-[10px] text-gray-400 uppercase font-semibold block">{dict.home?.visiting || 'Visiting'}</span>
-                      <span className="text-xs font-bold text-neutral-900">Rs. {provider.starting_price}</span>
+                      <span className="text-xs text-gray-500 uppercase font-medium block">{dict.home?.visiting || 'Visiting'}</span>
+                      <span className="text-sm font-semibold text-neutral-900">Rs. {provider.starting_price}</span>
                     </div>
 
                     <a
                       href={whatsappLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-[#059669] hover:bg-[#047857] text-white text-xs font-semibold px-3 sm:px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
+                      className="bg-[#059669] hover:bg-[#047857] text-white text-xs font-medium px-3.5 py-2 rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
                       <span>{dict.home?.whatsapp || 'WhatsApp'}</span>
@@ -278,24 +278,24 @@ export default async function HomePage({ params }: PageProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             <div className="p-4 sm:p-5 border border-gray-200 rounded-xl bg-white">
               <ShieldCheck className="w-6 h-6 text-[#059669] mb-3" />
-              <h3 className="text-sm font-bold text-neutral-900 mb-1">{dict.home?.valProp1Title || 'Direct Verified Karigars'}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <h3 className="text-lg font-semibold leading-snug text-neutral-900 mb-1.5">{dict.home?.valProp1Title || 'Direct Verified Karigars'}</h3>
+              <p className="text-base text-gray-600 leading-relaxed">
                 {dict.home?.valProp1Desc || 'Specialists submit national identification and technical proof before receiving the green verified badge.'}
               </p>
             </div>
 
             <div className="p-4 sm:p-5 border border-gray-200 rounded-xl bg-white">
               <CheckCircle2 className="w-6 h-6 text-[#059669] mb-3" />
-              <h3 className="text-sm font-bold text-neutral-900 mb-1">{dict.home?.valProp2Title || 'Zero Platform Commission'}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <h3 className="text-lg font-semibold leading-snug text-neutral-900 mb-1.5">{dict.home?.valProp2Title || 'Zero Platform Commission'}</h3>
+              <p className="text-base text-gray-600 leading-relaxed">
                 {dict.home?.valProp2Desc || 'No middleman fee or surcharge. 100% of your payment goes directly to the service specialist upon completion.'}
               </p>
             </div>
 
             <div className="p-4 sm:p-5 border border-gray-200 rounded-xl bg-white">
               <Clock className="w-6 h-6 text-[#059669] mb-3" />
-              <h3 className="text-sm font-bold text-neutral-900 mb-1">{dict.home?.valProp3Title || 'Instant WhatsApp Connection'}</h3>
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <h3 className="text-lg font-semibold leading-snug text-neutral-900 mb-1.5">{dict.home?.valProp3Title || 'Instant WhatsApp Connection'}</h3>
+              <p className="text-base text-gray-600 leading-relaxed">
                 {dict.home?.valProp3Desc || 'Chat or call specialists directly to discuss fault descriptions, share photos, and agree on timing.'}
               </p>
             </div>

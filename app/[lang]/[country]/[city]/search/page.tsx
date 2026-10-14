@@ -136,10 +136,10 @@ export default async function SearchResultsPage({
         <section className="flex flex-col gap-6">
           <div className="flex items-center justify-between border-b border-gray-200 pb-3">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 leading-snug">
                 Verified Specialists Matching Your Query
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-sm text-gray-500 mt-0.5">
                 {exactMatches.length} verified technician{exactMatches.length > 1 ? 's' : ''} directly available on WhatsApp
               </p>
             </div>
@@ -178,7 +178,7 @@ export default async function SearchResultsPage({
                       <div className="flex flex-col min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-1">
                           <div className="flex items-center gap-1.5 min-w-0">
-                            <h3 className="font-bold text-lg text-gray-900 truncate">{pro.name}</h3>
+                            <h3 className="font-semibold text-lg text-gray-900 truncate leading-snug">{pro.name}</h3>
                             {pro.is_verified && (
                               <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                             )}
@@ -188,17 +188,17 @@ export default async function SearchResultsPage({
                             {pro.rating}
                           </span>
                         </div>
-                        <span className="text-xs text-emerald-800 font-bold truncate mt-0.5">
+                        <span className="text-sm text-emerald-800 font-semibold truncate mt-0.5">
                           {pro.trade_title}
                         </span>
-                        <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
+                        <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
                           <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                           <span className="truncate font-medium text-emerald-800">{pro.district}</span>
                         </div>
                       </div>
                     </div>
 
-                    <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed mt-4">
+                    <p className="text-base text-gray-600 line-clamp-3 leading-relaxed mt-4">
                       {pro.short_bio}
                     </p>
 
@@ -209,7 +209,7 @@ export default async function SearchResultsPage({
                         return (
                           <span
                             key={area}
-                            className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
+                            className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
                               isTargetArea
                                 ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
                                 : 'bg-gray-100 text-gray-700'
@@ -224,8 +224,8 @@ export default async function SearchResultsPage({
 
                   <div className="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
                     <div>
-                      <span className="text-[10px] text-gray-400 font-medium block">{dict.profile.pricingFrom}</span>
-                      <span className="text-sm font-extrabold text-gray-900">
+                      <span className="text-xs text-gray-500 font-medium block">{dict.profile.pricingFrom}</span>
+                      <span className="text-base font-extrabold text-gray-900">
                         Rs. {pro.starting_price}
                       </span>
                     </div>
@@ -233,7 +233,7 @@ export default async function SearchResultsPage({
                     <div className="flex items-center gap-2">
                       <Link
                         href={`/${lang}/${country}/${city}/${pro.category_id}/${pro.slug}`}
-                        className="py-2.5 px-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold text-xs transition-colors"
+                        className="py-2.5 px-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold text-sm transition-colors"
                       >
                         {dict.common.viewProfile}
                       </Link>
@@ -317,7 +317,7 @@ export default async function SearchResultsPage({
                       </div>
                       <div className="flex flex-col min-w-0">
                         <span className="font-bold text-xs text-gray-900 truncate">{pro.name}</span>
-                        <span className="text-[11px] text-gray-500 truncate">{pro.district}</span>
+                        <span className="text-xs text-gray-500 truncate">{pro.district}</span>
                       </div>
                     </div>
                     <Link

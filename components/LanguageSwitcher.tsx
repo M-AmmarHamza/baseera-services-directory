@@ -15,7 +15,7 @@ export default function LanguageSwitcher({ currentLang }: { currentLang: string 
   };
 
   return (
-    <div className="flex items-center bg-gray-100/90 border border-gray-200/80 p-0.5 rounded-full text-[11px] sm:text-xs font-semibold">
+    <div className="flex items-center bg-gray-100/90 border border-gray-200/80 p-0.5 rounded-full text-xs font-semibold">
       <Link
         href={getLocalizedPath('en')}
         className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all ${

@@ -356,7 +356,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
           {/* Name & Trade Title */}
           <div className="space-y-1.5">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-neutral-900">
                 {provider.name}
               </h1>
               {provider.is_verified && (
@@ -366,11 +366,11 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               )}
             </div>
 
-            <p className="text-sm font-semibold text-[#059669]">
+            <p className="text-base font-semibold text-[#059669]">
               {provider.trade_title}
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 pt-1">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 pt-1">
               <div className="flex items-center gap-1 text-amber-600 font-bold">
                 <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
                 <span>{provider.rating.toFixed(1)}</span>
@@ -395,10 +395,10 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
           <div className="lg:col-span-2 space-y-6">
             {/* Bio */}
             <div className="p-6 border border-gray-200 rounded-2xl bg-white">
-              <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider mb-2">
-                About & Professional Experience
+              <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
+                About &amp; Professional Experience
               </h2>
-              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+              <p className="text-base text-gray-700 leading-relaxed whitespace-pre-line">
                 {provider.short_bio}
               </p>
             </div>
@@ -406,7 +406,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
             {/* DYNAMIC CORE SPECIALIZATIONS */}
             <div className="p-6 border border-gray-200 rounded-2xl bg-white">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">
+                <h2 className="text-xl font-semibold text-neutral-900 leading-snug">
                   Core Specializations
                 </h2>
                 <span className="text-xs text-[#059669] font-bold">Category Verified</span>
@@ -416,8 +416,8 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                   <div key={i} className="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
                     <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
                     <div>
-                      <h3 className="text-xs font-bold text-neutral-900">{spec.title}</h3>
-                      <p className="text-[11px] text-gray-600 mt-0.5 leading-relaxed">{spec.desc}</p>
+                      <h3 className="text-base sm:text-lg font-semibold text-neutral-900 leading-snug">{spec.title}</h3>
+                      <p className="text-sm text-gray-600 mt-0.5 leading-relaxed">{spec.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -426,7 +426,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
             {/* Service Area Tags */}
             <div className="p-6 border border-gray-200 rounded-2xl bg-white">
-              <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider mb-3">
+              <h2 className="text-xl font-semibold text-neutral-900 mb-3 leading-snug">
                 Service Area Coverage in {cityName}
               </h2>
               <div className="flex flex-wrap gap-2">
@@ -447,7 +447,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                 <ShieldCheck className="w-6 h-6 text-[#059669] shrink-0" />
                 <div>
                   <div className="text-xs font-bold text-neutral-900">Verified Specialist</div>
-                  <div className="text-[11px] text-gray-500">Identity & Trade Approved</div>
+                  <div className="text-xs text-gray-500">Identity & Trade Approved</div>
                 </div>
               </div>
 
@@ -455,7 +455,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                 <CheckCircle2 className="w-6 h-6 text-[#059669] shrink-0" />
                 <div>
                   <div className="text-xs font-bold text-neutral-900">Direct Pay</div>
-                  <div className="text-[11px] text-gray-500">No Booking Fees</div>
+                  <div className="text-xs text-gray-500">No Booking Fees</div>
                 </div>
               </div>
 
@@ -463,7 +463,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                 <Clock className="w-6 h-6 text-[#059669] shrink-0" />
                 <div>
                   <div className="text-xs font-bold text-neutral-900">Fast Response</div>
-                  <div className="text-[11px] text-gray-500">Direct WhatsApp</div>
+                  <div className="text-xs text-gray-500">Direct WhatsApp</div>
                 </div>
               </div>
             </div>
@@ -474,10 +474,10 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
             <div className="p-6 border border-gray-200 rounded-2xl bg-white sticky top-24">
               {/* Plain Text Visiting Charges */}
               <div className="pb-4 mb-4 border-b border-gray-100">
-                <span className="text-[11px] uppercase tracking-wider font-semibold text-gray-400 block mb-1">
+                <span className="text-xs uppercase tracking-wider font-semibold text-gray-500 block mb-1">
                   Visiting Charges
                 </span>
-                <div className="text-base font-bold text-neutral-900">
+                <div className="text-lg font-bold text-neutral-900">
                   Rs. {provider.starting_price}
                 </div>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">
@@ -491,7 +491,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                   href={`https://wa.me/${provider.whatsapp_number.replace(/\+/g, '')}?text=${whatsappMessage}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 bg-[#059669] hover:bg-[#047857] active:scale-[0.99] text-white transition-all rounded-xl flex items-center justify-center gap-2 font-bold text-sm"
+                  className="w-full py-3 bg-[#059669] hover:bg-[#047857] active:scale-[0.99] text-white transition-all rounded-xl flex items-center justify-center gap-2 font-semibold text-sm"
                 >
                   <WhatsAppIcon className="w-4 h-4 fill-current" />
                   <span>Chat on WhatsApp</span>
@@ -499,7 +499,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
                 <a
                   href={`tel:${provider.whatsapp_number}`}
-                  className="w-full py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-800 rounded-xl flex items-center justify-center gap-2 font-semibold text-xs transition-colors"
+                  className="w-full py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-800 rounded-xl flex items-center justify-center gap-2 font-semibold text-sm transition-colors"
                 >
                   <Phone className="w-3.5 h-3.5 text-gray-600" />
                   <span>Call Direct ({provider.whatsapp_number})</span>
@@ -507,11 +507,11 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               </div>
 
               <div className="text-xs text-gray-600 space-y-2 border-t border-gray-100 pt-4 mt-4">
-                <div className="flex items-center gap-2 text-[11px] text-gray-500">
+                <div className="flex items-center gap-2 text-xs text-gray-500">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
                   <span>Free cancellation before specialist arrival</span>
                 </div>
-                <div className="flex items-center gap-2 text-[11px] text-gray-500">
+                <div className="flex items-center gap-2 text-xs text-gray-500">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
                   <span>Negotiate major repairs on-site directly</span>
                 </div>

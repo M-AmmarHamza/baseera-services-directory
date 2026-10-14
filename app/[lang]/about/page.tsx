@@ -52,7 +52,7 @@ export default async function AboutPage({ params }: PageProps) {
             <Compass className="w-4 h-4" />
             <span>Our Vision &amp; Platform Mission</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-neutral-900 tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-neutral-900 mb-2">
             About Baseera
           </h1>
           <p className="text-base text-gray-600 max-w-2xl leading-relaxed">
@@ -66,8 +66,8 @@ export default async function AboutPage({ params }: PageProps) {
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#059669] flex items-center justify-center mb-3">
               <Zap className="w-5 h-5" />
             </div>
-            <h2 className="text-sm font-bold text-neutral-900 mb-1">Direct Connection</h2>
-            <p className="text-xs text-gray-500 leading-relaxed">
+            <h3 className="text-base font-semibold text-neutral-900 mb-1 leading-snug">Direct Connection</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
               No booking call centers or agency queues. Message or call verified karigars directly on WhatsApp.
             </p>
           </div>
@@ -76,8 +76,8 @@ export default async function AboutPage({ params }: PageProps) {
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#059669] flex items-center justify-center mb-3">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h2 className="text-sm font-bold text-neutral-900 mb-1">0% Commission</h2>
-            <p className="text-xs text-gray-500 leading-relaxed">
+            <h3 className="text-base font-semibold text-neutral-900 mb-1 leading-snug">0% Commission</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
               100% of hard-earned wages go to the technician. No platform cuts, no artificial fee inflations.
             </p>
           </div>
@@ -86,17 +86,17 @@ export default async function AboutPage({ params }: PageProps) {
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#059669] flex items-center justify-center mb-3">
               <Globe2 className="w-5 h-5" />
             </div>
-            <h2 className="text-sm font-bold text-neutral-900 mb-1">Global &amp; Local</h2>
-            <p className="text-xs text-gray-500 leading-relaxed">
+            <h3 className="text-base font-semibold text-neutral-900 mb-1 leading-snug">Global &amp; Local</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
               Designed for cities across Pakistan, UAE, Saudi Arabia, and worldwide hubs, localized in English, Urdu, and Arabic.
             </p>
           </div>
         </div>
 
         {/* Story */}
-        <div className="space-y-6 text-sm text-gray-700 leading-relaxed">
+        <div className="space-y-6 text-base text-gray-700 leading-relaxed">
           <section>
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               Why We Built Baseera
             </h2>
             <p>
@@ -108,7 +108,7 @@ export default async function AboutPage({ params }: PageProps) {
           </section>
 
           <section className="pt-4 border-t border-gray-200">
-            <h2 className="text-lg font-bold text-neutral-900 mb-2">
+            <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
               Are You a Service Specialist?
             </h2>
             <p className="mb-4">
@@ -116,7 +116,7 @@ export default async function AboutPage({ params }: PageProps) {
             </p>
             <Link
               href={`/${lang}/list-service`}
-              className="inline-flex items-center gap-2 bg-[#059669] hover:bg-[#047857] text-white px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-2xs"
+              className="inline-flex items-center gap-2 bg-[#059669] hover:bg-[#047857] text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-2xs"
             >
               <span>List Your Service Free</span>
               <ChevronRight className="w-4 h-4" />

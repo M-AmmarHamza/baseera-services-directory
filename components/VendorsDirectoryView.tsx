@@ -76,10 +76,10 @@ export default function VendorsDirectoryView({ initialProviders, lang }: Props) 
               <span className="w-2 h-2 rounded-full bg-[#006948] animate-pulse"></span>
               <span>Verified Service Specialists</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-950 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-gray-950">
               All Listed Vendors &amp; Specialists
             </h1>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1 max-w-2xl leading-relaxed">
+            <p className="text-base text-gray-600 mt-1 max-w-2xl leading-relaxed">
               Browse community technicians, electricians, plumbers, and local specialists. Connect directly on WhatsApp with zero agency commissions.
             </p>
           </div>
@@ -87,7 +87,7 @@ export default function VendorsDirectoryView({ initialProviders, lang }: Props) 
           <div className="flex items-center gap-2.5 shrink-0">
             <Link
               href={`/${lang}/list-service`}
-              className="px-4 py-2.5 rounded-xl bg-[#006948] hover:bg-[#00855d] text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5"
+              className="px-4 py-2.5 rounded-xl bg-[#006948] hover:bg-[#00855d] text-white font-semibold text-sm shadow-xs transition-all flex items-center gap-1.5"
             >
               <span>+ List Your Service (Free)</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -104,7 +104,7 @@ export default function VendorsDirectoryView({ initialProviders, lang }: Props) 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search vendor by name, specialty, neighborhood, or city (e.g. Tariq, PECHS, AC repair)..."
-              className="w-full bg-transparent text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
+              className="w-full bg-transparent text-base text-gray-900 placeholder:text-gray-400 focus:outline-none"
             />
             {search && (
               <button
@@ -233,10 +233,10 @@ export default function VendorsDirectoryView({ initialProviders, lang }: Props) 
                       <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
                         <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
                         <span className="text-xs font-bold text-gray-900">{pro.rating}</span>
-                        <span className="text-[11px] text-gray-500">({pro.review_count})</span>
+                        <span className="text-xs text-gray-500">({pro.review_count})</span>
                       </div>
                       {pro.is_verified && (
-                        <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-[#006948] text-white px-2 py-0.5 rounded-md text-[11px] font-bold shadow-xs">
+                        <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-[#006948] text-white px-2 py-0.5 rounded-md text-xs font-medium shadow-xs">
                           <BadgeCheck className="w-3.5 h-3.5 text-white" />
                           <span>Verified Pro</span>
                         </div>
@@ -246,26 +246,25 @@ export default function VendorsDirectoryView({ initialProviders, lang }: Props) 
                     {/* Details */}
                     <div className="flex flex-col">
                       <div className="flex items-center justify-between">
-                        <Link
-                          href={profileLink}
-                          className="font-bold text-base text-gray-950 truncate hover:text-[#006948] transition-colors"
-                        >
-                          {pro.name}
-                        </Link>
-                        <span className="text-[11px] text-[#006948] font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                        <h3 className="font-semibold text-lg text-gray-950 truncate hover:text-[#006948] transition-colors leading-snug">
+                          <Link href={profileLink}>
+                            {pro.name}
+                          </Link>
+                        </h3>
+                        <span className="text-xs text-[#006948] font-medium bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                           {pro.is_available ? 'Available Now' : 'Quick Reply'}
                         </span>
                       </div>
-                      <p className="text-xs text-[#006948] font-semibold mt-0.5 truncate">
+                      <p className="text-sm text-[#006948] font-semibold mt-0.5 truncate">
                         {pro.trade_title}
                       </p>
-                      <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
+                      <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
                         <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                         <span className="truncate">{pro.district}, {pro.city_slug.toUpperCase()}</span>
                       </div>
 
                       {/* Bio */}
-                      <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed mt-2">
+                      <p className="text-base text-gray-600 line-clamp-2 leading-relaxed mt-2">
                         {pro.short_bio}
                       </p>
 
@@ -274,7 +273,7 @@ export default function VendorsDirectoryView({ initialProviders, lang }: Props) 
                         {defaultTags.map((tag) => (
                           <span
                             key={tag}
-                            className="px-2 py-0.5 rounded-md bg-gray-50 border border-gray-200/70 text-gray-700 text-[11px] font-medium"
+                            className="px-2 py-0.5 rounded-md bg-gray-50 border border-gray-200/70 text-gray-700 text-xs font-medium"
                           >
                             {tag}
                           </span>
@@ -286,7 +285,7 @@ export default function VendorsDirectoryView({ initialProviders, lang }: Props) 
                   {/* Actions: Full Width WhatsApp Button + View Profile Link */}
                   <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
                     <a
-                      className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-[#006948] text-white text-xs font-bold active:opacity-90 transition-all hover:bg-[#00855d] shadow-2xs"
+                      className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-[#006948] text-white text-sm font-semibold active:opacity-90 transition-all hover:bg-[#00855d] shadow-2xs"
                       href={`https://wa.me/${pro.whatsapp_number.replace(/\+/g, '')}?text=${encodeURIComponent(`Salam ${pro.name}, saw your profile on Baseera directory.`)}`}
                       rel="noopener noreferrer"
                       target="_blank"
