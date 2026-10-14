@@ -8,68 +8,43 @@ export const config = {
      * - api routes (/api/...)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico, images, documents
+     * - favicon.ico, images, documents, sitemap, robots
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js)$).*)',
   ],
 };
 
 const SUPPORTED_LOCALES = ['en', 'ur', 'ar'];
 const DEFAULT_LOCALE = 'en';
 
-const COUNTRY_DEFAULTS: Record<string, string> = {
-  pk: 'karachi',
+// Fallback primary cities per country code (ISO 2-letter lowercase)
+const COUNTRY_DEFAULT_CITIES: Record<string, string> = {
   ae: 'dubai',
+  pk: 'karachi',
   sa: 'riyadh',
   qa: 'doha',
   kw: 'kuwait',
   bh: 'manama',
   om: 'muscat',
+  us: 'new-york',
+  gb: 'london',
+  ca: 'toronto',
   in: 'mumbai',
   bd: 'dhaka',
   tr: 'istanbul',
-  us: 'new-york',
-  ca: 'toronto',
-  mx: 'mexico-city',
-  br: 'sao-paulo',
-  gb: 'london',
   de: 'berlin',
   fr: 'paris',
   it: 'rome',
   es: 'madrid',
   nl: 'amsterdam',
-  ie: 'dublin',
-  ch: 'zurich',
   au: 'sydney',
-  nz: 'auckland',
   my: 'kuala-lumpur',
   sg: 'singapore',
-  id: 'jakarta',
-  jp: 'tokyo',
-  za: 'johannesburg',
   eg: 'cairo',
-  ng: 'lagos',
-  ke: 'nairobi',
+  za: 'johannesburg',
 };
 
-// Regional routing defaults
-const REGIONAL_ROUTING: Record<string, { country: string; city: string; defaultLang: string }> = {
-  AE: { country: 'ae', city: 'dubai', defaultLang: 'en' },
-  PK: { country: 'pk', city: 'karachi', defaultLang: 'en' },
-  SA: { country: 'sa', city: 'riyadh', defaultLang: 'en' },
-  QA: { country: 'qa', city: 'doha', defaultLang: 'en' },
-  OM: { country: 'om', city: 'muscat', defaultLang: 'en' },
-  BH: { country: 'bh', city: 'manama', defaultLang: 'en' },
-  KW: { country: 'kw', city: 'kuwait', defaultLang: 'en' },
-  GB: { country: 'gb', city: 'london', defaultLang: 'en' },
-  US: { country: 'us', city: 'new-york', defaultLang: 'en' },
-  CA: { country: 'ca', city: 'toronto', defaultLang: 'en' },
-  AU: { country: 'au', city: 'sydney', defaultLang: 'en' },
-  DE: { country: 'de', city: 'berlin', defaultLang: 'en' },
-  FR: { country: 'fr', city: 'paris', defaultLang: 'en' },
-  TR: { country: 'tr', city: 'istanbul', defaultLang: 'en' },
-};
-
+// Legacy profile mappings for SEO redirects
 const LEGACY_PROVIDER_MAP: Record<string, { category: string; slug: string }> = {
   'tariq-electric': { category: 'electrician', slug: 'tariq-mahmood' },
   'tariq-mahmood': { category: 'electrician', slug: 'tariq-mahmood' },
@@ -87,29 +62,35 @@ const LEGACY_PROVIDER_MAP: Record<string, { category: string; slug: string }> = 
 export function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
-  // Let sitemap and robots pass through directly without locale redirection
+  // Bypass sitemap and robots.txt
   if (pathname === '/sitemap.xml' || pathname === '/robots.txt') {
     return NextResponse.next();
   }
 
-  // Read Vercel Geo IP headers / object
-  const geoCountry = (((request as any).geo?.country || request.headers.get('x-vercel-ip-country') || 'PK') as string).toUpperCase();
-  const geoCity = ((request as any).geo?.city || request.headers.get('x-vercel-ip-city') || 'Karachi') as string;
+  // 1. Detect user country and city using Vercel Edge req.geo with header fallbacks
+  const geoCountry = (
+    (request as any).geo?.country ||
+    request.headers.get('x-vercel-ip-country') ||
+    'AE' // Default to UAE / Global Hub
+  ).toLowerCase();
 
-  const regionInfo = REGIONAL_ROUTING[geoCountry] || {
-    country: 'pk',
-    city: 'karachi',
-    defaultLang: DEFAULT_LOCALE,
-  };
+  const geoCityRaw = (
+    (request as any).geo?.city ||
+    request.headers.get('x-vercel-ip-city') ||
+    ''
+  );
 
-  const detectedCitySlug = generateEnglishSlug(geoCity) || regionInfo.city;
+  // Generate ASCII slug for detected city or fallback to country capital/primary city
+  const detectedCitySlug = geoCityRaw
+    ? generateEnglishSlug(geoCityRaw) || (COUNTRY_DEFAULT_CITIES[geoCountry] || 'dubai')
+    : (COUNTRY_DEFAULT_CITIES[geoCountry] || 'dubai');
 
-  // 1. Intercept unlocalized legacy routes (e.g. /provider-profile.html, /categories.html, /index.html)
+  // Handle unlocalized legacy routes (e.g., /provider-profile.html)
   if (pathname.includes('provider-profile')) {
     const rawId = searchParams.get('id') || searchParams.get('slug') || '';
     const resolved = LEGACY_PROVIDER_MAP[rawId.toLowerCase()] || { category: 'electrician', slug: 'tariq-mahmood' };
     return NextResponse.redirect(
-      new URL(`/${DEFAULT_LOCALE}/${regionInfo.country}/${detectedCitySlug}/${resolved.category}/${resolved.slug}`, request.url),
+      new URL(`/${DEFAULT_LOCALE}/${geoCountry}/${detectedCitySlug}/${resolved.category}/${resolved.slug}`, request.url),
       308
     );
   }
@@ -117,22 +98,25 @@ export function middleware(request: NextRequest) {
   if (pathname.includes('categories.html')) {
     const targetCat = searchParams.get('cat') || searchParams.get('category');
     return NextResponse.redirect(
-      new URL(`/${DEFAULT_LOCALE}/${regionInfo.country}/${detectedCitySlug}${targetCat ? `/${targetCat}` : ''}`, request.url),
+      new URL(`/${DEFAULT_LOCALE}/${geoCountry}/${detectedCitySlug}${targetCat ? `/${targetCat}` : ''}`, request.url),
       308
     );
   }
 
-  if (pathname === '/index.html' || pathname === '/') {
-    // User requested global site by default!
-    return NextResponse.redirect(new URL(`/${DEFAULT_LOCALE}`, request.url), 308);
-  }
-
-  // Check if pathname starts with a supported locale (/en, /ur, /ar)
+  // 2. Parse language segment from path
   const segments = pathname.split('/').filter(Boolean);
   const firstSegment = segments[0]?.toLowerCase();
   const isSupportedLocale = SUPPORTED_LOCALES.includes(firstSegment);
 
-  // If path has no valid locale prefix: prefix with /en
+  // 3. Auto-redirect root "/" to the IP-detected localized path (e.g. baseera.com/en/ae/dubai)
+  if (pathname === '/' || pathname === '/index.html') {
+    return NextResponse.redirect(
+      new URL(`/${DEFAULT_LOCALE}/${geoCountry}/${detectedCitySlug}`, request.url),
+      307 // Temporary redirect based on dynamic user IP
+    );
+  }
+
+  // If path lacks a supported locale prefix, prepend default locale
   if (!isSupportedLocale) {
     return NextResponse.redirect(
       new URL(`/${DEFAULT_LOCALE}${pathname}`, request.url),
@@ -142,51 +126,43 @@ export function middleware(request: NextRequest) {
 
   const lang = firstSegment;
 
-  // Case A: Just "/en", "/ur", or "/ar" -> Render the Global Directory Portal!
+  // If visiting "/en", "/ur", "/ar" directly without country/city, auto-redirect based on IP
   if (segments.length === 1) {
-    const response = NextResponse.next();
-    response.headers.set('x-baseera-lang', lang);
-    return response;
+    // Check if query string requested the global directory view explicitly
+    if (searchParams.get('view') === 'global') {
+      const response = NextResponse.next();
+      response.headers.set('x-baseera-lang', lang);
+      return response;
+    }
+
+    return NextResponse.redirect(
+      new URL(`/${lang}/${geoCountry}/${detectedCitySlug}`, request.url),
+      307
+    );
   }
 
-  // Case B: Handle top-level routes vs country hubs
+  // Handle top-level routes (e.g. /en/join, /en/vendors, /en/search)
   if (segments.length === 2) {
     const secondSegment = segments[1].toLowerCase();
-    // Pass through top-level static pages like /en/join, /en/vendors
     if (['join', 'vendors', 'search', 'services'].includes(secondSegment)) {
       const response = NextResponse.next();
       response.headers.set('x-baseera-lang', lang);
       return response;
     }
 
+    // Country hub without city -> auto-redirect to default city of that country
     const country = secondSegment;
-    const targetCity = COUNTRY_DEFAULTS[country] || (country === 'pk' ? 'karachi' : 'main-city');
+    const targetCity = COUNTRY_DEFAULT_CITIES[country] || (country === 'pk' ? 'karachi' : 'main-city');
     return NextResponse.redirect(
       new URL(`/${lang}/${country}/${targetCity}`, request.url),
       308
     );
   }
 
-  const [_, country, city, category, slug] = segments;
-
-  // Case C: Intercept legacy URLs with locale (e.g. /en/pk/karachi/provider-profilehtml)
-  if (category && category.includes('provider-profile')) {
-    const rawId = searchParams.get('id') || slug || '';
-    const resolved = LEGACY_PROVIDER_MAP[rawId.toLowerCase()] || { category: 'electrician', slug: 'tariq-mahmood' };
-    return NextResponse.redirect(
-      new URL(`/${lang}/${country}/${city}/${resolved.category}/${resolved.slug}`, request.url),
-      308
-    );
-  }
-
-  if (category && (category.includes('categories') || category.includes('index'))) {
-    return NextResponse.redirect(new URL(`/${lang}/${country}/${city}`, request.url), 308);
-  }
-
-  // Ensure any downstream segments are strictly English ASCII slugs
+  // Downstream path sanitization for ASCII slugs
   let needsSanitization = false;
   const sanitizedSegments = segments.map((seg, idx) => {
-    if (idx === 0) return seg; // Keep locale as is
+    if (idx === 0) return seg; // Keep locale intact
     const clean = generateEnglishSlug(seg);
     if (clean !== seg) needsSanitization = true;
     return clean;
@@ -195,12 +171,13 @@ export function middleware(request: NextRequest) {
   if (needsSanitization) {
     const sanitizedUrl = new URL(`/${sanitizedSegments.join('/')}`, request.url);
     sanitizedUrl.search = request.nextUrl.search;
-    return NextResponse.redirect(sanitizedUrl, 308); // Permanent SEO redirect
+    return NextResponse.redirect(sanitizedUrl, 308);
   }
 
+  const [_, country, city] = segments;
   const response = NextResponse.next();
   response.headers.set('x-baseera-lang', lang);
-  response.headers.set('x-baseera-country', country || 'pk');
-  response.headers.set('x-baseera-city', city || 'karachi');
+  response.headers.set('x-baseera-country', country || geoCountry);
+  response.headers.set('x-baseera-city', city || detectedCitySlug);
   return response;
 }
