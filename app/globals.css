@@ -1,29 +1,82 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-urdu: 'Noto Nastaliq Urdu', -apple-system, BlinkMacSystemFont, serif;
+  --font-arabic: 'Noto Sans Arabic', system-ui, sans-serif;
+}
 
 :root {
   --primary: #006948;
 }
 
-/* Urdu: Authentic Google Noto Nastaliq Urdu with normalized vertical spacing */
+/* ==========================================================================
+   URDU TYPOGRAPHY: Google Noto Nastaliq Urdu
+   Strictly applied across all elements, inputs, buttons, and headings
+   ========================================================================== */
+html[lang="ur"],
+html[lang="ur"] body,
+html[lang="ur"] * {
+  font-family: 'Noto Nastaliq Urdu', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, serif !important;
+  letter-spacing: normal !important;
+}
+
 html[lang="ur"] {
-  font-family: 'Noto Nastaliq Urdu', serif;
-  line-height: 1.85;
+  line-height: 2;
 }
 
-html[lang="ur"] h1,
+html[lang="ur"] body {
+  line-height: 2;
+}
+
+html[lang="ur"] h1 {
+  line-height: 1.8 !important;
+}
+
 html[lang="ur"] h2,
-html[lang="ur"] h3 {
-  line-height: 1.6;
+html[lang="ur"] h3,
+html[lang="ur"] h4,
+html[lang="ur"] h5,
+html[lang="ur"] h6 {
+  line-height: 1.7 !important;
 }
 
-/* Arabic: Crisp Modern Noto Sans Arabic */
+html[lang="ur"] p,
+html[lang="ur"] li,
+html[lang="ur"] span {
+  line-height: inherit;
+}
+
+html[lang="ur"] button,
+html[lang="ur"] input,
+html[lang="ur"] textarea,
+html[lang="ur"] select {
+  font-family: 'Noto Nastaliq Urdu', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, serif !important;
+}
+
+/* ==========================================================================
+   ARABIC TYPOGRAPHY: Google Noto Sans Arabic
+   ========================================================================== */
+html[lang="ar"],
+html[lang="ar"] body,
+html[lang="ar"] * {
+  font-family: 'Noto Sans Arabic', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
 html[lang="ar"] {
-  font-family: 'Noto Sans Arabic', sans-serif;
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
-/* English: Inter UI */
+html[lang="ar"] h1,
+html[lang="ar"] h2,
+html[lang="ar"] h3 {
+  line-height: 1.5 !important;
+}
+
+/* ==========================================================================
+   ENGLISH TYPOGRAPHY: Inter
+   ========================================================================== */
 html[lang="en"],
 html[dir="ltr"] {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -48,4 +101,3 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-

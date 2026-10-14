@@ -156,7 +156,7 @@ export default async function HomePage({ params }: PageProps) {
                 </div>
 
                 {/* Two-line clamped Title */}
-                <span className="text-xs sm:text-sm font-semibold text-gray-900 leading-tight line-clamp-2 h-8 sm:h-9 flex items-center justify-center">
+                <span className={`text-xs sm:text-sm font-semibold text-gray-900 leading-snug line-clamp-2 ${lang === 'ur' ? 'min-h-[2.8rem] py-0.5' : 'h-8 sm:h-9'} flex items-center justify-center`}>
                   {getCategoryName(cat, lang)}
                 </span>
 

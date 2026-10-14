@@ -26,8 +26,14 @@ export default async function RootLayout({
     <html lang={lang} dir={isRTL ? 'rtl' : 'ltr'}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap"
+          rel="stylesheet"
+        />
       </head>
-      <body className="bg-[#f9f9ff] text-[#141b2b] min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-100 selection:text-emerald-900">
+      <body className={`${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-arabic' : 'font-sans'} bg-[#f9f9ff] text-[#141b2b] min-h-screen flex flex-col antialiased selection:bg-emerald-100 selection:text-emerald-900`}>
         {/* Global Desktop & Mobile Header */}
         <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/90 shadow-2xs">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
@@ -135,7 +141,7 @@ export default async function RootLayout({
         <main className="flex-1 w-full">{children}</main>
 
         {/* Global Professional Unified Footer */}
-        <footer className="bg-white border-t border-gray-200/90 pt-12 pb-24 md:pb-12 mt-20 font-sans text-neutral-900">
+        <footer className="bg-white border-t border-gray-200/90 pt-12 pb-24 md:pb-12 mt-20 text-neutral-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10 pb-10 border-b border-gray-100">
               {/* Brand & Mission Column (2 cols wide on desktop) */}
