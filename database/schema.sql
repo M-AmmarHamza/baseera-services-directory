@@ -268,14 +268,30 @@ insert into public.cities (id, country_id, name, slug) values
 on conflict (id) do nothing;
 
 insert into public.categories (id, name, slug, icon, active_count) values
-  ('electrician', 'Electrician & Wiring', 'electrician', 'bolt', 42),
-  ('ac', 'AC & Refrigeration', 'ac-repair', 'mode_fan', 58),
-  ('plumbing', 'Plumbing & Boring', 'plumbing', 'plumbing', 37),
-  ('generator', 'Generator Technicians', 'generators', 'power', 19),
-  ('solar', 'Solar Energy & Net Metering', 'solar-energy', 'solar_power', 26),
-  ('cctv', 'CCTV & Home Security', 'cctv-security', 'videocam', 31),
-  ('ro-water', 'RO Plants & Filters', 'ro-plants', 'water_drop', 22),
-  ('food', 'Home Chefs & Catering', 'home-chefs', 'restaurant', 45)
+  ('electrician', 'Electrician', 'electrician', 'Zap', 42),
+  ('ups-inverter-technician', 'UPS & Inverter Technician', 'ups-inverter-technician', 'BatteryCharging', 28),
+  ('solar-installer', 'Solar Panel Installer', 'solar-installer', 'Sun', 34),
+  ('generator-repair', 'Generator Mechanic', 'generator-repair', 'Power', 19),
+  ('plumber', 'Plumber', 'plumber', 'Wrench', 37),
+  ('water-pump-repair', 'Water Pump Mechanic', 'water-pump-repair', 'Gauge', 24),
+  ('water-boring', 'Water Boring Specialist', 'water-boring', 'Layers', 18),
+  ('water-tank-cleaning', 'Water Tank Cleaner', 'water-tank-cleaning', 'Waves', 31),
+  ('ac-technician', 'AC Technician', 'ac-technician', 'Wind', 58),
+  ('fridge-repair', 'Fridge & Freezer Mechanic', 'fridge-repair', 'Snowflake', 32),
+  ('washing-machine-repair', 'Washing Machine Repair', 'washing-machine-repair', 'RotateCw', 26),
+  ('geyser-repair', 'Geyser Technician', 'geyser-repair', 'Flame', 22),
+  ('carpenter', 'Carpenter', 'carpenter', 'Hammer', 25),
+  ('painter', 'Painter', 'painter', 'Paintbrush', 31),
+  ('aluminium-glass-worker', 'Aluminium & Glass Worker', 'aluminium-glass-worker', 'Frame', 20),
+  ('welder', 'Welder', 'welder', 'Zap', 17),
+  ('mason', 'Mason', 'mason', 'Boxes', 23),
+  ('pest-control', 'Pest Control & Fumigation', 'pest-control', 'Bug', 21),
+  ('sofa-carpet-cleaning', 'Sofa & Carpet Cleaning', 'sofa-carpet-cleaning', 'Armchair', 29),
+  ('cctv-installer', 'CCTV Installer', 'cctv-installer', 'Camera', 31),
+  ('locksmith', 'Locksmith', 'locksmith', 'Key', 16),
+  ('home-chef', 'Home Chef', 'home-chef', 'Utensils', 45),
+  ('event-decorator', 'Home Event Decorator', 'event-decorator', 'PartyPopper', 18),
+  ('movers-packers', 'Movers & Packers', 'movers-packers', 'Truck', 27)
 on conflict (id) do nothing;
 
 -- Multi-language Category Translations

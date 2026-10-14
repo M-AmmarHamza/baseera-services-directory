@@ -33,89 +33,160 @@ const DOMAIN = 'https://baseera-services-directory.vercel.app';
 
 // DYNAMIC CATEGORY SPECIALIZATIONS (ZERO HARDCODED MISMATCHES)
 const CATEGORY_SPECIALIZATIONS: Record<string, Array<{ title: string; desc: string }>> = {
-  ac: [
-    { title: 'Inverter AC Jet Chemical Wash', desc: 'High-pressure anti-bacterial indoor coil wash, blower wheel degreasing, and drainage tray clearing.' },
-    { title: 'Refrigerant Gas Leak & Refill', desc: 'Nitrogen leak testing, copper flare nut brazing, and genuine R410a / R32 refrigerant charging.' },
-    { title: 'Inverter PCB Motherboard Diagnostics', desc: 'Microcontroller troubleshooting, capacitor replacement, and indoor/outdoor communication error reset.' },
-    { title: 'Compressor & Fan Motor Overhaul', desc: 'Rotary/Scroll compressor replacement, run capacitor testing, and condenser fan motor servicing.' },
-  ],
-  'ac-repair': [
-    { title: 'Inverter AC Jet Chemical Wash', desc: 'High-pressure anti-bacterial indoor coil wash, blower wheel degreasing, and drainage tray clearing.' },
-    { title: 'Refrigerant Gas Leak & Refill', desc: 'Nitrogen leak testing, copper flare nut brazing, and genuine R410a / R32 refrigerant charging.' },
-    { title: 'Inverter PCB Motherboard Diagnostics', desc: 'Microcontroller troubleshooting, capacitor replacement, and indoor/outdoor communication error reset.' },
-    { title: 'Compressor & Fan Motor Overhaul', desc: 'Rotary/Scroll compressor replacement, run capacitor testing, and condenser fan motor servicing.' },
-  ],
+  // Electrical & Power
   electrician: [
     { title: 'Concealed Wiring & Rewiring', desc: 'Full premise concealed copper cabling, load distribution, and short-circuit localization.' },
     { title: 'Inverter, Solar & ATS Changeover Panels', desc: 'Automatic transfer switch (ATS) wiring and UPS / solar inverter distribution.' },
     { title: 'Main Distribution Board (DB) Balancing', desc: 'Earthing rod testing, circuit breaker trip diagnosis, and phase load balancing.' },
     { title: 'Ceiling Fan & Heavy Fixture Fitting', desc: 'Secure ceiling suspension anchors, chandelier installation, and LED dimmer panels.' },
   ],
-  'electrician-services': [
-    { title: 'Concealed Wiring & Rewiring', desc: 'Full premise concealed copper cabling, load distribution, and short-circuit localization.' },
-    { title: 'Inverter, Solar & ATS Changeover Panels', desc: 'Automatic transfer switch (ATS) wiring and UPS / solar inverter distribution.' },
-    { title: 'Main Distribution Board (DB) Balancing', desc: 'Earthing rod testing, circuit breaker trip diagnosis, and phase load balancing.' },
-    { title: 'Ceiling Fan & Heavy Fixture Fitting', desc: 'Secure ceiling suspension anchors, chandelier installation, and LED dimmer panels.' },
+  'ups-inverter-technician': [
+    { title: 'Pure Sine Wave Inverter PCB Repair', desc: 'MOSFET replacement, driver IC testing, transformer coil winding, and error code diagnostics.' },
+    { title: 'Tubular & Lithium Battery Calibration', desc: 'Specific gravity acid balancing, equalization charge programming, and BMS communication wiring.' },
+    { title: 'Dual-Mode Changeover Panel Integration', desc: 'Manual and automatic transfer switches (ATS) with isolated neutral busbars.' },
+    { title: 'Load Shedding Automation & Overload Protection', desc: 'Fast millisecond relay switching for computers, medical units, and sensitive appliances.' },
   ],
-  plumbing: [
-    { title: 'Concealed Wall Seepage & Leak Detection', desc: 'Acoustic testing, non-destructive moisture tracing, and pipeline pressure inspection.' },
-    { title: 'Submersible Water Motor Installation', desc: 'Boring deep-well motor lowering, magnetic float switch, and overhead tank automation.' },
-    { title: 'PPRC & UPVC Sanitary Piping', desc: 'High-pressure heat-fusion hot/cold water pipeline fittings and bathroom sanitary remodeling.' },
-    { title: 'Gas & Electric Geyser Calibration', desc: 'Safe exhaust ventilation, non-return safety valve fitting, and pressure pump calibration.' },
+  'solar-installer': [
+    { title: 'Tier-1 Solar Array Mounting', desc: 'Heavy gauge galvanized structure, wind-load anchor bolt fastening, and optimal angle tilt.' },
+    { title: 'Hybrid & On-Grid Inverter Commissioning', desc: 'MPPT charge controller synchronization, net-metering three-phase calibration, and battery balancing.' },
+    { title: 'DC Breakers & Lightning Surge Protection', desc: 'SPD class II surge arrester integration, copper earth pit rod boring, and fire-resistant DC cabling.' },
+    { title: 'Performance Remote Monitoring Setup', desc: 'Wi-Fi datalogger configuration, cloud mobile dashboard tracking, and shading loss optimization.' },
   ],
-  'plumbing-services': [
-    { title: 'Concealed Wall Seepage & Leak Detection', desc: 'Acoustic testing, non-destructive moisture tracing, and pipeline pressure inspection.' },
-    { title: 'Submersible Water Motor Installation', desc: 'Boring deep-well motor lowering, magnetic float switch, and overhead tank automation.' },
-    { title: 'PPRC & UPVC Sanitary Piping', desc: 'High-pressure heat-fusion hot/cold water pipeline fittings and bathroom sanitary remodeling.' },
-    { title: 'Gas & Electric Geyser Calibration', desc: 'Safe exhaust ventilation, non-return safety valve fitting, and pressure pump calibration.' },
-  ],
-  generator: [
+  'generator-repair': [
     { title: 'Engine Overhaul & Tappet Clearance', desc: 'Valve clearance adjustment, cylinder compression check, and spark plug calibration.' },
     { title: 'Digital AVR & Alternator Repair', desc: 'Automatic voltage regulator replacement, carbon brush alignment, and frequency tuning.' },
     { title: 'Carburetor & Dual-Fuel Gas Kits', desc: 'CNG/LPG zero-pressure regulator installation and ultrasonic carburetor clearing.' },
     { title: 'ATS Relay Wiring & Starter Solenoids', desc: 'Auto-start relay integration, trickle battery charger setup, and starter motor servicing.' },
   ],
-  'generator-services': [
-    { title: 'Engine Overhaul & Tappet Clearance', desc: 'Valve clearance adjustment, cylinder compression check, and spark plug calibration.' },
-    { title: 'Digital AVR & Alternator Repair', desc: 'Automatic voltage regulator replacement, carbon brush alignment, and frequency tuning.' },
-    { title: 'Carburetor & Dual-Fuel Gas Kits', desc: 'CNG/LPG zero-pressure regulator installation and ultrasonic carburetor clearing.' },
-    { title: 'ATS Relay Wiring & Starter Solenoids', desc: 'Auto-start relay integration, trickle battery charger setup, and starter motor servicing.' },
+
+  // Water & Plumbing
+  plumber: [
+    { title: 'Concealed Wall Seepage & Leak Detection', desc: 'Acoustic testing, non-destructive moisture tracing, and pipeline pressure inspection.' },
+    { title: 'Submersible Water Motor Installation', desc: 'Boring deep-well motor lowering, magnetic float switch, and overhead tank automation.' },
+    { title: 'PPRC & UPVC Sanitary Piping', desc: 'High-pressure heat-fusion hot/cold water pipeline fittings and bathroom sanitary remodeling.' },
+    { title: 'Gas & Electric Geyser Calibration', desc: 'Safe exhaust ventilation, non-return safety valve fitting, and pressure pump calibration.' },
   ],
-  food: [
-    { title: 'Daily Office Lunch Delivery', desc: 'Hygienic fresh home-cooked meal boxes with premium basmati rice and canola oil preparation.' },
-    { title: 'Bulk Event & Daawat Catering', desc: 'Traditional mutton degi biryani, qorma, and custom desserts for family gatherings.' },
-    { title: 'Custom Diet & Diabetic Meal Plans', desc: 'Low-sodium, steamed vegetable, and portion-controlled wholesome meal prep.' },
-    { title: 'Homemade Sweets & Frozen Snacks', desc: 'Handcrafted samosas, shami kababs, and seasonal traditional mithai.' },
+  'water-pump-repair': [
+    { title: 'Impeller & Mechanical Seal Replacement', desc: 'Stainless steel impeller balancing, carbon-ceramic water seal leak stopping, and vibration dampening.' },
+    { title: 'Submersible Boring Motor Overhaul', desc: 'Deep-well copper stator rewinding, thrust bearing replacement, and waterproof splicing.' },
+    { title: 'Automatic Pressure Controller Calibration', desc: 'Digital pressure switch calibration, pressure tank diaphragm bladder replacement, and dry-run protection.' },
+    { title: 'Sweet Water Suction Line Priming', desc: 'Non-return check valve installation, foot valve clearing, and high-efficiency suction optimization.' },
   ],
-  'home-chef': [
-    { title: 'Daily Office Lunch Delivery', desc: 'Hygienic fresh home-cooked meal boxes with premium basmati rice and canola oil preparation.' },
-    { title: 'Bulk Event & Daawat Catering', desc: 'Traditional mutton degi biryani, qorma, and custom desserts for family gatherings.' },
-    { title: 'Custom Diet & Diabetic Meal Plans', desc: 'Low-sodium, steamed vegetable, and portion-controlled wholesome meal prep.' },
-    { title: 'Homemade Sweets & Frozen Snacks', desc: 'Handcrafted samosas, shami kababs, and seasonal traditional mithai.' },
+  'water-boring': [
+    { title: 'Deep Rotary & Percussion Well Drilling', desc: 'High-yield water stratum targeting, geological layer inspection, and heavy casing pipe lowering.' },
+    { title: 'Slotted Screen & Gravel Pack Filtration', desc: 'High-grade PVC strainer slotting, silica gravel packing, and silt prevention.' },
+    { title: 'Submersible Column Pipe & Cable Drop', desc: 'Corrosion-proof uPVC column pipes, safety stainless wire rope tethering, and underwater cable connection.' },
+    { title: 'Well Jetting & Compressor Mud Flushing', desc: 'High-CFM air compressor flushing, sand removal, and crystal clear water output testing.' },
   ],
-  cleaning: [
-    { title: 'Deep Home & Apartment Sanitization', desc: 'Floor grout scrubbing, window frame degreasing, and anti-dust detailing.' },
-    { title: 'Sofa & Carpet Injection-Extraction', desc: 'High-pressure steam extraction shampooing with anti-bacterial odor neutralizer.' },
-    { title: 'Water Tank Cleaning & Chlorination', desc: 'Underground and overhead tank sludge removal, pressure washing, and UV disinfection.' },
-    { title: 'Kitchen & Chimney Degreasing', desc: 'Commercial grade non-acidic solvent cleaning for exhaust hoods and cooktops.' },
+  'water-tank-cleaning': [
+    { title: 'Sludge Dewatering & Slurry Extraction', desc: 'High-capacity submersible pump extraction of bottom mud, silt, and bacterial sediment.' },
+    { title: 'High-Pressure Rotary Jet Scrubbing', desc: 'Anti-microbial wall and floor cleaning without damaging underlying plaster or tile grout.' },
+    { title: 'Food-Grade Chemical & Chlorine Disinfection', desc: 'Safe non-toxic sanitization, bio-film removal, and algae neutralization.' },
+    { title: 'UV Sterilization & Water Quality Testing', desc: 'Ultraviolet immersion lamp sterilization, TDS and pH verification before refill.' },
   ],
-  'home-cleaning': [
-    { title: 'Deep Home & Apartment Sanitization', desc: 'Floor grout scrubbing, window frame degreasing, and anti-dust detailing.' },
-    { title: 'Sofa & Carpet Injection-Extraction', desc: 'High-pressure steam extraction shampooing with anti-bacterial odor neutralizer.' },
-    { title: 'Water Tank Cleaning & Chlorination', desc: 'Underground and overhead tank sludge removal, pressure washing, and UV disinfection.' },
-    { title: 'Kitchen & Chimney Degreasing', desc: 'Commercial grade non-acidic solvent cleaning for exhaust hoods and cooktops.' },
+
+  // Cooling & Home Appliances
+  'ac-technician': [
+    { title: 'Inverter AC Jet Chemical Wash', desc: 'High-pressure anti-bacterial indoor coil wash, blower wheel degreasing, and drainage tray clearing.' },
+    { title: 'Refrigerant Gas Leak & Refill', desc: 'Nitrogen leak testing, copper flare nut brazing, and genuine R410a / R32 refrigerant charging.' },
+    { title: 'Inverter PCB Motherboard Diagnostics', desc: 'Microcontroller troubleshooting, capacitor replacement, and indoor/outdoor communication error reset.' },
+    { title: 'Compressor & Fan Motor Overhaul', desc: 'Rotary/Scroll compressor replacement, run capacitor testing, and condenser fan motor servicing.' },
   ],
+  'fridge-repair': [
+    { title: 'Inverter Compressor Replacement & Brazing', desc: 'Variable-speed compressor testing, copper line brazing, and nitrogen leak sweep.' },
+    { title: 'Eco-Friendly R600a / R134a Gas Charging', desc: 'Precision digital micro-gram refrigerant charging and vacuum line dehydration.' },
+    { title: 'Defrost Timer & Bi-Metal Sensor Fix', desc: 'Frost build-up clearance, heater coil replacement, and thermistor calibration.' },
+    { title: 'Door Gasket Seal & Thermostat Repair', desc: 'Magnetic rubber gasket replacement, internal LED thermostat repair, and air flap calibration.' },
+  ],
+  'washing-machine-repair': [
+    { title: 'Front & Top Load Drum Bearing Replacement', desc: 'Spider arm assembly renewal, heavy-duty waterproof seal fitting, and spin balance restoration.' },
+    { title: 'Direct-Drive Motor & PCB Module Repair', desc: 'Hall sensor replacement, logic board microcontroller repair, and drain pump unblocking.' },
+    { title: 'Water Inlet Solenoid Valve & Pressure Sensor', desc: 'Electronic water level pressure switch recalibration and mesh filter descaling.' },
+    { title: 'Shock Absorber & Suspension Spring Renewal', desc: 'Heavy spin cycle vibration elimination and child-safety door latch mechanism fix.' },
+  ],
+  'geyser-repair': [
+    { title: 'Instant Gas Geyser Diaphragm & Microswitch', desc: 'Water-gas linkage valve service, pilot flame jet clearing, and automatic pulse igniter setup.' },
+    { title: 'Electric Water Heater Immersion Element', desc: 'Heavy copper heating rod replacement, magnesium anode rod renewal, and thermostat calibration.' },
+    { title: 'Safety Pressure Relief Valve (PRV) Fitting', desc: 'Over-pressure steam blow-off protection, non-return check valve, and explosion safeguard.' },
+    { title: 'Flue Venting & Carbon Monoxide Clearance', desc: 'Safe stainless steel exhaust chimney alignment and thermal cut-off sensor testing.' },
+  ],
+
+  // Maintenance & Construction
   carpenter: [
     { title: 'Modular Woodwork & Kitchen Cabinets', desc: 'UV sheet, tactile laminate, and solid wood modular kitchen cabinet manufacturing.' },
     { title: 'Door Lock & Hydraulic Hinge Fitting', desc: 'Concealed multi-point mortise lock installation, soft-close hinges, and door alignment.' },
     { title: 'Wooden Flooring & Parquet Decking', desc: 'HDF water-resistant laminate wooden parquet laying with sound-absorbing underlay.' },
     { title: 'Wardrobe & Closet Customization', desc: 'Sliding aluminum channel wardrobes with integrated LED profile lighting.' },
   ],
-  'carpenter-services': [
-    { title: 'Modular Woodwork & Kitchen Cabinets', desc: 'UV sheet, tactile laminate, and solid wood modular kitchen cabinet manufacturing.' },
-    { title: 'Door Lock & Hydraulic Hinge Fitting', desc: 'Concealed multi-point mortise lock installation, soft-close hinges, and door alignment.' },
-    { title: 'Wooden Flooring & Parquet Decking', desc: 'HDF water-resistant laminate wooden parquet laying with sound-absorbing underlay.' },
-    { title: 'Wardrobe & Closet Customization', desc: 'Sliding aluminum channel wardrobes with integrated LED profile lighting.' },
+  painter: [
+    { title: 'Interior & Exterior Wall Emulsion', desc: 'Premium silk matte, weather sheet exterior coatings, and anti-fungal prep.' },
+    { title: 'Wall Putty & Damp Seepage Treatment', desc: 'Chemical moisture barrier primer, crack bridging, and smooth stucco finish.' },
+    { title: 'Wood Polish & Deco Paint Finish', desc: 'Polyurethane spray polish, matte clear coat, and antique lacquer furniture buffing.' },
+    { title: 'Waterproofing & Roof Heat Insulation', desc: 'Elastomeric roof membrane coating, tile grout sealant, and thermal reflection paint.' },
+  ],
+  'aluminium-glass-worker': [
+    { title: 'Thermal Break Aluminium Window Fabrication', desc: 'Double-glazed soundproof glass panels, heavy gauge channel extrusion, and sliding tracks.' },
+    { title: 'Tempered Glass Shower Enclosures', desc: '10mm-12mm toughened frameless safety glass, stainless steel patch fittings, and waterproof silicone seals.' },
+    { title: 'Commercial Glass Doors & Floor Closers', desc: 'Heavy-duty hydraulic floor hinge installation, glass lock fittings, and alignment.' },
+    { title: 'Office Partitioning & Spider Glass Facades', desc: 'Acoustic gypsum-aluminium combo partitions and exterior curtain wall maintenance.' },
+  ],
+  welder: [
+    { title: 'Custom Iron Gate & Grille Fabrication', desc: 'Wrought iron entrance gates, burglar-proof window grilles, and decorative handrails.' },
+    { title: 'Heavy Structural Steel Beam Arc Welding', desc: 'I-beam column splicing, truss welding, and high-strength load bearing joints.' },
+    { title: 'MIG / TIG Stainless Steel Pipe Welding', desc: 'Argon gas shielded welding for sanitary pipes, railing joints, and hairline polish.' },
+    { title: 'Emergency Mobile On-Site Welding', desc: 'Portable welding generator repairs for broken hinges, terrace sheds, and water tank stands.' },
+  ],
+  mason: [
+    { title: 'Tile & Marble Precision Flooring', desc: 'Laser-leveled porcelain tile laying, zero-joint epoxy grouting, and marble diamond polishing.' },
+    { title: 'Brickwork, Plastering & Wall Raising', desc: 'Straight plumb-line masonry, moisture-proof plaster screed, and structural lintel casting.' },
+    { title: 'Bathroom Waterproofing & Slope Screed', desc: 'Multi-layer chemical elastomeric slurry coating and leakage-proof drain sunken slab prep.' },
+    { title: 'Demolition, Remodeling & Concrete Core Cutting', desc: 'Non-destructive partition wall removal, debris clearing, and reinforcement repairs.' },
+  ],
+
+  // Cleaning & Security
+  'pest-control': [
+    { title: 'Drill-Fill-Seal Termite Chemical Barrier', desc: 'Subterranean termite perimeter trenching, high-pressure wood injection, and warranty certificate.' },
+    { title: 'Bed Bug Heat & Residual Steam Treatment', desc: 'Non-toxic organic misting, mattress crevice steaming, and egg eradication.' },
+    { title: 'Cockroach & Ant Gel Bait Application', desc: 'Odorless German cockroach baiting, kitchen cabinet micro-droplet application, and child-safe formulas.' },
+    { title: 'Rodent & Mosquito Fogging Extermination', desc: 'Ultrasonic rat repellent traps, ULV cold fogging for gardens, and drainage spray.' },
+  ],
+  'sofa-carpet-cleaning': [
+    { title: 'Hot Water Extraction Carpet Shampooing', desc: 'High-pressure injection-extraction machine with anti-mite hypoallergenic detergent.' },
+    { title: 'Upholstery Fabric & Leather Sofa Detailing', desc: 'Deep stain lift for tea, coffee, and oil spots, followed by moisture vacuum drying.' },
+    { title: 'Mattress Sanitization & Dust Mite Extraction', desc: 'High-frequency vibrating vacuuming and medical-grade anti-allergen UV sanitization.' },
+    { title: 'Color-Safe Drying & Deodorizing', desc: 'Fast 3-hour air-blower drying with natural long-lasting fresh scent neutralizer.' },
+  ],
+  'cctv-installer': [
+    { title: 'IP & HD Night-Vision Camera Installation', desc: '4K Ultra-HD bullet and dome camera mounting with color night-vision IR sensors.' },
+    { title: 'NVR/DVR Configuration & Hard Drive Setup', desc: 'Continuous motion-detection recording, surveillance storage calculation, and UPS backup.' },
+    { title: 'Remote Smartphone Live Stream Integration', desc: 'Port forwarding, cloud P2P mobile app sync, and real-time push intrusion alerts.' },
+    { title: 'Structured Cat6 & Coaxial Concealed Cabling', desc: 'Weatherproof conduit pipe routing, RJ45 crimping, and video balun noise filtering.' },
+  ],
+  locksmith: [
+    { title: 'Emergency Residential & Commercial Lockout', desc: 'Non-destructive pick unlocking for jammed entrance doors, deadbolts, and cabinets.' },
+    { title: 'High-Security Multi-Point Mortise Locks', desc: 'Computerized anti-tamper lock cylinders, brass deadbolts, and security strike plates.' },
+    { title: 'Smart Digital Biometric Lock Installation', desc: 'Fingerprint, RFID card, PIN code, and mobile Wi-Fi smart door lock setup.' },
+    { title: 'Master Key System & Precision Duplication', desc: 'Unified master keying for offices and residential complexes, with precision laser cut keys.' },
+  ],
+
+  // Lifestyle & Miscellaneous
+  'home-chef': [
+    { title: 'Daily Office Lunch Delivery', desc: 'Hygienic fresh home-cooked meal boxes with premium basmati rice and canola oil preparation.' },
+    { title: 'Bulk Event & Daawat Catering', desc: 'Traditional mutton degi biryani, qorma, and custom desserts for family gatherings.' },
+    { title: 'Custom Diet & Diabetic Meal Plans', desc: 'Low-sodium, steamed vegetable, and portion-controlled wholesome meal prep.' },
+    { title: 'Homemade Sweets & Frozen Snacks', desc: 'Handcrafted samosas, shami kababs, and seasonal traditional mithai.' },
+  ],
+  'event-decorator': [
+    { title: 'Bespoke Floral & Balloon Arch Backdrops', desc: 'Premium organic balloon garlands, fresh flower wall installations, and metallic shimmer walls.' },
+    { title: 'Ambient Stage & Mood Lighting Arrangements', desc: 'Warm fairy lights, LED uplighting, neon signage lettering, and spotlighting.' },
+    { title: 'Theme Birthday, Mehndi & Daawat Styling', desc: 'Custom cake tables, dessert plinths, printed welcome boards, and bespoke table runners.' },
+    { title: 'Fast Setup & Post-Event Dismantling', desc: 'Professional punctual venue transformation with zero damage to walls or furniture.' },
+  ],
+  'movers-packers': [
+    { title: 'Multi-Layer Furniture Protective Wrapping', desc: 'High-density bubble wrap, stretch film, corrugated sheets, and corner edge guards.' },
+    { title: 'Appliance & Heavy Safe Relocation', desc: 'Specialized hydraulic hand trucks for American fridges, washing machines, and heavy pianos.' },
+    { title: 'Covered Container Vans & GPS Tracked Fleet', desc: 'Weatherproof enclosed cargo trucks with soft interior padding for long and short distance.' },
+    { title: 'Unpacking & Furniture Reassembly', desc: 'Bed frame bolting, wardrobe shelf realignment, curtain rod fixing, and carton box placement.' },
   ],
 };
 

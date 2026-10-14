@@ -3,14 +3,28 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import {
   Zap,
+  BatteryCharging,
+  Sun,
+  Power,
   Wrench,
+  Gauge,
+  Layers,
+  Waves,
   Wind,
-  Sparkles,
+  Snowflake,
+  RotateCw,
+  Flame,
   Hammer,
   Paintbrush,
-  Cpu,
-  Video,
-  Tv,
+  Frame,
+  Boxes,
+  Bug,
+  Armchair,
+  Camera,
+  Key,
+  Utensils,
+  PartyPopper,
+  Truck,
   Star,
   BadgeCheck,
   MapPin,
@@ -21,7 +35,7 @@ import {
   Clock,
 } from 'lucide-react';
 import HomepageSearchBar from '@/components/HomepageSearchBar';
-import { getAllProviders } from '@/lib/db';
+import { getAllProviders, CATEGORIES } from '@/lib/db';
 
 interface PageProps {
   params: Promise<{
@@ -30,6 +44,33 @@ interface PageProps {
 }
 
 const DOMAIN = 'https://baseera-services-directory.vercel.app';
+
+// Dynamic Icon Mapping for Lucide Icons
+const CATEGORY_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Zap,
+  BatteryCharging,
+  Sun,
+  Power,
+  Wrench,
+  Gauge,
+  Layers,
+  Waves,
+  Wind,
+  Snowflake,
+  RotateCw,
+  Flame,
+  Hammer,
+  Paintbrush,
+  Frame,
+  Boxes,
+  Bug,
+  Armchair,
+  Camera,
+  Key,
+  Utensils,
+  PartyPopper,
+  Truck,
+};
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
@@ -51,82 +92,6 @@ export default async function HomePage({ params }: PageProps) {
   const { lang } = await params;
   const providers = await getAllProviders();
 
-  // 3x3 Flat Grid Categories
-  const categories = [
-    {
-      id: 'ac',
-      name: 'AC & Cooling',
-      desc: 'Inverter gas charging, PCB cards & jet servicing',
-      icon: Wind,
-      count: '58+ Specialists',
-      slug: 'ac-repair',
-    },
-    {
-      id: 'electrician',
-      name: 'Electrician & Wiring',
-      desc: 'DB panels, inverter wiring & emergency power faults',
-      icon: Zap,
-      count: '42+ Specialists',
-      slug: 'electrician-services',
-    },
-    {
-      id: 'plumbing',
-      name: 'Plumbing & Boring',
-      desc: 'Underground leaks, sweet water motors & fittings',
-      icon: Wrench,
-      count: '37+ Specialists',
-      slug: 'plumbing-services',
-    },
-    {
-      id: 'cleaning',
-      name: 'Home Cleaning',
-      desc: 'Deep home sanitization, sofa & carpet shampooing',
-      icon: Sparkles,
-      count: '29+ Specialists',
-      slug: 'home-cleaning',
-    },
-    {
-      id: 'carpenter',
-      name: 'Carpenter',
-      desc: 'Custom furniture, door lock installation & repairs',
-      icon: Hammer,
-      count: '25+ Specialists',
-      slug: 'carpenter-services',
-    },
-    {
-      id: 'painter',
-      name: 'Painting & Polish',
-      desc: 'Interior wall paint, damp proofing & deco polish',
-      icon: Paintbrush,
-      count: '31+ Specialists',
-      slug: 'painting-services',
-    },
-    {
-      id: 'generator',
-      name: 'Generator Service',
-      desc: 'Gas/petrol generator tuning, AVR & self starter',
-      icon: Cpu,
-      count: '19+ Specialists',
-      slug: 'generator-services',
-    },
-    {
-      id: 'cctv',
-      name: 'CCTV & Security',
-      desc: 'HD IP camera installation, DVR setup & remote view',
-      icon: Video,
-      count: '31+ Specialists',
-      slug: 'cctv-security',
-    },
-    {
-      id: 'appliances',
-      name: 'Appliance Repair',
-      desc: 'Automatic washing machines, refrigerators & ovens',
-      icon: Tv,
-      count: '36+ Specialists',
-      slug: 'appliance-repair',
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-white text-neutral-900 pb-20 md:pb-12">
       {/* 1. HERO SECTION */}
@@ -134,7 +99,7 @@ export default async function HomePage({ params }: PageProps) {
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-6">
             <span className="w-2 h-2 rounded-full bg-[#059669]" />
-            Direct Karigar & Specialist Directory
+            Direct Karigar &amp; Specialist Directory
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-neutral-900 leading-[1.15] mb-4">
@@ -150,52 +115,47 @@ export default async function HomePage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* 2. 3x3 CATEGORIES FLAT GRID */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+      {/* 2. BROWSE BY SPECIALTY (PREMIUM HORIZONTAL SCROLLABLE SECTION) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+        {/* Section Header */}
+        <div className="flex items-end justify-between gap-4 mb-6">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-neutral-900">
-              Explore by Category
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900">
+              Browse by Specialty
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Select a trade to view available verified technicians near you
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">
+              Verified community technicians &amp; specialists worldwide
             </p>
           </div>
-          <Link
-            href={`/${lang}/vendors`}
-            className="text-xs font-semibold text-[#059669] hover:underline flex items-center gap-1 shrink-0"
-          >
-            <span>View All Categories</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
+          <div className="text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0">
+            {CATEGORIES.length} Categories
+          </div>
         </div>
 
-        {/* 3x3 Responsive Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {categories.map((cat) => {
-            const Icon = cat.icon;
+        {/* Horizontal Scrollable Container */}
+        <div className="flex overflow-x-auto gap-4 pb-4 scrollbar-hide snap-x scroll-smooth -mx-4 px-4 sm:mx-0 sm:px-0">
+          {CATEGORIES.map((cat) => {
+            const IconComponent = CATEGORY_ICON_MAP[cat.icon] || Wrench;
             return (
               <Link
                 key={cat.id}
                 href={`/${lang}/pk/karachi/${cat.slug}`}
-                className="group bg-white border border-gray-200 rounded-xl p-5 hover:border-[#059669] transition-colors flex items-start gap-4"
+                className="bg-white border border-gray-200 rounded-xl min-w-[140px] w-[140px] p-4 flex flex-col items-center justify-center text-center transition-all hover:border-emerald-600 snap-start shrink-0 group cursor-pointer"
               >
-                <div className="w-11 h-11 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center text-[#059669] group-hover:bg-emerald-50 transition-colors shrink-0">
-                  <Icon className="w-5 h-5 stroke-[1.8]" />
+                {/* Soft circular background behind icon */}
+                <div className="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center mb-3 group-hover:bg-emerald-50 transition-colors">
+                  <IconComponent className="text-emerald-700 w-6 h-6" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-base font-bold text-neutral-900 group-hover:text-[#059669] transition-colors truncate">
-                      {cat.name}
-                    </h3>
-                    <span className="text-[11px] font-medium text-gray-500 shrink-0">
-                      {cat.count}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1 leading-normal line-clamp-2">
-                    {cat.desc}
-                  </p>
-                </div>
+
+                {/* Two-line clamped Title */}
+                <span className="text-sm font-semibold text-gray-900 leading-tight line-clamp-2 h-9 flex items-center justify-center">
+                  {cat.name}
+                </span>
+
+                {/* Active provider count Subtext */}
+                <span className="text-xs text-gray-500 mt-1">
+                  {cat.count}+ Active
+                </span>
               </Link>
             );
           })}
@@ -229,7 +189,7 @@ export default async function HomePage({ params }: PageProps) {
           </div>
 
           {/* Horizontal Scroll Track */}
-          <div className="flex gap-4 overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none snap-x">
+          <div className="flex gap-4 overflow-x-auto pb-4 pt-1 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide snap-x">
             {providers.map((provider) => {
               const cleanPhone = provider.whatsapp_number.replace(/[^0-9]/g, '');
               const whatsappLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(

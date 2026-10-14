@@ -16,11 +16,12 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
   const [isFocused, setIsFocused] = useState(false);
 
   const popularSearches = [
-    { title: 'AC Repair', category: 'ac-repair' },
-    { title: 'Electrician', category: 'electrician-services' },
-    { title: 'Plumbing', category: 'plumbing-services' },
-    { title: 'Home Cleaning', category: 'home-cleaning' },
-    { title: 'Carpenter', category: 'carpenter-services' },
+    { title: 'AC Technician', category: 'ac-technician' },
+    { title: 'Electrician', category: 'electrician' },
+    { title: 'Plumber', category: 'plumber' },
+    { title: 'Carpenter', category: 'carpenter' },
+    { title: 'Painter', category: 'painter' },
+    { title: 'Home Chef', category: 'home-chef' },
   ];
 
   const handleSearch = (e: React.FormEvent) => {
