@@ -133,61 +133,146 @@ export default async function RootLayout({
         {/* Dynamic Page Content */}
         <main className="flex-1 w-full">{children}</main>
 
-        {/* Global Footer with Tagline, Legal Pages & Cross-Region Hreflang Links */}
-        <footer className="bg-white border-t border-gray-200 pt-10 pb-20 md:pb-10 mt-16 font-sans">
+        {/* Global Professional Unified Footer */}
+        <footer className="bg-white border-t border-gray-200/90 pt-12 pb-24 md:pb-12 mt-20 font-sans text-neutral-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Top row: Brand & Tagline + Institutional Legal Pages */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-gray-100">
-              {/* Brand & Tagline */}
-              <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-                <span className="font-extrabold text-neutral-900 tracking-tight">Baseera</span>
-                <span className="text-gray-300">•</span>
-                <span className="text-gray-600 font-medium">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10 pb-10 border-b border-gray-100">
+              {/* Brand & Mission Column (2 cols wide on desktop) */}
+              <div className="sm:col-span-2 space-y-3">
+                <Link href={`/${lang}`} className="inline-flex items-center gap-2 group">
+                  <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#059669] to-[#047857] flex items-center justify-center text-white shadow-2xs group-hover:scale-105 transition-transform shrink-0">
+                    <svg
+                      className="w-4 h-4 fill-current"
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                    >
+                      <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+                    </svg>
+                  </div>
+                  <div className="flex flex-col leading-none">
+                    <span className="font-extrabold text-base text-gray-900 tracking-tight">
+                      Baseera
+                    </span>
+                    <span className="text-[9px] text-emerald-700 font-bold tracking-widest uppercase mt-0.5">
+                      Directory
+                    </span>
+                  </div>
+                </Link>
+
+                <p className="text-xs sm:text-sm font-semibold text-neutral-900">
                   Zero intermediary commission. 100% direct connection.
-                </span>
+                </p>
+
+                <p className="text-xs text-gray-500 leading-relaxed max-w-sm">
+                  Connecting verified local specialists and households with direct WhatsApp communication and zero platform markups.
+                </p>
+
+                <div className="pt-1">
+                  <Link
+                    href={`/${lang}/join`}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold bg-[#059669] hover:bg-[#047857] text-white px-3.5 py-1.5 rounded-full transition-all shadow-2xs"
+                  >
+                    <span>+ List Your Service</span>
+                  </Link>
+                </div>
               </div>
 
-              {/* Legal & Directory Links */}
-              <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs text-gray-500">
-                <Link href={`/${lang}/about`} className="hover:text-emerald-700 transition-colors">
-                  About Us
-                </Link>
-                <Link href={`/${lang}/privacy`} className="hover:text-emerald-700 transition-colors">
-                  Privacy Policy
-                </Link>
-                <Link href={`/${lang}/terms`} className="hover:text-emerald-700 transition-colors">
-                  Terms &amp; Conditions
-                </Link>
-                <Link href={`/${lang}/join`} className="hover:text-emerald-700 font-semibold text-[#059669] transition-colors">
-                  + List Service
-                </Link>
+              {/* Column 2: Directory */}
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                  Directory
+                </h3>
+                <ul className="space-y-2 text-xs text-gray-500">
+                  <li>
+                    <Link href={`/${lang}`} className="hover:text-emerald-700 transition-colors">
+                      Home
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/${lang}/vendors`} className="hover:text-emerald-700 transition-colors">
+                      Find Specialists
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/${lang}/blog`} className="hover:text-emerald-700 transition-colors">
+                      Guides &amp; Articles
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/${lang}/join`} className="hover:text-emerald-700 transition-colors">
+                      Provider Registration
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Column 3: Company & Legal */}
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                  Company &amp; Legal
+                </h3>
+                <ul className="space-y-2 text-xs text-gray-500">
+                  <li>
+                    <Link href={`/${lang}/about`} className="hover:text-emerald-700 transition-colors">
+                      About Us
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/${lang}/privacy`} className="hover:text-emerald-700 transition-colors">
+                      Privacy Policy
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/${lang}/terms`} className="hover:text-emerald-700 transition-colors">
+                      Terms &amp; Conditions
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Column 4: Top Cities */}
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
+                  Top Cities
+                </h3>
+                <ul className="space-y-2 text-xs text-gray-500">
+                  <li>
+                    <Link href={`/${lang}/pk/karachi`} className="hover:text-emerald-700 transition-colors">
+                      Karachi
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/${lang}/pk/lahore`} className="hover:text-emerald-700 transition-colors">
+                      Lahore
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/${lang}/pk/islamabad`} className="hover:text-emerald-700 transition-colors">
+                      Islamabad
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/${lang}/ae/dubai`} className="hover:text-emerald-700 transition-colors">
+                      Dubai
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href={`/${lang}/sa/riyadh`} className="hover:text-emerald-700 transition-colors">
+                      Riyadh
+                    </Link>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            {/* Bottom row: Global Hubs & Copyright */}
-            <div className="pt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-gray-400">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="font-semibold text-gray-500">Global Hubs:</span>
-                <Link href={`/${lang}/pk/karachi`} className="hover:text-emerald-700 transition-colors">
-                  Karachi (PK)
-                </Link>
-                <Link href={`/${lang}/pk/lahore`} className="hover:text-emerald-700 transition-colors">
-                  Lahore (PK)
-                </Link>
-                <Link href={`/${lang}/pk/islamabad`} className="hover:text-emerald-700 transition-colors">
-                  Islamabad (PK)
-                </Link>
-                <Link href={`/${lang}/ae/dubai`} className="hover:text-emerald-700 transition-colors">
-                  Dubai (AE)
-                </Link>
-                <Link href={`/${lang}/sa/riyadh`} className="hover:text-emerald-700 transition-colors">
-                  Riyadh (SA)
-                </Link>
-              </div>
-
-              <div>
+            {/* Bottom Copyright & Single Clean Subline */}
+            <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
+              <p>
                 &copy; {new Date().getFullYear()} Baseera Local Services Directory. All rights reserved.
-              </div>
+              </p>
+              <p className="text-[11px] text-gray-400">
+                Direct Karigar Directory • Zero Intermediary Fees
+              </p>
             </div>
           </div>
         </footer>
