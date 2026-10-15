@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Provider, getCategoryBySlug, getCategoryName, getLocalizedCityName } from '@/lib/db';
+import { Provider, getCategoryBySlug, getCategoryName, getLocalizedCityName, toTitleCase } from '@/lib/db';
 import { formatVisitingPrice } from '@/lib/currencies';
 import {
   Star,
@@ -185,8 +185,10 @@ export default function FeaturedProvidersSlider({ providers, lang, title, badge,
 
           const cityDisplay = getLocalizedCityName(provider.city_slug, lang);
 
-          const catObj = getCategoryBySlug(provider.category_id);
-          const categoryName = catObj ? getCategoryName(catObj, lang) : provider.category_id;
+          // Ensure raw slugs (like car-mechanic) are never shown: capitalize and translate
+          const categoryName =
+            getCategoryName(provider.category_id, lang) ||
+            toTitleCase(provider.category_id);
 
           return (
             <Link

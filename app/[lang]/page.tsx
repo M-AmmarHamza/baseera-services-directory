@@ -265,7 +265,7 @@ export default async function HomePage({ params }: PageProps) {
               <ShieldCheck className="w-6 h-6 text-[#059669] mb-3" />
               <h3 className={`text-lg font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2] mb-3 pt-1' : 'leading-snug mb-1.5'}`}>{dict.home?.valProp1Title || 'Direct Verified Karigars'}</h3>
               <p className={`text-base text-gray-600 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5]' : 'leading-relaxed'}`}>
-                {dict.home?.valProp1Desc || 'Specialists submit national identification and technical proof before receiving the green verified badge.'}
+                {dict.home?.valProp1Desc || 'Verified via active WhatsApp connectivity and genuine community feedback.'}
               </p>
             </div>
 

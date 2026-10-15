@@ -345,22 +345,27 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
       {/* Quick Category Search Chips (Auto-directed to the selected city) */}
       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3.5 justify-center text-xs text-gray-500 overflow-visible">
         <span className={`font-medium text-gray-400 ${lang === 'ur' ? 'font-urdu text-sm' : ''}`}>{t.popular}</span>
-        {t.popularSearches.map((item) => (
-          <button
-            key={item.category}
-            type="button"
-            onClick={() => handleChipClick(item.category)}
-            className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center overflow-visible ${
-              lang === 'ur'
-                ? 'font-urdu leading-[2.3] min-h-[40px] pt-1.5 pb-1'
-                : 'min-h-[32px]'
-            }`}
-          >
-            <span className={lang === 'ur' ? 'font-urdu leading-[2.3] overflow-visible inline-block' : ''}>
-              {item.title}
-            </span>
-          </button>
-        ))}
+        {t.popularSearches.map((item) => {
+          const countryCode = (selectedCity?.countryCode || 'pk').toLowerCase();
+          const citySlug = (selectedCity?.slug || 'karachi').toLowerCase();
+          const href = `/${lang}/${countryCode}/${citySlug}/${item.category}`;
+
+          return (
+            <Link
+              key={item.category}
+              href={href}
+              className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gray-50 hover:bg-emerald-50 hover:text-[#006948] hover:border-emerald-200 border border-gray-200 text-gray-700 text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center overflow-visible ${
+                lang === 'ur'
+                  ? 'font-urdu leading-[2.3] min-h-[40px] pt-1.5 pb-1'
+                  : 'min-h-[32px]'
+              }`}
+            >
+              <span className={lang === 'ur' ? 'font-urdu leading-[2.3] overflow-visible inline-block' : ''}>
+                {item.title}
+              </span>
+            </Link>
+          );
+        })}
       </div>
 
       {/* 2. MINIMALIST FLAT CITY SELECTION MODAL */}

@@ -1157,7 +1157,15 @@ export const CATEGORIES: CategoryDef[] = [
 export function getCategoryName(catOrSlug: CategoryDef | string | undefined | null, lang = 'en'): string {
   if (!catOrSlug) return '';
   const cat = typeof catOrSlug === 'string' ? getCategoryBySlug(catOrSlug) : catOrSlug;
-  if (!cat) return typeof catOrSlug === 'string' ? toTitleCase(catOrSlug) : '';
+  if (!cat) {
+    if (typeof catOrSlug === 'string') {
+      const clean = catOrSlug.toLowerCase().trim();
+      if (lang === 'ur' && (clean === 'car-mechanic' || clean === 'auto-mechanic')) return 'کار مکینک';
+      if (lang === 'ar' && (clean === 'car-mechanic' || clean === 'auto-mechanic')) return 'ميكانيكي سيارات';
+      return toTitleCase(catOrSlug);
+    }
+    return '';
+  }
   if (lang === 'ur' && cat.nameUr) return cat.nameUr;
   if (lang === 'ar' && cat.nameAr) return cat.nameAr;
   return cat.name;

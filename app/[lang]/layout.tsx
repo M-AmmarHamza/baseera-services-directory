@@ -204,10 +204,10 @@ export default async function RootLayout({
 
               {/* Column 4: Top Cities */}
               <div className="space-y-3">
-                <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+                <h3 className={`text-sm font-bold text-gray-900 uppercase tracking-wider ${lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}`}>
                   {dict.footer?.colTopCities || 'Top Cities'}
                 </h3>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className={`space-y-2 text-sm text-gray-600 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
                   <li>
                     <Link href={`/${lang}/pk/karachi`} className="hover:text-emerald-700 transition-colors">
                       {lang === 'ur' ? 'کراچی' : lang === 'ar' ? 'كراتشي' : 'Karachi'}
