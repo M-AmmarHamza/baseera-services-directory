@@ -118,7 +118,7 @@ export const SEED_PROVIDERS: Provider[] = [
   },
   {
     id: 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b',
-    name: 'Saleem Akhtar (Master Plumber)',
+    name: 'Saleem Akhtar',
     slug: 'saleem-master-plumber',
     profile_type: 'individual',
     category_id: 'plumber',
@@ -160,9 +160,9 @@ export const SEED_PROVIDERS: Provider[] = [
   },
   {
     id: 'a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d',
-    name: 'Asif Ali Electric Works',
+    name: 'Asif Ali',
     slug: 'asif-electric-works',
-    profile_type: 'shop',
+    profile_type: 'individual',
     category_id: 'electrician',
     trade_title: 'Emergency Wiring & Industrial Motor Works',
     city_slug: 'karachi',
@@ -181,7 +181,7 @@ export const SEED_PROVIDERS: Provider[] = [
   },
   {
     id: 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e',
-    name: 'Ustad Imtiaz Carpenter',
+    name: 'Ustad Imtiaz',
     slug: 'imtiaz-wood-craft',
     profile_type: 'individual',
     category_id: 'carpenter',
@@ -202,7 +202,7 @@ export const SEED_PROVIDERS: Provider[] = [
   },
   {
     id: 'c9d0e1f2-a3b4-5c6d-7e8f-9a0b1c2d3e4f',
-    name: 'Zahid Hussain Painter',
+    name: 'Zahid Hussain',
     slug: 'zahid-master-painter',
     profile_type: 'individual',
     category_id: 'painter',
@@ -223,10 +223,10 @@ export const SEED_PROVIDERS: Provider[] = [
   },
   {
     id: 'd0e1f2a3-b4c5-6d7e-8f9a-0b1c2d3e4f5a',
-    name: 'Kamran Solar & DB Works',
+    name: 'Kamran Khan',
     slug: 'kamran-solar-electric',
-    profile_type: 'shop',
-    category_id: 'electrician',
+    profile_type: 'individual',
+    category_id: 'solar-installer',
     trade_title: 'Hybrid Solar & Net-Metering Inverter Engineer',
     city_slug: 'lahore',
     country_code: 'pk',
@@ -265,10 +265,10 @@ export const SEED_PROVIDERS: Provider[] = [
   },
   {
     id: 'f2a3b4c5-d6e7-8f9a-0b1c-2d3e4f5a6b7c',
-    name: 'Hamza Smart CCTV',
+    name: 'Hamza Farooq',
     slug: 'hamza-cctv-security',
-    profile_type: 'shop',
-    category_id: 'cctv-security',
+    profile_type: 'individual',
+    category_id: 'cctv-technician',
     trade_title: '4K IP Surveillance & Remote Monitoring Expert',
     city_slug: 'karachi',
     country_code: 'pk',
@@ -286,10 +286,10 @@ export const SEED_PROVIDERS: Provider[] = [
   },
   {
     id: 'a3b4c5d6-e7f8-9a0b-1c2d-3e4f5a6b7c8d',
-    name: 'Bilal Auto Diagnostics',
+    name: 'Bilal Ahmed',
     slug: 'bilal-auto-mechanic',
-    profile_type: 'shop',
-    category_id: 'auto-mechanic',
+    profile_type: 'individual',
+    category_id: 'car-mechanic',
     trade_title: 'EFI Computerized Engine & Suspension Specialist',
     city_slug: 'karachi',
     country_code: 'pk',
@@ -307,7 +307,7 @@ export const SEED_PROVIDERS: Provider[] = [
   },
   {
     id: 'b4c5d6e7-f8a9-0b1c-2d3e-4f5a6b7c8d9e',
-    name: 'Naeem Ullah Sanitary & Boring',
+    name: 'Naeem Ullah',
     slug: 'naeem-sanitary-plumber',
     profile_type: 'individual',
     category_id: 'plumber',
@@ -331,7 +331,7 @@ export const SEED_PROVIDERS: Provider[] = [
     name: 'Al-Maktoum Auto Care',
     slug: 'al-maktoum-auto-repair',
     profile_type: 'shop',
-    category_id: 'auto-mechanic',
+    category_id: 'car-mechanic',
     trade_title: 'German & Japanese Auto AC & Transmission',
     city_slug: 'dubai',
     country_code: 'ae',
@@ -349,7 +349,7 @@ export const SEED_PROVIDERS: Provider[] = [
   },
   {
     id: 'd6e7f8a9-b0c1-2d3e-4f5a-6b7c8d9e0f1a',
-    name: 'Sajid Cool Point',
+    name: 'Sajid Mehmood',
     slug: 'sajid-cool-point',
     profile_type: 'individual',
     category_id: 'ac-technician',
@@ -370,9 +370,9 @@ export const SEED_PROVIDERS: Provider[] = [
   },
   {
     id: 'e7f8a9b0-c1d2-3e4f-5a6b-7c8d9e0f1a2b',
-    name: 'Master Altaf Woodcraft',
+    name: 'Master Altaf',
     slug: 'altaf-furniture-art',
-    profile_type: 'shop',
+    profile_type: 'individual',
     category_id: 'carpenter',
     trade_title: 'Sheesham Furniture Restoration & Lacquer Polish',
     city_slug: 'rawalpindi',
@@ -968,41 +968,102 @@ async function fetchSupabase<T>(path: string): Promise<T | null> {
 }
 
 export async function getProviders(citySlug: string, categorySlug?: string): Promise<Provider[]> {
+  const normCity = (citySlug || 'karachi').toLowerCase();
   const category = categorySlug ? getCategoryBySlug(categorySlug) : null;
-  const targetCategoryIds = category ? [category.id, category.slug] : categorySlug ? [categorySlug] : [];
+  const targetCategoryIds = category ? [category.id, category.slug] : categorySlug ? [categorySlug.toLowerCase()] : [];
 
-  let queryPath = `providers?select=*,cities!inner(slug),countries!inner(code)&cities.slug=eq.${encodeURIComponent(citySlug.toLowerCase())}`;
-  if (category) {
-    queryPath += `&category_id=in.(${targetCategoryIds.map(encodeURIComponent).join(',')})`;
+  let dbProviders: Provider[] = [];
+  try {
+    let queryPath = `providers?select=*,cities!inner(slug),countries!inner(code)&cities.slug=eq.${encodeURIComponent(normCity)}`;
+    if (category) {
+      queryPath += `&category_id=in.(${targetCategoryIds.map(encodeURIComponent).join(',')})`;
+    }
+    const dbRows = await fetchSupabase<any[]>(queryPath);
+    if (dbRows && dbRows.length > 0) {
+      dbProviders = dbRows.map((r) => mapDbProvider(r, normCity));
+    }
+  } catch (err) {
+    console.warn('getProviders fetch note:', err);
   }
 
-  const dbRows = await fetchSupabase<any[]>(queryPath);
-  if (dbRows && dbRows.length > 0) {
-    return dbRows.map((r) => mapDbProvider(r, citySlug));
-  }
-
-  // Fallback seed
-  return SEED_PROVIDERS.filter((p) => {
-    const cityMatch = p.city_slug.toLowerCase() === citySlug.toLowerCase();
+  // Matching seed providers for this city and category
+  const matchingSeeds = SEED_PROVIDERS.filter((p) => {
+    const cityMatch = p.city_slug.toLowerCase() === normCity;
     if (!categorySlug) return cityMatch;
     const catMatch =
       p.category_id.toLowerCase() === categorySlug.toLowerCase() ||
       (category && p.category_id.toLowerCase() === category.id.toLowerCase()) ||
       (category && category.aliases?.includes(p.category_id.toLowerCase())) ||
-      p.slug.includes(categorySlug);
+      p.slug.toLowerCase().includes(categorySlug.toLowerCase());
     return cityMatch && catMatch;
   });
+
+  // Combine DB providers + Seed providers without duplicate slugs
+  const seenSlugs = new Set<string>();
+  const combined: Provider[] = [];
+
+  for (const pro of [...dbProviders, ...matchingSeeds]) {
+    const s = pro.slug.toLowerCase();
+    if (!seenSlugs.has(s)) {
+      seenSlugs.add(s);
+      combined.push(pro);
+    }
+  }
+
+  return combined;
 }
 
 export async function getProviderBySlug(citySlug: string, categorySlug: string, providerSlug: string): Promise<Provider | null> {
+  const normSlug = (providerSlug || '').toLowerCase();
+  const normCity = (citySlug || 'karachi').toLowerCase();
+
+  // 1. Direct query in Supabase by slug
+  try {
+    const dbRows = await fetchSupabase<any[]>(
+      `providers?select=*,cities!inner(slug),countries!inner(code)&slug=eq.${encodeURIComponent(normSlug)}`
+    );
+    if (dbRows && dbRows.length > 0) {
+      return mapDbProvider(dbRows[0], normCity);
+    }
+  } catch (err) {
+    console.warn('getProviderBySlug direct fetch note:', err);
+  }
+
+  // 2. Direct match in SEED_PROVIDERS by exact slug or normalized slug
+  const seed = SEED_PROVIDERS.find(
+    (p) => p.slug.toLowerCase() === normSlug || p.slug.toLowerCase().replace(/-/g, '') === normSlug.replace(/-/g, '')
+  );
+  if (seed) {
+    return seed;
+  }
+
+  // 3. Fallback: search across all providers in this city & category
   const providers = await getProviders(citySlug, categorySlug);
-  return providers.find((p) => p.slug === providerSlug) || null;
+  return providers.find((p) => p.slug.toLowerCase() === normSlug) || null;
 }
 
 export async function getAllProviders(): Promise<Provider[]> {
-  const dbRows = await fetchSupabase<any[]>('providers?select=*,cities!inner(slug),countries!inner(code)');
-  if (dbRows && dbRows.length > 0) {
-    return dbRows.map((r) => mapDbProvider(r, 'karachi'));
+  let dbProviders: Provider[] = [];
+  try {
+    const dbRows = await fetchSupabase<any[]>('providers?select=*,cities!inner(slug),countries!inner(code)');
+    if (dbRows && dbRows.length > 0) {
+      dbProviders = dbRows.map((r) => mapDbProvider(r, 'karachi'));
+    }
+  } catch (err) {
+    console.warn('getAllProviders fetch note:', err);
   }
-  return SEED_PROVIDERS;
+
+  // Combine DB providers + Seed providers so all featured profiles remain accessible
+  const seenSlugs = new Set<string>();
+  const combined: Provider[] = [];
+
+  for (const pro of [...dbProviders, ...SEED_PROVIDERS]) {
+    const s = pro.slug.toLowerCase();
+    if (!seenSlugs.has(s)) {
+      seenSlugs.add(s);
+      combined.push(pro);
+    }
+  }
+
+  return combined;
 }
