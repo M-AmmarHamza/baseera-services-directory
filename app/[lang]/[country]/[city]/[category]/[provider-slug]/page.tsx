@@ -16,6 +16,7 @@ import {
 import { WhatsAppIcon } from '@/components/Icons';
 import { getDictionary } from '@/lib/get-dictionary';
 import { getProviderBySlug, getCategoryBySlug } from '@/lib/db';
+import { getProviderCoverUrl, getProviderAvatarUrl } from '@/lib/category-banners';
 import ProviderImageSlider from '@/components/ProviderImageSlider';
 import ProviderContactFAB from '@/components/ProviderContactFAB';
 
@@ -195,6 +196,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   const { lang, country, city, category } = resolvedParams;
   const slug = resolvedParams['provider-slug'];
   const provider = await getProviderBySlug(city, category, slug);
+  const categoryInfo = getCategoryBySlug(category);
 
   if (!provider) {
     return {
@@ -228,10 +230,10 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
       siteName: 'Baseera Local Services Directory',
       images: [
         {
-          url: provider.avatar_url,
-          width: 800,
-          height: 600,
-          alt: provider.name,
+          url: getProviderCoverUrl(provider),
+          width: 1200,
+          height: 630,
+          alt: `${provider.name} - ${categoryInfo?.name || category} in ${cityName}`,
         },
       ],
       locale: lang === 'ur' ? 'ur_PK' : lang === 'ar' ? 'ar_AE' : 'en_US',
@@ -257,13 +259,16 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
   const countryCode = country.toUpperCase();
   const canonicalUrl = `${DOMAIN}/${lang}/${country}/${city}/${category}/${slug}`;
 
+  const effectiveCover = getProviderCoverUrl(provider);
+  const effectiveAvatar = getProviderAvatarUrl(provider);
+
   // 1. DYNAMIC JSON-LD LOCALBUSINESS SCHEMA MARKUP
   const localBusinessSchema = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     '@id': canonicalUrl,
     name: provider.name,
-    image: [provider.avatar_url],
+    image: [effectiveCover, effectiveAvatar],
     telephone: provider.whatsapp_number,
     url: canonicalUrl,
     priceRange: `Rs. ${provider.starting_price}`,
@@ -282,9 +287,9 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     },
   };
 
-  // Portfolio photos
+  // Portfolio photos with category cover banner as slide #1
   const portfolioPhotos = [
-    provider.avatar_url,
+    effectiveCover,
     'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80',
     'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
   ];
@@ -336,10 +341,10 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
         <div className="relative px-2 sm:px-6 mb-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-12 sm:-mt-16 mb-4">
             {/* Circular Overlapping Avatar */}
-            <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-white overflow-hidden shrink-0">
+            <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white bg-white overflow-hidden shrink-0 shadow-md">
               <img
-                src={provider.avatar_url}
-                alt={provider.name}
+                src={effectiveAvatar}
+                alt={`${provider.name} profile picture`}
                 className="w-full h-full object-cover"
               />
             </div>

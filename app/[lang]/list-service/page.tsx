@@ -636,6 +636,21 @@ function ListServiceContent({ lang }: { lang: string }) {
                   </span>
                 </div>
 
+                {/* Reassurance Callout: Photos are optional & automatic fallbacks are provided */}
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200/80 text-xs text-emerald-950 flex items-start gap-2">
+                  <span className="text-sm mt-0.5 shrink-0">ℹ️</span>
+                  <div className="leading-relaxed">
+                    <span className="font-bold text-emerald-900">
+                      {lang === 'ur' ? 'تصاویر اپ لوڈ کرنا اختیاری ہے (Optional): ' : 'Photos are 100% Optional: '}
+                    </span>
+                    <span className="text-emerald-800">
+                      {lang === 'ur'
+                        ? 'اگر آپ کے پاس ابھی تصاویر نہیں ہیں تو کوئی مسئلہ نہیں، آپ کی لسٹنگ فوراً ایکٹو ہو جائے گی اور آپ کے منتخب کردہ شعبے (جیسے الیکٹریشن، پلمبر وغیرہ) کا تصدیق شدہ کور بینر اور نام کا برانڈڈ اوتار خودکار طریقے سے لگ جائے گا۔ آپ کو لسٹ سے ہرگز باہر نہیں کیا جائے گا۔'
+                        : 'If you do not have photos right now, you can still publish your profile immediately. A professional category-specific cover banner and branded initials avatar will be generated for your profile automatically.'}
+                    </span>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                   
                   {/* 1. Profile Picture (Avatar) */}
