@@ -14,6 +14,11 @@ import {
 } from '@/lib/db';
 import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
 import {
+  validateAndFormatE164,
+  formatAsYouType,
+  getCountryCallingCodeSafe,
+} from '@/lib/phone';
+import {
   providerRegistrationSchema,
   MAX_SERVICE_AREAS,
   MAX_BIO_LENGTH,
@@ -113,6 +118,7 @@ function ListServiceContent({ lang }: { lang: string }) {
   const [profileType, setProfileType] = useState<'individual' | 'shop'>('individual');
 
   const selectedCurrency = getCountryCurrency(countryCode);
+  const countryCallingCode = getCountryCallingCodeSafe(countryCode);
 
   // Parse entered service areas (comma separated, max 3)
   const parsedAreas = serviceArea
@@ -153,6 +159,14 @@ function ListServiceContent({ lang }: { lang: string }) {
       setAvailableCities(filtered);
       const curr = getCountryCurrency(newCountryCode);
       setStartingPrice(String(curr.defaultFee));
+
+      // Reformat phone numbers for the newly selected country
+      if (contactNumber && contactChannel !== 'telegram') {
+        setContactNumber(formatAsYouType(contactNumber, newCountryCode));
+      }
+      if (secondaryPhone) {
+        setSecondaryPhone(formatAsYouType(secondaryPhone, newCountryCode));
+      }
     } else {
       setAvailableCities([]);
     }
@@ -306,10 +320,58 @@ function ListServiceContent({ lang }: { lang: string }) {
       return;
     }
 
+    let finalWhatsAppNumber = '';
+    let finalPhoneNumber = '';
+
+    if (contactChannel === 'telegram') {
+      const handle = contactNumber.trim();
+      if (!handle) {
+        setErrorMsg(
+          lang === 'ur'
+            ? 'براہِ کرم ٹیلیگرام یوزرنیم درج کریں۔'
+            : lang === 'ar'
+            ? 'يرجى إدخال اسم المستخدم على تيليجرام.'
+            : 'Please enter your Telegram handle.'
+        );
+        return;
+      }
+      finalPhoneNumber = handle;
+    } else {
+      // Strictly validate primary phone / WhatsApp number with libphonenumber-js
+      const primaryValidation = validateAndFormatE164(contactNumber, countryCode);
+      if (!primaryValidation.isValid) {
+        setErrorMsg(
+          lang === 'ur'
+            ? `براہِ کرم منتخب کردہ ملک کے لیے درست فون / واٹس ایپ نمبر درج کریں۔ (مثلاً: +${primaryValidation.countryCallingCode || '92'}...)`
+            : lang === 'ar'
+            ? `يرجى إدخال رقم هاتف أو واتساب صحيح للدولة المحددة.`
+            : `Please enter a valid phone or WhatsApp number for the selected country (e.g. +${primaryValidation.countryCallingCode || '92'}...).`
+        );
+        return;
+      }
+      finalWhatsAppNumber = primaryValidation.e164;
+      finalPhoneNumber = primaryValidation.e164;
+    }
+
+    if (secondaryPhone.trim()) {
+      const secValidation = validateAndFormatE164(secondaryPhone, countryCode);
+      if (!secValidation.isValid) {
+        setErrorMsg(
+          lang === 'ur'
+            ? 'متبادل فون نمبر درست نہیں ہے۔ براہِ کرم درست نمبر درج کریں۔'
+            : lang === 'ar'
+            ? 'الرقم البديل غير صالح. يرجى إدخال رقم هاتف صحيح.'
+            : 'The alternate direct call number is invalid for the selected country.'
+        );
+        return;
+      }
+      finalPhoneNumber = secValidation.e164;
+    }
+
     const payload = {
       name: name.trim(),
-      whatsapp_number: contactNumber.trim(),
-      phone_number: secondaryPhone.trim() || contactNumber.trim(),
+      whatsapp_number: finalWhatsAppNumber || (contactChannel === 'telegram' ? '' : contactNumber.trim()),
+      phone_number: finalPhoneNumber || (contactChannel === 'telegram' ? '' : (secondaryPhone.trim() || contactNumber.trim())),
       preferred_contact: contactChannel,
       country_code: countryCode.toLowerCase(),
       city_name: cityName.trim(),
@@ -596,15 +658,52 @@ function ListServiceContent({ lang }: { lang: string }) {
                     type="text"
                     required
                     value={contactNumber}
-                    onChange={(e) => setContactNumber(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (contactChannel === 'telegram') {
+                        setContactNumber(val);
+                      } else {
+                        setContactNumber(formatAsYouType(val, selectedCountryId));
+                      }
+                    }}
                     placeholder={
                       contactChannel === 'telegram'
                         ? '@username or t.me/username'
-                        : 'e.g. +92 333 2145890 or +971 50 1234567'
+                        : countryCallingCode
+                        ? `e.g. +${countryCallingCode} ... or 0...`
+                        : 'e.g. +92 300 1234567'
                     }
                     className="w-full ps-10 pe-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] transition-all font-medium"
                   />
                 </div>
+
+                {/* Live E.164 Format Feedback */}
+                {contactChannel !== 'telegram' && contactNumber.trim().length >= 4 && (() => {
+                  const check = validateAndFormatE164(contactNumber, selectedCountryId);
+                  if (check.isValid) {
+                    return (
+                      <div className="flex items-center gap-1.5 text-xs text-emerald-700 font-medium px-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        <span>
+                          {lang === 'ur' ? 'درست فارمیٹ:' : lang === 'ar' ? 'تنسيق دولي صالح:' : 'Verified E.164:'}{' '}
+                          <code className="font-mono font-semibold text-emerald-800">{check.e164}</code>
+                        </span>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div className="flex items-center gap-1.5 text-xs text-amber-700 font-normal px-1">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <span>
+                        {lang === 'ur'
+                          ? `ملک کے فارمیٹ کے مطابق نمبر مکمل کریں (+${countryCallingCode || '92'})`
+                          : lang === 'ar'
+                          ? `أدخل رقم هاتف صالح للدولة (+${countryCallingCode || '92'})`
+                          : `Enter valid number for country (+${countryCallingCode || '92'})`}
+                      </span>
+                    </div>
+                  );
+                })()}
 
                 {/* Secondary / Alternate Phone Number (Optional) */}
                 <div className="mt-1">
@@ -614,8 +713,8 @@ function ListServiceContent({ lang }: { lang: string }) {
                   <input
                     type="tel"
                     value={secondaryPhone}
-                    onChange={(e) => setSecondaryPhone(e.target.value)}
-                    placeholder="e.g. +92 300 9876543"
+                    onChange={(e) => setSecondaryPhone(formatAsYouType(e.target.value, selectedCountryId))}
+                    placeholder={countryCallingCode ? `e.g. +${countryCallingCode} ...` : 'e.g. +92 300 9876543'}
                     className="w-full px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] transition-all"
                   />
                 </div>

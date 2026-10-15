@@ -4,6 +4,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Provider, getCategoryBySlug, getCategoryName, getLocalizedCityName, toTitleCase } from '@/lib/db';
 import { formatVisitingPrice } from '@/lib/currencies';
+import { getCleanWhatsAppUrl } from '@/lib/phone';
+import { trackLeadClick } from '@/lib/analytics';
 import {
   Star,
   BadgeCheck,
@@ -174,14 +176,13 @@ export default function FeaturedProvidersSlider({ providers, lang, title, badge,
       >
         {loopList.map((provider, index) => {
           const profileUrl = `/${lang}/${provider.country_code}/${provider.city_slug}/${provider.category_id}/${provider.slug}`;
-          const cleanPhone = provider.whatsapp_number.replace(/[^0-9]/g, '');
-          const whatsappLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
+          const whatsappMessage =
             lang === 'ur'
               ? `السلام علیکم ${provider.name}، میں نے بصیرہ ڈائریکٹری پر آپ کا تصدیق شدہ پروفائل دیکھا ہے۔ مجھے سروس درکار ہے۔`
               : lang === 'ar'
               ? `مرحباً ${provider.name}، شاهدت ملفك الموثق على منصة بصيرة. أود الاستفسار عن خدماتك.`
-              : `Salam ${provider.name}, saw your verified profile on Baseera directory. I need service assistance.`
-          )}`;
+              : `Salam ${provider.name}, saw your verified profile on Baseera directory. I need service assistance.`;
+          const whatsappLink = getCleanWhatsAppUrl(provider.whatsapp_number, whatsappMessage);
 
           const cityDisplay = getLocalizedCityName(provider.city_slug, lang);
 
@@ -267,6 +268,12 @@ export default function FeaturedProvidersSlider({ providers, lang, title, badge,
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    trackLeadClick({
+                      providerId: provider.id,
+                      categoryId: provider.category_id,
+                      cityId: provider.city_slug,
+                      clickType: 'whatsapp',
+                    });
                     window.open(whatsappLink, '_blank', 'noopener,noreferrer');
                   }}
                   className="bg-[#059669] hover:bg-[#047857] active:scale-[0.98] text-white text-xs sm:text-sm font-semibold px-3 sm:px-3.5 py-2 rounded-xl transition-all inline-flex items-center justify-center gap-1.5 shrink-0 shadow-2xs cursor-pointer min-h-[36px] leading-normal"

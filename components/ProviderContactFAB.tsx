@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { MessageCircle, Send, Phone, Mail } from 'lucide-react';
+import { getCleanWhatsAppUrl, getCleanTelUrl } from '@/lib/phone';
+import { trackLeadClick } from '@/lib/analytics';
 
 interface Props {
   providerId: string;
@@ -9,7 +11,9 @@ interface Props {
   contactMethod?: string; // 'whatsapp' | 'telegram' | 'phone' | 'email'
   contactValue: string; // phone number, username, or email
   categoryTitle?: string;
+  categoryId?: string;
   cityName?: string;
+  cityId?: string;
 }
 
 export default function ProviderContactFAB({
@@ -18,16 +22,16 @@ export default function ProviderContactFAB({
   contactMethod = 'whatsapp',
   contactValue,
   categoryTitle = 'Services',
+  categoryId,
   cityName = 'Karachi',
+  cityId,
 }: Props) {
   const [clicked, setClicked] = useState(false);
-
-  // Clean value
-  const cleanNumber = contactValue.replace(/[^0-9]/g, '');
 
   let directUrl = '';
   let label = 'Chat on WhatsApp';
   let Icon = MessageCircle;
+  let clickType: 'whatsapp' | 'call' | 'telegram' | 'email' = 'whatsapp';
 
   switch (contactMethod.toLowerCase()) {
     case 'telegram':
@@ -35,59 +39,48 @@ export default function ProviderContactFAB({
       directUrl = `https://t.me/${tgUser}`;
       label = 'Contact on Telegram';
       Icon = Send;
+      clickType = 'telegram';
       break;
 
     case 'phone':
-      directUrl = `tel:${contactValue}`;
+      directUrl = getCleanTelUrl(contactValue);
       label = `Call ${providerName}`;
       Icon = Phone;
+      clickType = 'call';
       break;
 
     case 'email':
       directUrl = `mailto:${contactValue}?subject=${encodeURIComponent(`Service Inquiry via Baseera`)}`;
       label = 'Send Email';
       Icon = Mail;
+      clickType = 'email';
       break;
 
     case 'whatsapp':
     default:
-      const defaultMsg = encodeURIComponent(
-        `Assalam-o-Alaikum ${providerName}, I found your verified profile on Baseera in ${cityName}. I would like to inquire about your ${categoryTitle} services.`
-      );
-      directUrl = `https://wa.me/${cleanNumber}?text=${defaultMsg}`;
+      const defaultMsg = `Assalam-o-Alaikum ${providerName}, I found your verified profile on Baseera in ${cityName}. I would like to inquire about your ${categoryTitle} services.`;
+      directUrl = getCleanWhatsAppUrl(contactValue, defaultMsg);
       label = 'Chat on WhatsApp';
       Icon = MessageCircle;
+      clickType = 'whatsapp';
       break;
   }
 
   const handleClick = () => {
     setClicked(true);
-
-    // Track lead click in Supabase in background
-    try {
-      if (typeof window !== 'undefined') {
-        const payload = JSON.stringify({ provider_id: providerId });
-        if (navigator.sendBeacon) {
-          navigator.sendBeacon('/api/leads/click', payload);
-        } else {
-          fetch('/api/leads/click', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: payload,
-            keepalive: true,
-          }).catch(() => {});
-        }
-      }
-    } catch (e) {
-      console.warn('Click tracking error:', e);
-    }
+    trackLeadClick({
+      providerId,
+      categoryId,
+      cityId,
+      clickType,
+    });
   };
 
   return (
     <aside aria-label="Quick contact" className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40">
       <a
         href={directUrl}
-        target={contactMethod === 'phone' ? '_self' : '_blank'}
+        target={clickType === 'call' || clickType === 'email' ? '_self' : '_blank'}
         rel="noopener noreferrer"
         onClick={handleClick}
         className="group flex items-center gap-2 bg-[#059669] hover:bg-[#047857] text-white px-4 py-3 sm:px-5 sm:py-3.5 rounded-full border border-emerald-700 shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"

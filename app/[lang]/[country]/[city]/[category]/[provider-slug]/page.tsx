@@ -27,9 +27,11 @@ import {
 } from '@/lib/db';
 import { getProviderCoverUrl, getProviderAvatarUrl } from '@/lib/category-banners';
 import { formatVisitingPrice } from '@/lib/currencies';
+import { getCleanWhatsAppUrl, getCleanTelUrl } from '@/lib/phone';
 import ProviderImageSlider from '@/components/ProviderImageSlider';
 import ProviderContactFAB from '@/components/ProviderContactFAB';
 import RelatedSlider from '@/components/RelatedSlider';
+import LeadTrackButton from '@/components/LeadTrackButton';
 
 interface ProviderPageProps {
   params: Promise<{
@@ -295,15 +297,33 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
   const effectiveCover = getProviderCoverUrl(provider);
   const effectiveAvatar = getProviderAvatarUrl(provider);
 
-  // 1. DYNAMIC JSON-LD LOCALBUSINESS SCHEMA MARKUP
-  const localBusinessSchema = {
+  // 1. DYNAMIC JSON-LD LOCALBUSINESS & SERVICE SCHEMA MARKUP (LOCAL SEO)
+  const areaServedList =
+    Array.isArray(provider.service_area) && provider.service_area.length > 0
+      ? provider.service_area.map((area: string) => ({
+          '@type': 'AdministrativeArea',
+          name: `${area}, ${cityName}`,
+        }))
+      : [
+          {
+            '@type': 'City',
+            name: cityName,
+          },
+        ];
+
+  const localBusinessSchema: Record<string, any> = {
     '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
+    '@type': ['LocalBusiness', 'ProfessionalService'],
     '@id': canonicalUrl,
     name: providerName,
-    image: [effectiveCover, effectiveAvatar],
+    description:
+      provider.short_bio ||
+      `${providerName} is a verified ${categoryName} serving ${cityName}, ${countryName}. Direct contact with zero middleman commission.`,
+    image: [effectiveCover, effectiveAvatar].filter(Boolean),
     telephone: provider.whatsapp_number,
     url: canonicalUrl,
+    serviceType: categoryName,
+    category: categoryName,
     priceRange: formatVisitingPrice(provider.starting_price, provider.country_code || country),
     address: {
       '@type': 'PostalAddress',
@@ -311,14 +331,18 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
       addressRegion: cityName,
       addressCountry: countryCode,
     },
-    aggregateRating: {
+    areaServed: areaServedList,
+  };
+
+  if (provider.review_count && provider.review_count > 0) {
+    localBusinessSchema.aggregateRating = {
       '@type': 'AggregateRating',
-      ratingValue: provider.rating.toFixed(1),
-      reviewCount: provider.review_count.toString(),
+      ratingValue: Number(provider.rating || 5).toFixed(1),
+      reviewCount: String(provider.review_count || 1),
       bestRating: '5',
       worstRating: '1',
-    },
-  };
+    };
+  }
 
   // Portfolio photos with category cover banner as slide #1
   const portfolioPhotos = [
@@ -334,13 +358,15 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     CATEGORY_SPECIALIZATIONS[category] ||
     CATEGORY_SPECIALIZATIONS['electrician'];
 
-  const whatsappMessage = encodeURIComponent(
+  const whatsappMessageText =
     lang === 'ur'
       ? `السلام علیکم ${provider.name}، میں نے بصیرہ پر آپ کا تصدیق شدہ پروفائل دیکھا ہے۔ مجھے ${cityName} میں آپ کی ${categoryName} سروسز کے لیے معلومات درکار ہیں۔ کیا آپ آج دستیاب ہیں؟`
       : lang === 'ar'
       ? `مرحباً ${provider.name}، لقد شاهدت ملفك الموثق على منصة بصيرة في ${cityName}. أود الاستفسار عن خدمات ${categoryName}. هل أنت متاح اليوم؟`
-      : `Assalam-o-Alaikum ${provider.name}, I found your verified profile on Baseera directory in ${cityName}. I need consultation for ${categoryName}. Are you available today?`
-  );
+      : `Assalam-o-Alaikum ${provider.name}, I found your verified profile on Baseera directory in ${cityName}. I need consultation for ${categoryName}. Are you available today?`;
+
+  const whatsappDirectUrl = getCleanWhatsAppUrl(provider.whatsapp_number, whatsappMessageText);
+  const telDirectUrl = getCleanTelUrl(provider.whatsapp_number);
 
   return (
     <div className={`min-h-screen bg-white text-neutral-900 pb-28 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
@@ -586,19 +612,28 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
               {/* Direct Contact Actions */}
               <div className="space-y-3">
-                <a
-                  href={`https://wa.me/${provider.whatsapp_number.replace(/\+/g, '')}?text=${whatsappMessage}`}
+                <LeadTrackButton
+                  href={whatsappDirectUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 bg-[#059669] hover:bg-[#047857] active:scale-[0.99] text-white transition-all rounded-xl flex items-center justify-center gap-2 font-semibold text-sm"
+                  providerId={provider.id}
+                  categoryId={category}
+                  cityId={city}
+                  clickType="whatsapp"
+                  className="w-full py-3 bg-[#059669] hover:bg-[#047857] active:scale-[0.99] text-white transition-all rounded-xl flex items-center justify-center gap-2 font-semibold text-sm cursor-pointer shadow-xs"
                 >
                   <WhatsAppIcon className="w-4 h-4 fill-current" />
                   <span>{lang === 'ur' ? 'واٹس ایپ پر رابطہ کریں' : lang === 'ar' ? 'محادثة عبر واتساب' : 'Chat on WhatsApp'}</span>
-                </a>
+                </LeadTrackButton>
 
-                <a
-                  href={`tel:${provider.whatsapp_number}`}
-                  className="w-full py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-800 rounded-xl flex items-center justify-center gap-2 font-semibold text-sm transition-colors"
+                <LeadTrackButton
+                  href={telDirectUrl}
+                  target="_self"
+                  providerId={provider.id}
+                  categoryId={category}
+                  cityId={city}
+                  clickType="call"
+                  className="w-full py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-800 rounded-xl flex items-center justify-center gap-2 font-semibold text-sm transition-colors cursor-pointer"
                 >
                   <Phone className="w-3.5 h-3.5 text-gray-600" />
                   <span>
@@ -608,7 +643,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                       ? `اتصال هاتفي مباشر (${provider.whatsapp_number})`
                       : `Call Direct (${provider.whatsapp_number})`}
                   </span>
-                </a>
+                </LeadTrackButton>
               </div>
 
               <div className="text-xs text-gray-600 space-y-2 border-t border-gray-100 pt-4 mt-4">
@@ -673,7 +708,9 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
         contactMethod="whatsapp"
         contactValue={provider.whatsapp_number}
         categoryTitle={categoryName}
+        categoryId={category}
         cityName={cityName}
+        cityId={city}
       />
     </div>
   );

@@ -3,6 +3,7 @@ import { generateEnglishSlug } from '@/lib/transliterate';
 import { getCategoryBySlug, getCountryByCode, getCategoryName, SEED_PROVIDERS } from '@/lib/db';
 import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
 import { providerRegistrationSchema } from '@/lib/validations/provider';
+import { validateAndFormatE164 } from '@/lib/phone';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -76,7 +77,15 @@ export async function POST(request: NextRequest) {
       lang = 'en',
     } = parseResult.data;
 
-    const contactMethod = (whatsapp_number || phone_number || telegram_handle || '').trim();
+    let resolvedWhatsApp = (whatsapp_number || phone_number || '').trim();
+    if (preferred_contact !== 'telegram' && resolvedWhatsApp) {
+      const check = validateAndFormatE164(resolvedWhatsApp, country_code);
+      if (check.isValid) {
+        resolvedWhatsApp = check.e164;
+      }
+    }
+
+    const contactMethod = (resolvedWhatsApp || telegram_handle || '').trim();
 
     if (!name || !contactMethod) {
       return NextResponse.json(
@@ -86,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     // --- ANTI-DUPLICATE / SINGLE-PROFILE PER PHONE NUMBER VALIDATION ---
-    const phoneCandidates = [whatsapp_number, phone_number]
+    const phoneCandidates = [resolvedWhatsApp, phone_number]
       .filter((p): p is string => Boolean(p && typeof p === 'string' && p.trim().length > 0))
       .map((p) => p.trim());
 
@@ -271,7 +280,7 @@ export async function POST(request: NextRequest) {
         name: name.trim(),
         slug: uniqueSlug,
         profile_type: profile_type === 'shop' ? 'shop' : 'individual',
-        whatsapp_number: (whatsapp_number || phone_number || telegram_handle || '').trim(),
+        whatsapp_number: (resolvedWhatsApp || telegram_handle || '').trim(),
         avatar_url: avatar_url?.trim() || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,
         service_area: serviceAreaArray,
         short_bio: short_bio?.trim() || `${resolvedTradeTitle} serving ${cleanCityName}. Direct communication with zero commission.`,
