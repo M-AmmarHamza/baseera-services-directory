@@ -89,26 +89,34 @@ const CITY_LOCALIZED_NAMES: Record<string, { ur: string; ar: string }> = {
   vancouver: { ur: 'وینکوور', ar: 'فانكوفر' },
 };
 
-export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK' }: Props) {
+export default function HomepageSearchBar({ lang, defaultLocation }: Props) {
   const router = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Default active city based on language context
-  const defaultCity: SelectedCity = useMemo(() => {
-    if (lang === 'ar') {
-      return { slug: 'dubai', name: 'Dubai', countryCode: 'ae' };
-    }
-    return { slug: 'karachi', name: 'Karachi', countryCode: 'pk' };
-  }, [lang]);
-
   const [query, setQuery] = useState('');
-  const [selectedCity, setSelectedCity] = useState<SelectedCity>(defaultCity);
+  // 1. Generic Global Hub default state (null = no city selected yet, prompting explicit user selection)
+  const [selectedCity, setSelectedCity] = useState<SelectedCity | null>(null);
   const [isCityModalOpen, setIsCityModalOpen] = useState(false);
   const [citySearch, setCitySearch] = useState('');
   const [countryFilter, setCountryFilter] = useState<'all' | string>('all');
   const [isMounted, setIsMounted] = useState(false);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  // Pending user intent if they searched or clicked a category while on Global Hub
+  const [pendingAction, setPendingAction] = useState<{
+    categorySlug?: string;
+    searchQuery?: string;
+  } | null>(null);
+
+  // Optional lightweight Geo-IP detected location
+  const [detectedGeo, setDetectedGeo] = useState<{
+    countryCode: string;
+    countryName: string;
+    citySlug: string;
+    cityName: string;
+    flag?: string;
+  } | null>(null);
 
   // Compute live smart category suggestions as user types
   const suggestedCategories = useMemo(() => {
@@ -135,13 +143,14 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
 
   const isRTL = lang === 'ur' || lang === 'ar';
 
-  // Restore saved city from localStorage if available
+  // Restore saved city from localStorage or check lightweight Geo-IP
   useEffect(() => {
     setIsMounted(true);
     try {
       const saved = localStorage.getItem('baseera_selected_city');
       if (saved) {
         const parsed = JSON.parse(saved);
+        // Only restore if user explicitly selected a valid city previously
         if (parsed?.slug && parsed?.countryCode && parsed?.name) {
           setSelectedCity(parsed);
         }
@@ -149,6 +158,16 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
     } catch {
       // Ignore localStorage errors
     }
+
+    // Lightweight Geo-IP lookup (via /api/geo)
+    fetch('/api/geo')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.detected && data?.countryCode && data?.citySlug) {
+          setDetectedGeo(data);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Lock body scroll and handle Escape key on modal
@@ -236,13 +255,19 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
   const t = translations[lang as 'ur' | 'ar'] || translations.en;
 
   // Format localized display name for city chip
-  const getCityDisplayName = (city: SelectedCity): string => {
+  const getCityDisplayName = (city: SelectedCity | null): string => {
+    if (!city) {
+      return lang === 'ur' ? 'عالمی مرکز' : lang === 'ar' ? 'الدليل العام' : 'Global Hub';
+    }
     const locCity = getLocalizedCityName(city.slug, lang);
     const separator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
     return `${locCity}${separator}${city.countryCode.toUpperCase()}`;
   };
 
-  const getCityNameOnly = (city: SelectedCity): string => {
+  const getCityNameOnly = (city: SelectedCity | null): string => {
+    if (!city) {
+      return lang === 'ur' ? 'عالمی مرکز' : lang === 'ar' ? 'الدليل العام' : 'Global Hub';
+    }
     return getLocalizedCityName(city.slug, lang);
   };
 
@@ -291,11 +316,34 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
     } catch {
       // Ignore localStorage failure
     }
+
+    if (pendingAction) {
+      const countryCode = newSelected.countryCode.toLowerCase();
+      const citySlug = newSelected.slug.toLowerCase();
+
+      if (pendingAction.categorySlug) {
+        router.push(`/${lang}/${countryCode}/${citySlug}/${pendingAction.categorySlug}`);
+      } else if (pendingAction.searchQuery) {
+        const trimmed = pendingAction.searchQuery.trim();
+        const matched = findBestCategoryMatch(trimmed, CATEGORIES, lang);
+        if (matched) {
+          router.push(`/${lang}/${countryCode}/${citySlug}/${matched.slug}`);
+        } else {
+          router.push(`/${lang}/${countryCode}/${citySlug}/search?q=${encodeURIComponent(trimmed)}`);
+        }
+      }
+      setPendingAction(null);
+    }
   };
 
   // Select category directly from live smart suggestions
   const handleSelectCategory = (categorySlug: string) => {
     setIsSuggestionsOpen(false);
+    if (!selectedCity) {
+      setPendingAction({ categorySlug });
+      setIsCityModalOpen(true);
+      return;
+    }
     const countryCode = selectedCity.countryCode.toLowerCase();
     const citySlug = selectedCity.slug.toLowerCase();
     router.push(`/${lang}/${countryCode}/${citySlug}/${categorySlug}`);
@@ -309,9 +357,14 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
 
     setIsSuggestionsOpen(false);
 
+    if (!selectedCity) {
+      setPendingAction({ searchQuery: trimmed });
+      setIsCityModalOpen(true);
+      return;
+    }
+
     // 1. Try finding best category match using alias mapping + fuzzy match
     const matchedCategory = findBestCategoryMatch(trimmed, CATEGORIES, lang);
-
     const countryCode = selectedCity.countryCode.toLowerCase();
     const citySlug = selectedCity.slug.toLowerCase();
 
@@ -322,8 +375,13 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
     }
   };
 
-  // Quick chip click directed to selected city
+  // Quick chip click directed to selected city or triggers city modal
   const handleChipClick = (categorySlug: string) => {
+    if (!selectedCity) {
+      setPendingAction({ categorySlug });
+      setIsCityModalOpen(true);
+      return;
+    }
     const countryCode = selectedCity.countryCode.toLowerCase();
     const citySlug = selectedCity.slug.toLowerCase();
     router.push(`/${lang}/${countryCode}/${citySlug}/${categorySlug}`);
@@ -340,21 +398,39 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
           {/* 1. INTERACTIVE LOCATION CHIP BUTTON */}
           <button
             type="button"
-            onClick={() => setIsCityModalOpen(true)}
-            className="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 min-h-[44px] bg-gray-50 hover:bg-gray-100 active:bg-gray-200/80 border border-gray-200 hover:border-emerald-600/70 rounded-xl text-xs sm:text-sm font-semibold text-gray-800 transition-all shrink-0 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#006948]/20 overflow-visible"
+            onClick={() => {
+              setPendingAction(null);
+              setIsCityModalOpen(true);
+            }}
+            className={`flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all shrink-0 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#006948]/20 overflow-visible ${
+              !selectedCity
+                ? 'bg-emerald-50/90 hover:bg-emerald-100/80 border border-emerald-200 hover:border-emerald-500/70 text-emerald-900'
+                : 'bg-gray-50 hover:bg-gray-100 active:bg-gray-200/80 border border-gray-200 hover:border-emerald-600/70 text-gray-800'
+            }`}
             title={t.changeCityTooltip}
             aria-haspopup="dialog"
             aria-expanded={isCityModalOpen}
           >
             <div className="flex items-center gap-1.5 min-w-0 overflow-visible">
-              <MapPin className="w-4 h-4 text-[#059669] shrink-0 group-hover:scale-110 transition-transform" />
-              <span className={`font-semibold text-neutral-900 text-xs sm:text-sm overflow-visible whitespace-nowrap ${
-                lang === 'ur' ? 'font-urdu leading-[2.2] pt-1 pb-0.5' : 'truncate'
-              }`}>
-                {isMounted ? getCityDisplayName(selectedCity) : defaultLocation}
+              {!selectedCity ? (
+                <Globe className="w-4 h-4 text-[#006948] shrink-0 group-hover:scale-110 transition-transform" />
+              ) : (
+                <MapPin className="w-4 h-4 text-[#059669] shrink-0 group-hover:scale-110 transition-transform" />
+              )}
+              <span className={`font-semibold text-xs sm:text-sm overflow-visible whitespace-nowrap ${
+                !selectedCity ? 'text-[#006948]' : 'text-neutral-900'
+              } ${lang === 'ur' ? 'font-urdu leading-[2.2] pt-1 pb-0.5' : 'truncate'}`}>
+                {isMounted ? getCityDisplayName(selectedCity) : defaultLocation || 'Global Hub'}
               </span>
+              {!selectedCity && (
+                <span className="hidden xs:inline-flex items-center text-[10px] uppercase font-bold tracking-wide px-1.5 py-0.5 rounded bg-emerald-600 text-white leading-none">
+                  {lang === 'ur' ? 'شہر منتخب کریں' : lang === 'ar' ? 'اختر المدينة' : 'Select City'}
+                </span>
+              )}
             </div>
-            <ChevronDown className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-700 transition-colors shrink-0" />
+            <ChevronDown className={`w-3.5 h-3.5 transition-colors shrink-0 ${
+              !selectedCity ? 'text-emerald-700 group-hover:text-emerald-900' : 'text-gray-400 group-hover:text-gray-700'
+            }`} />
           </button>
 
           {/* Search Input */}
@@ -448,7 +524,7 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                         </span>
                       </div>
                       <span className="text-[11px] text-gray-400 block truncate">
-                        {cat.group} • {getCityNameOnly(selectedCity)}
+                        {cat.group} {selectedCity ? `• ${getCityNameOnly(selectedCity)}` : ''}
                       </span>
                     </div>
                   </div>
@@ -469,11 +545,11 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                 <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                 <span className="truncate">
                   {lang === 'ur' ? (
-                    <>تمام ماہرین برائے &quot;<strong className="text-gray-900">{query.trim()}</strong>&quot; ({getCityNameOnly(selectedCity)})</>
+                    <>تمام ماہرین برائے &quot;<strong className="text-gray-900">{query.trim()}</strong>&quot; {selectedCity ? `(${getCityNameOnly(selectedCity)})` : ''}</>
                   ) : lang === 'ar' ? (
-                    <>بحث شامل عن &quot;<strong className="text-gray-900">{query.trim()}</strong>&quot; في {getCityNameOnly(selectedCity)}</>
+                    <>بحث شامل عن &quot;<strong className="text-gray-900">{query.trim()}</strong>&quot; {selectedCity ? `في ${getCityNameOnly(selectedCity)}` : ''}</>
                   ) : (
-                    <>Search all providers for &quot;<strong className="text-gray-900">{query.trim()}</strong>&quot; in <strong className="text-gray-900">{getCityNameOnly(selectedCity)}</strong></>
+                    <>Search all providers for &quot;<strong className="text-gray-900">{query.trim()}</strong>&quot; {selectedCity ? <>in <strong className="text-gray-900">{getCityNameOnly(selectedCity)}</strong></> : '• Select City'}</>
                   )}
                 </span>
               </div>
@@ -487,31 +563,57 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
         )}
       </div>
 
-      {/* Quick Category Search Chips (Auto-directed to the selected city) */}
+      {/* Quick Category Search Chips (Auto-directed to the selected city or opens city modal) */}
       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3.5 justify-center text-xs text-gray-500 overflow-visible">
         <span className={`font-medium text-gray-400 ${lang === 'ur' ? 'font-urdu text-sm' : ''}`}>{t.popular}</span>
-        {t.popularSearches.map((item) => {
-          const countryCode = (selectedCity?.countryCode || 'pk').toLowerCase();
-          const citySlug = (selectedCity?.slug || 'karachi').toLowerCase();
-          const href = `/${lang}/${countryCode}/${citySlug}/${item.category}`;
-
-          return (
-            <Link
-              key={item.category}
-              href={href}
-              className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gray-50 hover:bg-emerald-50 hover:text-[#006948] hover:border-emerald-200 border border-gray-200 text-gray-700 text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center overflow-visible ${
-                lang === 'ur'
-                  ? 'font-urdu leading-[2.3] min-h-[40px] pt-1.5 pb-1'
-                  : 'min-h-[32px]'
-              }`}
-            >
-              <span className={lang === 'ur' ? 'font-urdu leading-[2.3] overflow-visible inline-block' : ''}>
-                {item.title}
-              </span>
-            </Link>
-          );
-        })}
+        {t.popularSearches.map((item) => (
+          <button
+            key={item.category}
+            type="button"
+            onClick={() => handleChipClick(item.category)}
+            className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gray-50 hover:bg-emerald-50 hover:text-[#006948] hover:border-emerald-200 border border-gray-200 text-gray-700 text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center overflow-visible ${
+              lang === 'ur'
+                ? 'font-urdu leading-[2.3] min-h-[40px] pt-1.5 pb-1'
+                : 'min-h-[32px]'
+            }`}
+          >
+            <span className={lang === 'ur' ? 'font-urdu leading-[2.3] overflow-visible inline-block' : ''}>
+              {item.title}
+            </span>
+          </button>
+        ))}
       </div>
+
+      {/* Geo-IP Auto-Detection 1-Click Pill (Displayed if detected and city not explicitly set yet) */}
+      {detectedGeo && !selectedCity && isMounted && (
+        <div className="mt-3 flex items-center justify-center animate-in fade-in slide-in-from-top-1 duration-200">
+          <button
+            type="button"
+            onClick={() => {
+              const newSelected: SelectedCity = {
+                slug: detectedGeo.citySlug,
+                name: detectedGeo.cityName,
+                countryCode: detectedGeo.countryCode,
+              };
+              setSelectedCity(newSelected);
+              try {
+                localStorage.setItem('baseera_selected_city', JSON.stringify(newSelected));
+              } catch {}
+            }}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs group cursor-pointer transition-all"
+          >
+            <span className="text-sm">{detectedGeo.flag || '📍'}</span>
+            <span>
+              {lang === 'ur'
+                ? `آپ کا مقام: ${detectedGeo.cityName} (${detectedGeo.countryCode.toUpperCase()}) — بطور میرا شہر سیٹ کریں؟`
+                : lang === 'ar'
+                ? `الموقع المقترح: ${detectedGeo.cityName} (${detectedGeo.countryCode.toUpperCase()}) — تعيين كمدينتي؟`
+                : `Detected location: ${detectedGeo.cityName}, ${detectedGeo.countryCode.toUpperCase()} — Set as my city?`}
+            </span>
+            <Check className="w-3.5 h-3.5 text-emerald-600 group-hover:scale-110 transition-transform" />
+          </button>
+        </div>
+      )}
 
       {/* 2. MINIMALIST FLAT CITY SELECTION MODAL */}
       {isCityModalOpen && (
@@ -555,6 +657,22 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                 <X className="w-4 h-4" />
               </button>
             </div>
+
+            {/* Context Awareness Banner if User was trying to search/browse */}
+            {pendingAction && (
+              <div className="px-5 pt-3">
+                <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span className={lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}>
+                    {lang === 'ur'
+                      ? 'براہ کرم نتائج دیکھنے کے لیے پہلے اپنا شہر منتخب کریں۔'
+                      : lang === 'ar'
+                      ? 'يرجى تحديد مدينتك أولاً لعرض الخدمات المتوفرة بالقرب منك.'
+                      : 'Please select your city first to discover verified specialists near you.'}
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* City Search Input */}
             <div className="px-5 pt-4 pb-2 bg-white">
@@ -636,9 +754,10 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                     {/* Cities Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {group.cities.map((c) => {
-                        const isSelected =
-                          selectedCity.slug.toLowerCase() === c.slug.toLowerCase() &&
-                          selectedCity.countryCode.toLowerCase() === c.countryCode.toLowerCase();
+                        const isSelected = selectedCity
+                          ? selectedCity.slug.toLowerCase() === c.slug.toLowerCase() &&
+                            selectedCity.countryCode.toLowerCase() === c.countryCode.toLowerCase()
+                          : false;
 
                         const displayTitle = getLocalizedCityName(c.slug, lang);
 
@@ -680,23 +799,37 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
               )}
             </div>
 
-            {/* Modal Footer with Direct Link Option */}
+            {/* Modal Footer with Direct Link Option or Guidance Message */}
             <div className={`px-5 py-3 border-t border-gray-100 bg-gray-50/70 flex items-center justify-between text-xs overflow-visible ${
               lang === 'ur' ? 'font-urdu leading-[2.2]' : ''
             }`}>
-              <span className={`text-gray-500 overflow-visible ${lang === 'ur' ? '' : 'truncate'}`}>
-                {t.browseCityDirectly} <strong className="text-gray-900">{getCityNameOnly(selectedCity)}</strong>:
-              </span>
-              <Link
-                href={`/${lang}/${selectedCity.countryCode.toLowerCase()}/${selectedCity.slug.toLowerCase()}`}
-                onClick={() => setIsCityModalOpen(false)}
-                className={`font-bold text-[#006948] hover:underline flex items-center gap-1 shrink-0 ${
-                  lang === 'ur' ? 'font-urdu pt-0.5' : ''
-                }`}
-              >
-                <span>{getCityNameOnly(selectedCity)} Hub</span>
-                <ArrowRight className={`w-3.5 h-3.5 ${isRTL ? 'rotate-180' : ''}`} />
-              </Link>
+              {selectedCity ? (
+                <>
+                  <span className={`text-gray-500 overflow-visible ${lang === 'ur' ? '' : 'truncate'}`}>
+                    {t.browseCityDirectly} <strong className="text-gray-900">{getCityNameOnly(selectedCity)}</strong>:
+                  </span>
+                  <Link
+                    href={`/${lang}/${selectedCity.countryCode.toLowerCase()}/${selectedCity.slug.toLowerCase()}`}
+                    onClick={() => setIsCityModalOpen(false)}
+                    className={`font-bold text-[#006948] hover:underline flex items-center gap-1 shrink-0 ${
+                      lang === 'ur' ? 'font-urdu pt-0.5' : ''
+                    }`}
+                  >
+                    <span>{getCityNameOnly(selectedCity)} Hub</span>
+                    <ArrowRight className={`w-3.5 h-3.5 ${isRTL ? 'rotate-180' : ''}`} />
+                  </Link>
+                </>
+              ) : (
+                <div className="w-full flex items-center justify-between text-gray-500">
+                  <span className={lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}>
+                    {lang === 'ur'
+                      ? 'مقامی سروسز دیکھنے کے لیے اوپر سے کسی بھی شہر کا انتخاب کریں۔'
+                      : lang === 'ar'
+                      ? 'اختر أي مدينة من القائمة أعلاه لاستكشاف دليل الخدمات المحلي.'
+                      : 'Select any city above to explore verified local specialists.'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

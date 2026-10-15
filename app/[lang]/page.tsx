@@ -62,7 +62,7 @@ export default async function HomePage({ params }: PageProps) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
   const providers = await getAllProviders();
-  const defaultLocation = lang === 'ur' ? 'کراچی، پاکستان' : lang === 'ar' ? 'دبي، الإمارات' : 'Karachi, PK';
+  const defaultLocation = lang === 'ur' ? 'عالمی مرکز' : lang === 'ar' ? 'الدليل العام' : 'Global Hub';
 
   // Dynamic JSON-LD WebSite & ItemList Schema
   const websiteSchema = {
@@ -140,61 +140,61 @@ export default async function HomePage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* 2. BROWSE BY SPECIALTY (PREMIUM HORIZONTAL SCROLLABLE SECTION) */}
-      <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 overflow-visible scroll-mt-20">
+      {/* 2. BROWSE BY SPECIALTY (RESPONSIVE NON-OVERFLOWING GRID) */}
+      <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 overflow-hidden scroll-mt-20">
         {/* Section Header */}
-        <div className="flex items-end justify-between gap-4 mb-5 sm:mb-6 overflow-visible">
-          <div className="overflow-visible">
-            <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-2 pt-2' : 'leading-snug'}`}>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-5 sm:mb-6">
+          <div>
+            <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-2 pt-2' : 'leading-snug'}`}>
               {h2Text}
             </h2>
-            <p className={`text-sm text-gray-500 mt-1 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
+            <p className={`text-sm text-gray-500 mt-1 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
               {dict.home?.specialtySubtitle || 'Verified community technicians & specialists worldwide'}
             </p>
           </div>
-          <div className={`text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}`}>
+          <div className={`text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0 ${lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}`}>
             {CATEGORIES.length} {dict.home?.categoriesCount || 'Categories'}
           </div>
         </div>
 
-        {/* Full Specialty Categories Grid (All 24 Categories in 3 Rows on Desktop) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-3.5 overflow-visible">
+        {/* Responsive Categories Grid (2 cols on iPhone SE/mobile, 3 on sm, 4 on md, 6 on lg) */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full max-w-full overflow-hidden">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat.id}
               href={`/${lang}/pk/karachi/${cat.slug}`}
-              className={`flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group cursor-pointer overflow-visible ${
-                lang === 'ur' ? 'min-h-[165px] sm:min-h-[175px]' : 'min-h-[135px] sm:min-h-[145px]'
+              className={`w-full min-w-0 max-w-full flex flex-col items-center justify-between p-3 sm:p-4 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group cursor-pointer overflow-hidden box-border ${
+                lang === 'ur' ? 'min-h-[160px] sm:min-h-[170px]' : 'min-h-[130px] sm:min-h-[140px]'
               }`}
             >
               {/* Soft circular background behind icon */}
-              <div className="w-12 h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-1 shrink-0 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
+              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-1.5 shrink-0 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
                 <CategoryIcon slug={cat.slug} id={cat.id} name={cat.name} icon={cat.icon} className="w-5 h-5" />
               </div>
 
-                {/* Title Container - Zero clipping, natural Nastaliq line height & full overflow visibility */}
-                <div className="flex-1 flex items-center justify-center w-full my-auto py-1 overflow-visible">
-                  <span
-                    className={`font-bold text-gray-900 group-hover:text-[#006948] transition-colors text-center overflow-visible ${
-                      lang === 'ur'
-                        ? 'font-urdu text-[13px] sm:text-sm leading-[2.4] py-0.5 tracking-normal'
-                        : 'text-xs line-clamp-2 leading-tight h-8 sm:h-9 flex items-center justify-center'
-                    }`}
-                  >
-                    {getCategoryName(cat, lang)}
-                  </span>
-                </div>
-
-                {/* Active provider count Subtext */}
+              {/* Title Container - Zero clipping, natural line height, break-words for narrow screens */}
+              <div className="flex-1 flex items-center justify-center w-full min-w-0 my-auto py-1 px-0.5 overflow-hidden">
                 <span
-                  dir="auto"
-                  className={`text-[11px] sm:text-xs text-gray-500 font-medium shrink-0 mt-1.5 overflow-visible ${
-                    lang === 'ur' ? 'font-urdu leading-[1.8] pt-0.5' : ''
+                  className={`font-bold text-gray-900 group-hover:text-[#006948] transition-colors text-center break-words ${
+                    lang === 'ur'
+                      ? 'font-urdu text-xs sm:text-sm leading-[2.3] py-0.5 tracking-normal'
+                      : 'text-xs line-clamp-2 leading-tight flex items-center justify-center'
                   }`}
                 >
-                  {cat.count}+ {dict.home?.activeCount || 'Active'}
+                  {getCategoryName(cat, lang)}
                 </span>
-              </Link>
+              </div>
+
+              {/* Active provider count Subtext */}
+              <span
+                dir="auto"
+                className={`text-[10px] sm:text-xs text-gray-500 font-medium shrink-0 mt-1 truncate ${
+                  lang === 'ur' ? 'font-urdu leading-[1.8] pt-0.5' : ''
+                }`}
+              >
+                {cat.count}+ {dict.home?.activeCount || 'Active'}
+              </span>
+            </Link>
           ))}
         </div>
       </section>

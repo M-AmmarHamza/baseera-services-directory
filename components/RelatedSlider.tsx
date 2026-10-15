@@ -153,12 +153,9 @@ export default function RelatedSlider({
         className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-4 pt-1 hide-scrollbar scrollbar-hide no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth"
       >
         {filteredItems.map((item, idx) => {
-          // Responsive Card Sizing:
-          // Mobile: ~1.5 cards visible (w-[calc(100%/1.45)])
-          // Tablet: ~3.5 cards visible (sm:w-[calc(100%/2.4)] md:w-[calc(100%/3.4)])
-          // Desktop: ~5 cards visible (lg:w-[calc(100%/5.1)])
+          // Responsive Card Sizing with snap-start and minimum width to prevent overflow
           const cardWidthClasses =
-            'w-[calc(100%/1.45)] sm:w-[calc(100%/2.4)] md:w-[calc(100%/3.4)] lg:w-[calc(100%/5.1)] shrink-0 snap-start';
+            'snap-start min-w-[150px] sm:min-w-[180px] md:min-w-[200px] shrink-0';
 
           if (type === 'cities') {
             const cityItem = item as City;
