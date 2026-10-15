@@ -545,11 +545,15 @@ export const CITIES: City[] = [
   { slug: 'kotri', name: 'Kotri', countryCode: 'pk' },
   { slug: 'kamoke', name: 'Kamoke', countryCode: 'pk' },
 
-  // UAE
+  // UAE (7 Emirates + Al Ain)
   { slug: 'dubai', name: 'Dubai', countryCode: 'ae' },
-  { slug: 'sharjah', name: 'Sharjah', countryCode: 'ae' },
   { slug: 'abu-dhabi', name: 'Abu Dhabi', countryCode: 'ae' },
+  { slug: 'sharjah', name: 'Sharjah', countryCode: 'ae' },
   { slug: 'ajman', name: 'Ajman', countryCode: 'ae' },
+  { slug: 'ras-al-khaimah', name: 'Ras Al Khaimah', countryCode: 'ae' },
+  { slug: 'fujairah', name: 'Fujairah', countryCode: 'ae' },
+  { slug: 'umm-al-quwain', name: 'Umm Al Quwain', countryCode: 'ae' },
+  { slug: 'al-ain', name: 'Al Ain', countryCode: 'ae' },
 
   // Saudi Arabia
   { slug: 'riyadh', name: 'Riyadh', countryCode: 'sa' },
@@ -738,11 +742,15 @@ export const CITY_NAMES_UR: Record<string, string> = {
   kotri: 'کوٹری',
   kamoke: 'کامونکے',
 
-  // International
+  // UAE
   dubai: 'دبئی',
-  sharjah: 'شارجہ',
   'abu-dhabi': 'ابوظہبی',
+  sharjah: 'شارجہ',
   ajman: 'عجمان',
+  'ras-al-khaimah': 'راس الخیمہ',
+  fujairah: 'فجیرہ',
+  'umm-al-quwain': 'ام القیوین',
+  'al-ain': 'العین',
   riyadh: 'ریاض',
   jeddah: 'جدہ',
   dammam: 'دمام',
@@ -809,11 +817,15 @@ export const CITY_NAMES_AR: Record<string, string> = {
   kotri: 'كوتري',
   kamoke: 'كاموكي',
 
-  // International
+  // UAE
   dubai: 'دبي',
-  sharjah: 'الشارقة',
   'abu-dhabi': 'أبوظبي',
+  sharjah: 'الشارقة',
   ajman: 'عجمان',
+  'ras-al-khaimah': 'رأس الخيمة',
+  fujairah: 'الفجيرة',
+  'umm-al-quwain': 'أم القيوين',
+  'al-ain': 'العين',
   riyadh: 'الرياض',
   jeddah: 'جدة',
   dammam: 'الدمام',
