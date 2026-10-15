@@ -656,8 +656,17 @@ export const CITIES: City[] = [
   { slug: 'sheffield', name: 'Sheffield', countryCode: 'gb' },
   { slug: 'bristol', name: 'Bristol', countryCode: 'gb' },
   { slug: 'cardiff', name: 'Cardiff', countryCode: 'gb' },
+  // Australia (10 Cities)
   { slug: 'sydney', name: 'Sydney', countryCode: 'au' },
   { slug: 'melbourne', name: 'Melbourne', countryCode: 'au' },
+  { slug: 'brisbane', name: 'Brisbane', countryCode: 'au' },
+  { slug: 'perth', name: 'Perth', countryCode: 'au' },
+  { slug: 'adelaide', name: 'Adelaide', countryCode: 'au' },
+  { slug: 'gold-coast', name: 'Gold Coast', countryCode: 'au' },
+  { slug: 'canberra', name: 'Canberra', countryCode: 'au' },
+  { slug: 'newcastle', name: 'Newcastle', countryCode: 'au' },
+  { slug: 'hobart', name: 'Hobart', countryCode: 'au' },
+  { slug: 'darwin', name: 'Darwin', countryCode: 'au' },
 
   // Asia
   { slug: 'istanbul', name: 'Istanbul', countryCode: 'tr' },
@@ -1048,8 +1057,18 @@ export const CITY_NAMES_UR: Record<string, string> = {
   sheffield: 'شیفیلڈ',
   bristol: 'برسٹل',
   cardiff: 'کارڈف',
+
+  // Australia
   sydney: 'سڈنی',
   melbourne: 'میلبورن',
+  brisbane: 'برسبین',
+  perth: 'پرتھ',
+  adelaide: 'ایڈیلیڈ',
+  'gold-coast': 'گولڈ کوسٹ',
+  canberra: 'کینبرا',
+  newcastle: 'نیو کیسل',
+  hobart: 'ہوبارٹ',
+  darwin: 'ڈارون',
   istanbul: 'استنبول',
   'kuala-lumpur': 'کوالالمپور',
   singapore: 'سنگاپور',
@@ -1305,8 +1324,18 @@ export const CITY_NAMES_AR: Record<string, string> = {
   sheffield: 'شيفيلد',
   bristol: 'بريستول',
   cardiff: 'كارديف',
+
+  // Australia
   sydney: 'سيدني',
   melbourne: 'ملبورن',
+  brisbane: 'بريزبان',
+  perth: 'بيرث',
+  adelaide: 'أديلايد',
+  'gold-coast': 'غولد كوست',
+  canberra: 'كانبرا',
+  newcastle: 'نيوكاسل',
+  hobart: 'هوبارت',
+  darwin: 'داروين',
   istanbul: 'إسطنبول',
   'kuala-lumpur': 'كوالالمبور',
   singapore: 'سنغافورة',
@@ -2174,6 +2203,38 @@ export const CITY_DISTRICTS: Record<string, string[]> = {
     'Gauthier',
     'Bourgogne',
     'Ain Diab',
+  ],
+
+  // Australia
+  sydney: [
+    'Sydney CBD',
+    'Bondi',
+    'Surry Hills',
+    'Parramatta',
+    'Manly',
+    'Chatswood',
+  ],
+  melbourne: [
+    'Melbourne CBD',
+    'Southbank',
+    'St Kilda',
+    'Carlton',
+    'Richmond',
+    'Docklands',
+  ],
+  brisbane: [
+    'Brisbane CBD',
+    'Fortitude Valley',
+    'South Brisbane',
+    'West End',
+    'New Farm',
+  ],
+  perth: [
+    'Perth CBD',
+    'Northbridge',
+    'Fremantle',
+    'Subiaco',
+    'Scarborough',
   ],
 };
 
