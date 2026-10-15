@@ -29,6 +29,8 @@ export interface Provider {
   total_leads: number;
   is_verified: boolean;
   is_available: boolean;
+  status?: 'pending' | 'approved' | 'rejected' | 'suspended';
+  is_featured?: boolean;
 }
 
 export const SEED_PROVIDERS: Provider[] = [
@@ -2100,6 +2102,8 @@ function mapDbProvider(row: any, fallbackCity: string = 'karachi'): Provider {
     total_leads: Number(row.total_leads) || 25,
     is_verified: Boolean(row.is_verified),
     is_available: Boolean(row.is_available),
+    status: row.status || (row.is_verified ? 'approved' : 'pending'),
+    is_featured: Boolean(row.is_featured),
   };
 }
 
@@ -2132,7 +2136,8 @@ export async function getProviders(citySlug: string, categorySlug?: string): Pro
 
   let dbProviders: Provider[] = [];
   try {
-    let queryPath = `providers?select=*,cities!inner(slug),countries!inner(code)&cities.slug=eq.${encodeURIComponent(normCity)}`;
+    // Only approved/verified providers are visible on the public frontend
+    let queryPath = `providers?select=*,cities!inner(slug),countries!inner(code)&cities.slug=eq.${encodeURIComponent(normCity)}&is_verified=eq.true`;
     if (category) {
       queryPath += `&category_id=in.(${targetCategoryIds.map(encodeURIComponent).join(',')})`;
     }
@@ -2144,8 +2149,12 @@ export async function getProviders(citySlug: string, categorySlug?: string): Pro
     console.warn('getProviders fetch note:', err);
   }
 
-  // Matching seed providers for this city and category
+  // Matching approved seed providers for this city and category
   const matchingSeeds = SEED_PROVIDERS.filter((p) => {
+    // Only approved providers should be visible on public frontend
+    const isApproved = p.is_verified && (p.status || 'approved') === 'approved';
+    if (!isApproved) return false;
+
     const cityMatch = p.city_slug.toLowerCase() === normCity;
     if (!categorySlug) return cityMatch;
     const catMatch =

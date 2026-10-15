@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateEnglishSlug } from './lib/transliterate';
+import { verifyAdminToken, ADMIN_COOKIE_NAME } from './lib/admin-auth';
 
 export const config = {
   matcher: [
@@ -91,7 +92,7 @@ const SHORT_CATEGORY_REDIRECTS: Record<string, string> = {
   'interior-decorator': 'interior-designer',
 };
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
   // Bypass sitemap and robots.txt
@@ -158,6 +159,25 @@ export function middleware(request: NextRequest) {
   }
 
   const lang = firstSegment;
+ 
+  // STRICT ADMIN AUTHENTICATION GUARD
+  const isAdminRoute = segments.length >= 2 && segments[1].toLowerCase() === 'admin';
+  if (isAdminRoute) {
+    const isLoginRoute = segments.length >= 3 && segments[2].toLowerCase() === 'login';
+    if (!isLoginRoute) {
+      const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
+      const { valid } = await verifyAdminToken(token);
+      if (!valid) {
+        const loginUrl = new URL(`/${lang}/admin/login`, request.url);
+        loginUrl.searchParams.set('next', pathname);
+        return NextResponse.redirect(loginUrl, 307);
+      }
+    }
+    const response = NextResponse.next();
+    response.headers.set('x-baseera-lang', lang);
+    response.headers.set('x-baseera-admin-authorized', 'true');
+    return response;
+  }
 
   // Serve Main Homepage on direct language paths (/en, /ur, /ar) without forcing city redirect
   if (segments.length === 1 && isSupportedLocale) {

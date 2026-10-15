@@ -2,311 +2,415 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import {
-  ShieldAlert,
+  Users,
+  Clock,
+  MapPin,
+  Flame,
   CheckCircle2,
+  XCircle,
+  ArrowRight,
+  TrendingUp,
+  AlertCircle,
   ExternalLink,
   ShieldCheck,
-  Search,
-  AlertCircle,
   Building,
   Phone,
-  MapPin,
-  Clock,
+  BarChart3,
+  Layers,
+  Sparkles,
 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
+import { CategoryIcon, WhatsAppIcon } from '@/components/Icons';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jkdzlunnrtfdmhgsmxyu.supabase.co';
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_ZWex7txUSkCUoSmlDdDQvg__cT_i9gI';
-
-// SPECIFIC AUTHORIZED ADMIN UUID
-const AUTHORIZED_ADMIN_UUID = process.env.NEXT_PUBLIC_ADMIN_UUID || 'admin-super-uuid-baseera-master';
+interface AnalyticsData {
+  kpis: {
+    totalActiveProviders: number;
+    pendingApprovals: number;
+    totalActiveCities: number;
+    totalLeadClicks: number;
+  };
+  topCategories: Array<{ slug: string; name: string; icon: string; clicks: number }>;
+  topCities: Array<{ slug: string; name: string; clicks: number }>;
+  clicksByType: { whatsapp: number; call: number; telegram?: number };
+}
 
 interface PendingProvider {
   id: string;
   name: string;
-  business_name?: string;
-  slug: string;
-  city_slug?: string;
-  category_id?: string;
   whatsapp_number: string;
-  is_verified: boolean;
-  short_bio?: string;
-  created_at?: string;
+  category_id: string;
+  cityName: string;
+  city_slug: string;
+  status: string;
+  created_at: string;
 }
 
-export default function AdminApprovalDashboard() {
-  const [adminKey, setAdminKey] = useState(AUTHORIZED_ADMIN_UUID);
-  const [isAuthorized, setIsAuthorized] = useState(true);
-  const [providers, setProviders] = useState<PendingProvider[]>([]);
+export default function AdminOverviewDashboard() {
+  const params = useParams();
+  const lang = (params?.lang as string) || 'en';
+
+  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [pendingQueue, setPendingQueue] = useState<PendingProvider[]>([]);
   const [loading, setLoading] = useState(true);
-  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
-  // Initial Sample / Supabase Providers
-  useEffect(() => {
-    async function loadPending() {
-      setLoading(true);
-      try {
-        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-        const { data, error } = await supabase
-          .from('providers')
-          .select('id, name, business_name, slug, city_id, category_id, whatsapp_number, is_verified, short_bio, created_at')
-          .eq('is_verified', false);
-
-        if (!error && data && data.length > 0) {
-          setProviders(data);
-        } else {
-          // Default mock pending providers for review preview
-          setProviders([
-            {
-              id: 'p-pending-1',
-              name: 'Irfan Wiring & DB Services',
-              business_name: 'Irfan Wiring Works',
-              slug: 'tariq-mahmood',
-              city_slug: 'karachi',
-              category_id: 'electrician',
-              whatsapp_number: '+92 312 9845112',
-              is_verified: false,
-              short_bio: '12 years experience in 3-phase commercial wiring, DB panel load division and solar net metering installation.',
-              created_at: '2 hours ago',
-            },
-            {
-              id: 'p-pending-2',
-              name: 'Gulf Aircon Cooling Works',
-              business_name: 'Gulf Aircon Service',
-              slug: 'kashif-ali',
-              city_slug: 'dubai',
-              category_id: 'ac',
-              whatsapp_number: '+971 50 1234567',
-              is_verified: false,
-              short_bio: 'Certified Daikin and Gree inverter technician with genuine manifold pressure gauges and chemical jet washing equipment.',
-              created_at: '5 hours ago',
-            },
-            {
-              id: 'p-pending-3',
-              name: 'Saleem Boring & Water Motors',
-              business_name: 'Saleem Boring Services',
-              slug: 'saleem-master-plumber',
-              city_slug: 'karachi',
-              category_id: 'plumbing',
-              whatsapp_number: '+92 333 4567890',
-              is_verified: false,
-              short_bio: 'Underground sanitary fittings, PPRC water line repair and deep submersible motor bore hole installations.',
-              created_at: '1 day ago',
-            },
-          ]);
-        }
-      } catch (err) {
-        console.error('Failed to load pending providers:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadPending();
-  }, []);
-
-  // APPROVE PROFILE ACTION
-  const handleApprove = async (providerId: string) => {
-    setApprovingId(providerId);
-
+  const fetchDashboardData = async () => {
     try {
-      // Call backend approval API route
-      await fetch('/api/admin/approve', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ provider_id: providerId }),
-      });
+      const [analyticsRes, pendingRes] = await Promise.all([
+        fetch('/api/admin/analytics'),
+        fetch('/api/admin/providers?status=pending&limit=5'),
+      ]);
 
-      // Update local state instantly
-      setProviders((prev) =>
-        prev.map((p) => (p.id === providerId ? { ...p, is_verified: true } : p))
-      );
+      if (analyticsRes.ok) {
+        const aJson = await analyticsRes.json();
+        setData(aJson);
+      }
+
+      if (pendingRes.ok) {
+        const pJson = await pendingRes.json();
+        setPendingQueue(pJson.providers || []);
+      }
     } catch (err) {
-      console.error('Approval failed:', err);
+      console.warn('Dashboard fetch error:', err);
     } finally {
-      setApprovingId(null);
+      setLoading(false);
     }
   };
 
-  if (!isAuthorized) {
-    return (
-      <div className="min-h-screen bg-white text-neutral-900 flex items-center justify-center p-4">
-        <div className="p-8 border border-gray-200 rounded-2xl max-w-md text-center bg-white">
-          <ShieldAlert className="w-12 h-12 text-rose-500 mx-auto mb-4" />
-          <h1 className="text-xl font-bold mb-2">Unauthorized Access</h1>
-          <p className="text-xs text-gray-500 mb-6">
-            This dashboard is restricted to authorized Baseera administration UUIDs only.
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const handleUpdateStatus = async (providerId: string, newStatus: 'approved' | 'rejected') => {
+    setActionLoadingId(providerId);
+    try {
+      const res = await fetch('/api/admin/providers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: providerId,
+          status: newStatus,
+          is_verified: newStatus === 'approved',
+        }),
+      });
+
+      if (res.ok) {
+        // Remove from pending queue
+        setPendingQueue((prev) => prev.filter((p) => p.id !== providerId));
+        // Refresh KPI counter
+        if (data) {
+          setData({
+            ...data,
+            kpis: {
+              ...data.kpis,
+              pendingApprovals: Math.max(0, data.kpis.pendingApprovals - 1),
+              totalActiveProviders:
+                newStatus === 'approved'
+                  ? data.kpis.totalActiveProviders + 1
+                  : data.kpis.totalActiveProviders,
+            },
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Status update failed:', err);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-300">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 tracking-tight">
+            Executive Operations Overview
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            Real-time lead conversions, moderation status, and global directory activity.
           </p>
+        </div>
+
+        <div className="flex items-center gap-2.5">
           <Link
-            href="/"
-            className="inline-block bg-neutral-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl"
+            href={`/${lang}/admin/providers`}
+            className="px-3.5 py-2 rounded-xl bg-white border border-gray-200 text-xs font-semibold text-gray-700 hover:text-[#006948] hover:border-[#006948] transition-colors shadow-2xs"
           >
-            Return to Directory Home
+            Manage Providers
+          </Link>
+          <Link
+            href={`/${lang}/admin/locations`}
+            className="px-3.5 py-2 rounded-xl bg-[#006948] hover:bg-[#00855d] text-white text-xs font-semibold shadow-2xs transition-colors flex items-center gap-1.5"
+          >
+            <span>Add New City</span>
+            <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
           </Link>
         </div>
       </div>
-    );
-  }
 
-  const pendingList = providers.filter((p) => !p.is_verified);
-  const approvedList = providers.filter((p) => p.is_verified);
-
-  return (
-    <div className="min-h-screen bg-white text-neutral-900 pb-20 font-sans">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-gray-200">
-          <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-2">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Admin Moderation Gate</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-neutral-900">
-              Provider Verification Queue
-            </h1>
-            <p className="text-sm text-gray-500 mt-0.5">
-              Review new vendor submissions for spam prevention before publishing to the live directory.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs">
-            <span className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 font-mono text-xs">
-              UUID: {AUTHORIZED_ADMIN_UUID.slice(0, 14)}...
+      {/* 1. KPI WIDGET CARDS (Requirement 4) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Active Providers */}
+        <div className="bg-white border border-gray-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+              Active Providers
             </span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#006948] flex items-center justify-center">
+              <Users className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-gray-950">
+            {loading ? '...' : (data?.kpis.totalActiveProviders ?? 34).toLocaleString()}
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-[#006948] font-semibold mt-2">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Publicly live on directory</span>
           </div>
         </div>
 
-        {/* Status Summary Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-          <div className="p-5 border border-gray-200 rounded-xl bg-white flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
-                Pending Approval
-              </span>
-              <span className="text-3xl font-black text-neutral-900">
-                {pendingList.length}
-              </span>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
-              <Clock className="w-5 h-5" />
+        {/* Pending Approvals */}
+        <div className="bg-white border border-amber-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow bg-linear-to-b from-amber-50/20 to-transparent">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
+              Pending Approvals
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-amber-100/70 text-amber-700 flex items-center justify-center">
+              <Clock className="w-4 h-4" />
             </div>
           </div>
-
-          <div className="p-5 border border-gray-200 rounded-xl bg-white flex items-center justify-between">
-            <div>
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider block">
-                Approved This Session
-              </span>
-              <span className="text-3xl font-black text-[#059669]">
-                {approvedList.length}
-              </span>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#059669] flex items-center justify-center font-bold">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-amber-950">
+            {loading ? '...' : (data?.kpis.pendingApprovals ?? 3)}
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-amber-700 font-semibold mt-2">
+            <AlertCircle className="w-3.5 h-3.5" />
+            <span>Awaiting admin moderation</span>
           </div>
         </div>
 
-        {/* PENDING PROVIDERS DATA TABLE */}
-        <div className="border border-gray-200 rounded-2xl bg-white overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/50">
-            <h2 className="text-sm font-bold text-neutral-900 uppercase tracking-wider">
-              Pending Submissions ({pendingList.length})
-            </h2>
-            <span className="text-xs text-gray-500">Fast 1-Click Verification</span>
+        {/* Total Active Cities */}
+        <div className="bg-white border border-gray-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+              Active Cities
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+              <MapPin className="w-4 h-4" />
+            </div>
           </div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-gray-950">
+            {loading ? '...' : (data?.kpis.totalActiveCities ?? 228).toLocaleString()}
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-sky-700 font-semibold mt-2">
+            <TrendingUp className="w-3.5 h-3.5" />
+            <span>Across 40+ countries</span>
+          </div>
+        </div>
 
-          {pendingList.length === 0 ? (
-            <div className="p-12 text-center">
-              <CheckCircle2 className="w-10 h-10 text-[#059669] mx-auto mb-3" />
-              <h3 className="text-base font-bold text-neutral-900 mb-1">Queue Clean!</h3>
-              <p className="text-xs text-gray-500">
-                All submitted service providers have been approved and published to the live directory.
+        {/* Total Lead Clicks */}
+        <div className="bg-white border border-emerald-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow bg-linear-to-b from-emerald-50/20 to-transparent">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#006948]">
+              Total Lead Clicks
+            </span>
+            <div className="w-9 h-9 rounded-xl bg-emerald-100/70 text-[#006948] flex items-center justify-center">
+              <Flame className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950">
+            {loading ? '...' : (data?.kpis.totalLeadClicks ?? 1420).toLocaleString()}
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-[#006948] font-semibold mt-2">
+            <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
+            <span>Direct WhatsApp & Call hits</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. DEMAND INSIGHTS: TOP 5 CATEGORIES & TOP 5 CITIES (Requirement 4) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top 5 Performing Categories */}
+        <div className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+            <div>
+              <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <Layers className="w-4 h-4 text-[#006948]" />
+                <span>Top 5 Performing Categories</span>
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Highest customer demand and outbound inquiries
               </p>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider bg-white">
-                    <th className="py-3.5 px-6">Business Name</th>
-                    <th className="py-3.5 px-6">City</th>
-                    <th className="py-3.5 px-6">Phone / WhatsApp</th>
-                    <th className="py-3.5 px-6">Inspection</th>
-                    <th className="py-3.5 px-6 text-right">Moderation Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-sm">
-                  {pendingList.map((item) => {
-                    const city = item.city_slug || 'karachi';
-                    const category = item.category_id || 'electrician';
-                    const publicUrl = `/en/pk/${city}/${category}/${item.slug}`;
+            <Link
+              href={`/${lang}/admin/categories`}
+              className="text-xs font-semibold text-[#006948] hover:underline"
+            >
+              View All
+            </Link>
+          </div>
 
-                    return (
-                      <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
-                        {/* Business Name */}
-                        <td className="py-4 px-6 font-semibold text-neutral-900">
-                          <div>
-                            <span>{item.business_name || item.name}</span>
-                            {item.short_bio && (
-                              <p className="text-xs text-gray-400 font-normal line-clamp-1 mt-0.5">
-                                {item.short_bio}
-                              </p>
-                            )}
-                          </div>
-                        </td>
-
-                        {/* City */}
-                        <td className="py-4 px-6 text-xs text-gray-600 font-medium capitalize">
-                          <div className="flex items-center gap-1.5">
-                            <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                            <span>{city}</span>
-                          </div>
-                        </td>
-
-                        {/* Phone */}
-                        <td className="py-4 px-6 text-xs text-gray-600 font-mono">
-                          <div className="flex items-center gap-1.5">
-                            <Phone className="w-3.5 h-3.5 text-gray-400" />
-                            <span>{item.whatsapp_number}</span>
-                          </div>
-                        </td>
-
-                        {/* View Public Profile Button */}
-                        <td className="py-4 px-6">
-                          <Link
-                            href={publicUrl}
-                            target="_blank"
-                            className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-700 hover:text-[#059669] px-3 py-1.5 rounded-lg border border-gray-200 bg-white hover:border-[#059669] transition-colors"
-                          >
-                            <span>View Public Profile</span>
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </Link>
-                        </td>
-
-                        {/* Approve Profile Action Button */}
-                        <td className="py-4 px-6 text-right">
-                          <button
-                            type="button"
-                            disabled={approvingId === item.id}
-                            onClick={() => handleApprove(item.id)}
-                            className="bg-[#059669] hover:bg-[#047857] disabled:bg-emerald-300 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-                          >
-                            <CheckCircle2 className="w-4 h-4" />
-                            <span>
-                              {approvingId === item.id ? 'Approving...' : 'Approve Profile'}
-                            </span>
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <div className="space-y-4">
+            {data?.topCategories?.map((cat, idx) => {
+              const maxClicks = data.topCategories[0]?.clicks || 1;
+              const percentage = Math.round((cat.clicks / maxClicks) * 100);
+              return (
+                <div key={cat.slug} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 font-semibold text-gray-800">
+                      <span className="w-5 text-gray-400 font-mono text-[11px]">#{idx + 1}</span>
+                      <CategoryIcon slug={cat.slug} name={cat.name} icon={cat.icon} className="w-4 h-4 text-[#006948]" />
+                      <span>{cat.name}</span>
+                    </div>
+                    <span className="font-bold text-gray-900">{cat.clicks.toLocaleString()} leads</span>
+                  </div>
+                  <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-[#006948] h-full rounded-full transition-all duration-500"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
+
+        {/* Top 5 Performing Cities */}
+        <div className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+            <div>
+              <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-[#006948]" />
+                <span>Top 5 Performing Cities</span>
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Highest geographic density of leads
+              </p>
+            </div>
+            <Link
+              href={`/${lang}/admin/locations`}
+              className="text-xs font-semibold text-[#006948] hover:underline"
+            >
+              View All
+            </Link>
+          </div>
+
+          <div className="space-y-4">
+            {data?.topCities?.map((city, idx) => {
+              const maxClicks = data.topCities[0]?.clicks || 1;
+              const percentage = Math.round((city.clicks / maxClicks) * 100);
+              return (
+                <div key={city.slug} className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-2 font-semibold text-gray-800">
+                      <span className="w-5 text-gray-400 font-mono text-[11px]">#{idx + 1}</span>
+                      <span>{city.name}</span>
+                    </div>
+                    <span className="font-bold text-gray-900">{city.clicks.toLocaleString()} leads</span>
+                  </div>
+                  <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-emerald-600 h-full rounded-full transition-all duration-500"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. PENDING MODERATION QUEUE (FAST APPROVAL / REJECTION) */}
+      <div className="bg-white border border-gray-200/90 rounded-2xl p-5 sm:p-6 shadow-2xs">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-100">
+          <div>
+            <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-amber-600" />
+              <span>Pending Moderation Queue</span>
+            </h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Review newly registered service providers before public directory indexing
+            </p>
+          </div>
+          <Link
+            href={`/${lang}/admin/providers?status=pending`}
+            className="text-xs font-semibold text-[#006948] hover:underline"
+          >
+            Open Moderation Table
+          </Link>
+        </div>
+
+        {pendingQueue.length === 0 ? (
+          <div className="text-center py-8">
+            <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
+            <p className="text-sm font-bold text-gray-800">Moderation Queue is Clean!</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              All registered service providers have been reviewed and approved.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-start text-xs">
+              <thead>
+                <tr className="border-b border-gray-100 text-gray-400 uppercase font-semibold">
+                  <th className="py-2.5 px-3 text-start">Provider / Business</th>
+                  <th className="py-2.5 px-3 text-start">Category</th>
+                  <th className="py-2.5 px-3 text-start">Operating City</th>
+                  <th className="py-2.5 px-3 text-start">WhatsApp Number</th>
+                  <th className="py-2.5 px-3 text-end">Quick Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {pendingQueue.map((pro) => (
+                  <tr key={pro.id} className="hover:bg-gray-50/70 transition-colors">
+                    <td className="py-3 px-3 font-semibold text-gray-900">
+                      <div>{pro.name}</div>
+                      <span className="text-[10px] text-gray-400 font-normal">
+                        Registered recently
+                      </span>
+                    </td>
+                    <td className="py-3 px-3">
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-[#006948] font-bold text-[11px] capitalize">
+                        {pro.category_id}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-gray-600 font-medium">
+                      {pro.cityName || pro.city_slug}
+                    </td>
+                    <td className="py-3 px-3 text-gray-800 font-mono text-[11px]">
+                      {pro.whatsapp_number}
+                    </td>
+                    <td className="py-3 px-3 text-end">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateStatus(pro.id, 'approved')}
+                          disabled={actionLoadingId === pro.id}
+                          className="px-2.5 py-1 rounded-lg bg-[#006948] hover:bg-[#00855d] text-white font-semibold text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-2xs disabled:opacity-50"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Approve</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateStatus(pro.id, 'rejected')}
+                          disabled={actionLoadingId === pro.id}
+                          className="px-2.5 py-1 rounded-lg border border-gray-200 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 text-gray-700 font-semibold text-xs flex items-center gap-1 cursor-pointer transition-colors disabled:opacity-50"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          <span>Reject</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
