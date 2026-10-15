@@ -410,7 +410,7 @@ function ListServiceContent({ lang }: { lang: string }) {
               </div>
               <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight text-gray-950 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-6 pt-2' : 'leading-tight'}`}>
                 {lang === 'ur'
-                  ? 'بطور سروس پرووائیڈر / کاریگر رجسٹر ہوں'
+                  ? 'بطور سروس پرووائیڈر رجسٹر ہوں'
                   : lang === 'ar'
                   ? 'سجل كفني أو مقدم خدمة محلي'
                   : 'Register as a Local Specialist'}
@@ -561,7 +561,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                   <ShieldCheck className="w-4 h-4 text-[#006948] shrink-0 mt-0.5" />
                   <span className="leading-relaxed">
                     {lang === 'ur'
-                      ? 'قاعدہ: بصیرہ پر ایک فون / واٹس ایپ نمبر پر صرف ایک تصدیق شدہ پروفائل بنائی جا سکتی ہے۔ ایک ہی کاریگر کے مختلف کیٹیگریز میں الگ الگ ڈپلیکیٹ پروفائلز بنانا سختی سے منع ہے۔'
+                      ? 'قاعدہ: بصیرہ پر ایک فون / واٹس ایپ نمبر پر صرف ایک تصدیق شدہ پروفائل بنائی جا سکتی ہے۔ ایک ہی فرد / پرووائیڈر کے مختلف کیٹیگریز میں الگ الگ ڈپلیکیٹ پروفائلز بنانا سختی سے منع ہے۔'
                       : lang === 'ar'
                       ? 'قاعدة هامة: يُسمح بملف شخصي واحد موثق فقط لكل رقم هاتف / واتساب. يُحظر إنشاء حسابات مكررة بنفس الرقم عبر فئات متعددة.'
                       : 'Important Policy: Only one verified profile per phone / WhatsApp number is permitted on Baseera. Registering duplicate profiles across multiple categories using the same number is strictly prohibited.'}
@@ -663,10 +663,14 @@ function ListServiceContent({ lang }: { lang: string }) {
                     className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-[#006948] focus:bg-white transition-all cursor-pointer"
                   >
                     <option value="individual">
-                      {lang === 'ur' ? 'انفرادی کاریگر / آزاد ماہر (Freelance Karigar)' : 'Individual Karigar / Freelance Master'}
+                      {lang === 'ur'
+                        ? 'انفرادی ماہر / آزاد پیشہ ور (Individual Specialist)'
+                        : lang === 'ar'
+                        ? 'أخصائي فردي / مستقل (Individual Specialist)'
+                        : 'Individual Specialist / Freelance Professional'}
                     </option>
                     <option value="shop">
-                      {lang === 'ur' ? 'رجسٹرڈ ورکشاپ / دکان / ایجنسی' : 'Registered Workshop / Agency / Team'}
+                      {lang === 'ur' ? 'رجسٹرڈ ورکشاپ / دکان / ایجنسی' : lang === 'ar' ? 'ورشة عمل مسجلة / وكالة / فريق' : 'Registered Workshop / Agency / Team'}
                     </option>
                   </select>
                 </div>

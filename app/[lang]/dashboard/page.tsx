@@ -240,7 +240,7 @@ export default function ProviderOnboardingDashboard({ params }: Props) {
 
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 uppercase mb-2">
-                      Business or Karigar Name
+                      Business or Specialist Name
                     </label>
                     <input
                       type="text"
