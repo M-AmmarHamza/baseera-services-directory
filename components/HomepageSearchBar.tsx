@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Search, MapPin, ArrowRight, ChevronDown, X, Check, Globe } from 'lucide-react';
-import { COUNTRIES, CITIES, Country, City } from '@/lib/db';
+import { COUNTRIES, CITIES, Country, City, getLocalizedCountryName, getLocalizedCityName } from '@/lib/db';
 
 interface Props {
   lang: string;
@@ -196,21 +196,12 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
 
   // Format localized display name for city chip
   const getCityDisplayName = (city: SelectedCity): string => {
-    const localized = CITY_LOCALIZED_NAMES[city.slug.toLowerCase()];
-    if (lang === 'ur' && localized?.ur) {
-      return `${localized.ur}، ${city.countryCode.toUpperCase()}`;
-    }
-    if (lang === 'ar' && localized?.ar) {
-      return `${localized.ar}، ${city.countryCode.toUpperCase()}`;
-    }
-    return `${city.name}, ${city.countryCode.toUpperCase()}`;
+    const locCity = getLocalizedCityName(city.slug, lang);
+    return `${locCity}، ${city.countryCode.toUpperCase()}`;
   };
 
   const getCityNameOnly = (city: SelectedCity): string => {
-    const localized = CITY_LOCALIZED_NAMES[city.slug.toLowerCase()];
-    if (lang === 'ur' && localized?.ur) return localized.ur;
-    if (lang === 'ar' && localized?.ar) return localized.ar;
-    return city.name;
+    return getLocalizedCityName(city.slug, lang);
   };
 
   // Filtered and grouped cities for selection modal
@@ -222,16 +213,16 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
 
     return activeCountries
       .map((country) => {
+        const locCountry = getLocalizedCountryName(country.code, lang).toLowerCase();
         const countryCities = CITIES.filter((city) => {
           if (city.countryCode.toLowerCase() !== country.code.toLowerCase()) return false;
           if (!q) return true;
-          const loc = CITY_LOCALIZED_NAMES[city.slug.toLowerCase()];
+          const locCity = getLocalizedCityName(city.slug, lang).toLowerCase();
           const matchesName = city.name.toLowerCase().includes(q);
           const matchesSlug = city.slug.toLowerCase().includes(q);
-          const matchesCountry = country.name.toLowerCase().includes(q);
-          const matchesUrdu = loc?.ur ? loc.ur.includes(q) : false;
-          const matchesArabic = loc?.ar ? loc.ar.includes(q) : false;
-          return matchesName || matchesSlug || matchesCountry || matchesUrdu || matchesArabic;
+          const matchesCountry = country.name.toLowerCase().includes(q) || locCountry.includes(q);
+          const matchesLoc = locCity.includes(q);
+          return matchesName || matchesSlug || matchesCountry || matchesLoc;
         });
 
         return {
@@ -240,7 +231,7 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
         };
       })
       .filter((group) => group.cities.length > 0);
-  }, [citySearch, countryFilter]);
+  }, [citySearch, countryFilter, lang]);
 
   // Handle City Selection
   const handleSelectCity = (city: City) => {
@@ -466,7 +457,9 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                   } ${lang === 'ur' ? 'font-urdu leading-[2.2] min-h-[36px]' : ''}`}
                 >
                   <span>{c.flag}</span>
-                  <span>{c.name}</span>
+                  <span className={lang === 'ur' ? 'font-urdu leading-none' : ''}>
+                    {getLocalizedCountryName(c.code, lang)}
+                  </span>
                 </button>
               ))}
             </div>
@@ -485,8 +478,8 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                     {/* Country Header */}
                     <div className="flex items-center gap-2 mb-2.5">
                       <span className="text-base">{group.country.flag}</span>
-                      <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                        {group.country.name}
+                      <span className={`text-xs font-bold uppercase tracking-wider text-gray-700 ${lang === 'ur' ? 'font-urdu text-sm' : ''}`}>
+                        {getLocalizedCountryName(group.country.code, lang)}
                       </span>
                     </div>
 
@@ -497,13 +490,7 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                           selectedCity.slug.toLowerCase() === c.slug.toLowerCase() &&
                           selectedCity.countryCode.toLowerCase() === c.countryCode.toLowerCase();
 
-                        const localizedName = CITY_LOCALIZED_NAMES[c.slug.toLowerCase()];
-                        const displayTitle =
-                          lang === 'ur' && localizedName?.ur
-                            ? localizedName.ur
-                            : lang === 'ar' && localizedName?.ar
-                            ? localizedName.ar
-                            : c.name;
+                        const displayTitle = getLocalizedCityName(c.slug, lang);
 
                         return (
                           <button

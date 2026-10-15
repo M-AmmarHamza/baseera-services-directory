@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { COUNTRIES, CITIES, Country } from '@/lib/db';
+import { COUNTRIES, CITIES, Country, getLocalizedCountryName, getLocalizedCityName } from '@/lib/db';
 import { MapPin, ChevronRight, Search, Globe } from '@/components/Icons';
 
 interface Props {
@@ -18,18 +18,21 @@ export default function GlobalCountryExplorer({ lang }: Props) {
   const filteredCountries = useMemo(() => {
     return COUNTRIES.filter((c) => {
       const matchRegion = selectedRegion === 'All' || c.region === selectedRegion;
+      const q = search.trim().toLowerCase();
+      const locCountry = getLocalizedCountryName(c.code, lang).toLowerCase();
       const matchSearch =
-        search.trim() === '' ||
-        c.name.toLowerCase().includes(search.toLowerCase()) ||
-        c.code.toLowerCase().includes(search.toLowerCase()) ||
-        CITIES.some(
-          (city) =>
-            city.countryCode === c.code &&
-            city.name.toLowerCase().includes(search.toLowerCase())
-        );
+        q === '' ||
+        c.name.toLowerCase().includes(q) ||
+        c.code.toLowerCase().includes(q) ||
+        locCountry.includes(q) ||
+        CITIES.some((city) => {
+          if (city.countryCode !== c.code) return false;
+          const locCity = getLocalizedCityName(city.slug, lang).toLowerCase();
+          return city.name.toLowerCase().includes(q) || city.slug.toLowerCase().includes(q) || locCity.includes(q);
+        });
       return matchRegion && matchSearch;
     });
-  }, [selectedRegion, search]);
+  }, [selectedRegion, search, lang]);
 
   return (
     <section className="flex flex-col gap-6 w-full">
@@ -118,8 +121,8 @@ export default function GlobalCountryExplorer({ lang }: Props) {
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-2xl shrink-0">{country.flag}</span>
                       <div className="min-w-0">
-                        <h3 className="font-semibold text-lg text-gray-900 group-hover:text-[#006948] transition-colors truncate leading-snug">
-                          {country.name}
+                        <h3 className={`font-semibold text-lg text-gray-900 group-hover:text-[#006948] transition-colors truncate leading-snug ${lang === 'ur' ? 'font-urdu' : ''}`}>
+                          {getLocalizedCountryName(country.code, lang)}
                         </h3>
                         <span className="text-xs text-gray-500 font-medium">
                           {country.region}
@@ -141,7 +144,9 @@ export default function GlobalCountryExplorer({ lang }: Props) {
                           className="inline-flex items-center gap-1 text-xs font-semibold text-gray-700 bg-gray-50 hover:bg-emerald-50 hover:text-[#006948] px-2.5 py-1 rounded-lg border border-gray-200/60 transition-colors"
                         >
                           <MapPin className="w-3.5 h-3.5 text-[#006948] shrink-0" />
-                          <span>{city.name}</span>
+                          <span className={lang === 'ur' ? 'font-urdu leading-none' : ''}>
+                            {getLocalizedCityName(city.slug, lang)}
+                          </span>
                         </Link>
                       ))
                     ) : (
@@ -150,7 +155,9 @@ export default function GlobalCountryExplorer({ lang }: Props) {
                         className="inline-flex items-center gap-1 text-xs font-semibold text-gray-700 bg-gray-50 hover:bg-emerald-50 hover:text-[#006948] px-2.5 py-1 rounded-lg border border-gray-200/60 transition-colors"
                       >
                         <MapPin className="w-3.5 h-3.5 text-[#006948] shrink-0" />
-                        <span className="capitalize">{country.defaultCity}</span>
+                        <span className={`capitalize ${lang === 'ur' ? 'font-urdu leading-none' : ''}`}>
+                          {getLocalizedCityName(country.defaultCity, lang)}
+                        </span>
                       </Link>
                     )}
                   </div>
@@ -160,7 +167,9 @@ export default function GlobalCountryExplorer({ lang }: Props) {
                   href={`/${lang}/${country.code}/${country.defaultCity}`}
                   className="w-full mt-1 py-2 px-3 rounded-xl bg-gray-50 group-hover:bg-[#006948] group-hover:text-white text-gray-700 text-sm font-semibold transition-all text-center flex items-center justify-center gap-1"
                 >
-                  <span>Open {country.name}</span>
+                  <span className={lang === 'ur' ? 'font-urdu' : ''}>
+                    {lang === 'ur' ? `${getLocalizedCountryName(country.code, lang)} دیکھیں` : lang === 'ar' ? `تصفح ${getLocalizedCountryName(country.code, lang)}` : `Open ${country.name}`}
+                  </span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
