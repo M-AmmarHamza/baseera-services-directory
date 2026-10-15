@@ -13,6 +13,7 @@ import {
   getCityDistricts,
 } from '@/lib/db';
 import SearchBar from '@/components/SearchBar';
+import RelatedSlider from '@/components/RelatedSlider';
 import {
   CategoryIcon,
   MapPin,
@@ -196,42 +197,28 @@ export default async function CityHomePage({ params }: PageProps) {
             )}
           </section>
 
-          {/* Browse by Specialty Grid */}
-          <section className="flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <div className="overflow-visible">
-                <h2 className={`text-xl sm:text-2xl font-semibold text-gray-950 tracking-tight overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-3 pt-1.5' : 'leading-snug'}`}>
-                  {lang === 'ur' ? 'شعبہ جات کے لحاظ سے تلاش کریں' : lang === 'ar' ? 'تصفح حسب التخصص' : 'Browse by Specialty'}
-                </h2>
-                <p className={`text-sm text-gray-500 font-medium overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-                  {lang === 'ur' ? 'دنیا بھر کے تصدیق شدہ کمیونٹی ٹیکنیشنز اور ماہر کاریگر' : lang === 'ar' ? 'فنيون محترفون ومعتمدون في منطقتك' : 'Verified community technicians & cooks'}
-                </p>
-              </div>
-              <span className="text-xs text-[#006948] font-bold">
-                {CATEGORIES.length} {lang === 'ur' ? 'شعبہ جات' : lang === 'ar' ? 'تخصص' : 'Categories'}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3">
-              {CATEGORIES.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${cat.slug}`}
-                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group overflow-visible"
-                >
-                  <div className="w-12 h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-2 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
-                    <CategoryIcon id={cat.id} className="w-5 h-5" />
-                  </div>
-                  <span className={`font-bold text-xs text-gray-900 group-hover:text-[#006948] transition-colors leading-tight ${lang === 'ur' ? 'font-urdu leading-[2.2] min-h-[2.5rem] py-0.5' : ''} overflow-visible`}>
-                    {getCategoryName(cat, lang)}
-                  </span>
-                  <span className="text-xs text-gray-400 font-medium mt-0.5">
-                    {cat.count}+ {lang === 'ur' ? 'دستیاب' : lang === 'ar' ? 'متاح' : 'Active'}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </section>
+          {/* Popular Services Slider */}
+          <RelatedSlider
+            type="categories"
+            title={
+              lang === 'ur'
+                ? `${cityName} میں مقبول ترین سروسز`
+                : lang === 'ar'
+                ? `الخدمات الشائعة في ${cityName}`
+                : `Popular Services in ${cityName}`
+            }
+            subtitle={
+              lang === 'ur'
+                ? 'دنیا بھر کے تصدیق شدہ کمیونٹی ٹیکنیشنز اور ماہر کاریگر'
+                : lang === 'ar'
+                ? 'فنيون محترفون ومعتمدون في منطقتك'
+                : `Verified community specialists & technicians across ${cityName}`
+            }
+            items={CATEGORIES}
+            lang={lang}
+            country={country}
+            city={city}
+          />
 
           {/* Verified Specialists Section */}
           {providers.length > 0 ? (

@@ -1658,6 +1658,7 @@ export interface CategoryDef {
   icon: string;
   count: number;
 }
+export type Category = CategoryDef;
 
 export const CATEGORIES: CategoryDef[] = [
   // Electrical & Power

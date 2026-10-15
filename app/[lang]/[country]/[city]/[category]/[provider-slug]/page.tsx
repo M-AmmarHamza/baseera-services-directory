@@ -17,6 +17,7 @@ import { WhatsAppIcon } from '@/components/Icons';
 import { getDictionary } from '@/lib/get-dictionary';
 import {
   getProviderBySlug,
+  getProviders,
   getCategoryBySlug,
   getCategoryName,
   getCountryByCode,
@@ -28,6 +29,7 @@ import { getProviderCoverUrl, getProviderAvatarUrl } from '@/lib/category-banner
 import { formatVisitingPrice } from '@/lib/currencies';
 import ProviderImageSlider from '@/components/ProviderImageSlider';
 import ProviderContactFAB from '@/components/ProviderContactFAB';
+import RelatedSlider from '@/components/RelatedSlider';
 
 interface ProviderPageProps {
   params: Promise<{
@@ -282,6 +284,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     notFound();
   }
 
+  const similarProviders = await getProviders(city, category);
   const cityName = getLocalizedCityName(city, lang);
   const countryObj = getCountryByCode(country);
   const countryName = getLocalizedCountryName(countryObj, lang);
@@ -632,6 +635,34 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Similar Specialists Near You Slider */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <RelatedSlider
+            type="providers"
+            title={
+              lang === 'ur'
+                ? `آپ کے قریب دیگر تصدیق شدہ ${categoryName} ماہرین`
+                : lang === 'ar'
+                ? `متخصصون آخرون في ${categoryName} بالقرب منك`
+                : `Similar ${categoryName} Specialists Near You`
+            }
+            subtitle={
+              lang === 'ur'
+                ? `${cityName} میں دستیاب دیگر اعلیٰ ریٹنگ والے تصدیق شدہ کاریگر`
+                : lang === 'ar'
+                ? `فنيون موثقون يقدمون نفس الخدمة في ${cityName}`
+                : `Verified professionals in ${cityName} specializing in ${categoryName.toLowerCase()}`
+            }
+            items={similarProviders}
+            currentSlug={slug}
+            lang={lang}
+            country={country}
+            city={city}
+            category={category}
+            viewAllHref={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`}
+          />
         </div>
       </main>
 

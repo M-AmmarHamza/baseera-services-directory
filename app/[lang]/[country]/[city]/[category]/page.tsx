@@ -21,6 +21,7 @@ import {
   toTitleCase,
 } from '@/lib/db';
 import { formatVisitingPrice } from '@/lib/currencies';
+import RelatedSlider from '@/components/RelatedSlider';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -245,8 +246,42 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
             </div>
           </div>
         ) : (
-          /* 2. FLAT PROVIDER CARDS LIST */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="space-y-10">
+            {/* 1. TOP-RATED SPECIALISTS HORIZONTAL SLIDER */}
+            <RelatedSlider
+              type="providers"
+              title={
+                lang === 'ur'
+                  ? `${cityName} میں ٹاپ ریٹڈ ${categoryName}`
+                  : lang === 'ar'
+                  ? `أفضل ${categoryName} في ${cityName}`
+                  : `Top-Rated ${categoryName} in ${cityName}`
+              }
+              subtitle={
+                lang === 'ur'
+                  ? 'اعلیٰ ترین ریٹنگز اور تصدیق شدہ تجربے کے حامل لوکل ماہرین'
+                  : lang === 'ar'
+                  ? 'فنيون معتمدون حاصلون على أعلى تقييمات العملاء'
+                  : `Swipe to view top verified ${categoryName.toLowerCase()} profiles in ${cityName}`
+              }
+              items={providers}
+              lang={lang}
+              country={country}
+              city={city}
+              category={category}
+            />
+
+            {/* 2. ALL PROVIDERS LIST */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className={`text-lg sm:text-xl font-bold text-neutral-900 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
+                  {lang === 'ur' ? 'تمام دستیاب کاریگر' : lang === 'ar' ? 'جميع الفنيين المتاحين' : 'All Available Profiles'}
+                </h3>
+                <span className="text-xs text-gray-500 font-semibold bg-gray-100 px-2.5 py-1 rounded-full">
+                  {providers.length} {lang === 'ur' ? 'پروفائلز' : lang === 'ar' ? 'ملف' : 'Profiles'}
+                </span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {providers.map((provider) => {
               const cleanPhone = provider.whatsapp_number.replace(/[^0-9]/g, '');
               const whatsappMessage = encodeURIComponent(
@@ -367,6 +402,8 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                 </div>
               );
             })}
+              </div>
+            </div>
           </div>
         )}
       </main>

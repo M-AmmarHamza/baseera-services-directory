@@ -41,6 +41,7 @@ import {
   getLocalizedCityName,
   toTitleCase,
 } from '@/lib/db';
+import RelatedSlider from '@/components/RelatedSlider';
 
 interface CountryPageProps {
   params: Promise<{
@@ -197,54 +198,28 @@ export default async function CountryPage({ params }: CountryPageProps) {
         </div>
       </section>
 
-      {/* Section 1: Popular Cities in Country */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-        <div className="flex items-end justify-between gap-4 mb-6">
-          <div className="overflow-visible">
-            <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-2 pt-1' : 'leading-snug'}`}>
-              {lang === 'ur'
-                ? `${countryName} کے مشہور شہر`
-                : lang === 'ar'
-                ? `المدن الرئيسية في ${countryName}`
-                : `Popular Cities in ${countryName}`}
-            </h2>
-            <p className={`text-sm text-gray-500 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-              {lang === 'ur'
-                ? 'قریبی تصدیق شدہ کاریگروں سے رابطے کے لیے اپنا شہر منتخب کریں'
-                : lang === 'ar'
-                ? 'اختر مدينتك للتواصل مع الفنيين المعتمدين بالقرب منك'
-                : 'Select your city to connect with nearby verified technicians'}
-            </p>
-          </div>
-          <span className="text-xs font-semibold text-[#006948] bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
-            {cities.length} {lang === 'ur' ? 'شہر' : lang === 'ar' ? 'مدن' : cities.length === 1 ? 'City' : 'Cities'}
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {cities.map((city) => (
-            <Link
-              key={city.slug}
-              href={`/${lang}/${country.toLowerCase()}/${city.slug}`}
-              className="p-5 rounded-2xl bg-white border border-gray-200 hover:border-[#006948] hover:shadow-md transition-all group flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#006948] flex items-center justify-center shrink-0 group-hover:bg-[#006948] group-hover:text-white transition-all">
-                  <MapPin className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900 group-hover:text-[#006948] transition-colors">
-                    {getLocalizedCityName(city.slug, lang)}
-                  </h3>
-                  <span className="text-xs text-gray-500">
-                    {lang === 'ur' ? 'کاریگر دیکھیں ←' : lang === 'ar' ? 'استكشف الفنيين ←' : 'Explore Specialists →'}
-                  </span>
-                </div>
-              </div>
-              <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#006948] group-hover:translate-x-1 transition-all rtl:rotate-180" />
-            </Link>
-          ))}
-        </div>
+      {/* Section 1: Popular Cities in Country Slider */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+        <RelatedSlider
+          type="cities"
+          title={
+            lang === 'ur'
+              ? `${countryName} کے مشہور شہر`
+              : lang === 'ar'
+              ? `أهم المدن في ${countryName}`
+              : `Top Cities in ${countryName}`
+          }
+          subtitle={
+            lang === 'ur'
+              ? 'قریبی تصدیق شدہ کاریگروں سے رابطے کے لیے اپنا شہر منتخب کریں'
+              : lang === 'ar'
+              ? 'اختر مدينتك للتواصل مع الفنيين المعتمدين بالقرب منك'
+              : `Select your city to connect with nearby verified technicians across ${countryName}`
+          }
+          items={cities}
+          lang={lang}
+          country={country}
+        />
       </section>
 
       {/* Section 2: 24+ Verified Specialties */}
