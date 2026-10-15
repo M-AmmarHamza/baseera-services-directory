@@ -246,24 +246,14 @@ export default async function HomePage({ params }: PageProps) {
       {/* 3. CONTINUOUS SLIDING 20 FEATURED PROVIDERS */}
       <section className="border-t border-gray-200 bg-white py-10 sm:py-16 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-6 sm:mb-8">
-            <div className="overflow-visible">
-              <div className="flex items-center gap-2">
-                <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-2 pt-1' : 'leading-snug'}`}>
-                  {dict.home?.featuredProviders || 'Featured Providers'}
-                </h2>
-                <span className="px-2.5 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200">
-                  {dict.home?.verified || 'Verified (20 Specialists)'}
-                </span>
-              </div>
-              <p className={`text-sm text-gray-500 mt-1 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-                {dict.home?.featuredSubtitle || 'Top-rated specialists ready for immediate direct booking'}
-              </p>
-            </div>
-          </div>
-
-          {/* Smooth Auto-Sliding Infinite Carousel with Direct Profile Navigation */}
-          <FeaturedProvidersSlider providers={providers} lang={lang} />
+          {/* Smooth Auto-Sliding Infinite Carousel with Unified Header & Navigation */}
+          <FeaturedProvidersSlider
+            providers={providers}
+            lang={lang}
+            title={dict.home?.featuredProviders || 'Featured Providers'}
+            badge={dict.home?.verified || 'Verified (20 Specialists)'}
+            subtitle={dict.home?.featuredSubtitle || 'Top-rated specialists ready for immediate direct booking'}
+          />
         </div>
       </section>
 
