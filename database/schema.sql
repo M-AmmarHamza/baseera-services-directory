@@ -259,13 +259,46 @@ create policy "Only Admin can view CNIC documents" on storage.objects
 -- =========================================================================
 insert into public.countries (id, name, code, slug) values
   (1, 'Pakistan', 'pk', 'pakistan')
-on conflict (id) do nothing;
+on conflict (code) do nothing;
 
-insert into public.cities (id, country_id, name, slug) values
-  (1, 1, 'Karachi', 'karachi'),
-  (2, 1, 'Lahore', 'lahore'),
-  (3, 1, 'Islamabad', 'islamabad')
-on conflict (id) do nothing;
+-- Top 30 Cities of Pakistan (Exact Slugs for Dynamic Routing)
+insert into public.cities (country_id, name, slug)
+select c.id, v.name, v.slug
+from (
+  values
+    ('Karachi', 'karachi'),
+    ('Lahore', 'lahore'),
+    ('Faisalabad', 'faisalabad'),
+    ('Rawalpindi', 'rawalpindi'),
+    ('Gujranwala', 'gujranwala'),
+    ('Peshawar', 'peshawar'),
+    ('Multan', 'multan'),
+    ('Hyderabad', 'hyderabad'),
+    ('Islamabad', 'islamabad'),
+    ('Quetta', 'quetta'),
+    ('Bahawalpur', 'bahawalpur'),
+    ('Sargodha', 'sargodha'),
+    ('Sialkot', 'sialkot'),
+    ('Sukkur', 'sukkur'),
+    ('Larkana', 'larkana'),
+    ('Sheikhupura', 'sheikhupura'),
+    ('Rahim Yar Khan', 'rahim-yar-khan'),
+    ('Jhang', 'jhang'),
+    ('Dera Ghazi Khan', 'dera-ghazi-khan'),
+    ('Gujrat', 'gujrat'),
+    ('Sahiwal', 'sahiwal'),
+    ('Wah Cantonment', 'wah-cantonment'),
+    ('Mardan', 'mardan'),
+    ('Kasur', 'kasur'),
+    ('Okara', 'okara'),
+    ('Mingora', 'mingora'),
+    ('Nawabshah', 'nawabshah'),
+    ('Chiniot', 'chiniot'),
+    ('Kotri', 'kotri'),
+    ('Kamoke', 'kamoke')
+) as v(name, slug)
+cross join (select id from public.countries where code = 'pk' limit 1) c
+on conflict (country_id, slug) do update set name = excluded.name;
 
 insert into public.categories (id, name, slug, icon, active_count) values
   ('electrician', 'Electrician', 'electrician', 'Zap', 42),
@@ -314,7 +347,9 @@ insert into public.providers (
 ) values
   (
     'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
-    1, 1, 'electrician',
+    (select id from public.countries where code = 'pk' limit 1),
+    (select id from public.cities where slug = 'karachi' limit 1),
+    'electrician',
     'Tariq Mahmood', 'tariq-mahmood', 'individual',
     '+923332145890',
     array['PECHS', 'Clifton', 'DHA Phases 1-8', 'Bahadurabad'],
@@ -323,7 +358,9 @@ insert into public.providers (
   ),
   (
     'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e',
-    1, 1, 'ac',
+    (select id from public.countries where code = 'pk' limit 1),
+    (select id from public.cities where slug = 'karachi' limit 1),
+    'ac',
     'Kashif Ali', 'kashif-ali', 'individual',
     '+923012349811',
     array['Gulshan-e-Iqbal', 'Gulistan-e-Jauhar', 'Federal B Area'],
@@ -332,7 +369,9 @@ insert into public.providers (
   ),
   (
     'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f',
-    1, 1, 'food',
+    (select id from public.countries where code = 'pk' limit 1),
+    (select id from public.cities where slug = 'karachi' limit 1),
+    'food',
     'Farzana Kitchen', 'farzana-kitchen', 'shop',
     '+923325567890',
     array['DHA Phase 5', 'Clifton', 'Zamzama'],
@@ -341,7 +380,9 @@ insert into public.providers (
   ),
   (
     'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b',
-    1, 1, 'plumbing',
+    (select id from public.countries where code = 'pk' limit 1),
+    (select id from public.cities where slug = 'karachi' limit 1),
+    'plumbing',
     'Saleem Akhtar (Master Plumber)', 'saleem-master-plumber', 'individual',
     '+923129876543',
     array['Orangi Town', 'Nazimabad', 'North Nazimabad', 'SITE Area', 'Banaras'],
