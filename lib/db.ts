@@ -486,6 +486,7 @@ export const COUNTRIES: Country[] = [
   { code: 'ca', name: 'Canada', defaultCity: 'toronto', flag: '🇨🇦', region: 'Americas' },
   { code: 'mx', name: 'Mexico', defaultCity: 'mexico-city', flag: '🇲🇽', region: 'Americas' },
   { code: 'br', name: 'Brazil', defaultCity: 'sao-paulo', flag: '🇧🇷', region: 'Americas' },
+  { code: 'co', name: 'Colombia', defaultCity: 'bogota', flag: '🇨🇴', region: 'Americas' },
 
   // Europe
   { code: 'uk', name: 'United Kingdom', defaultCity: 'london', flag: '🇬🇧', region: 'Europe' },
@@ -606,9 +607,15 @@ export const CITIES: City[] = [
   { slug: 'al-jahra', name: 'Al Jahra', countryCode: 'kw' },
   { slug: 'mubarak-al-kabeer', name: 'Mubarak Al-Kabeer', countryCode: 'kw' },
 
-  // Oman & Bahrain
-  { slug: 'manama', name: 'Manama', countryCode: 'bh' },
+  // Oman (3 Cities)
   { slug: 'muscat', name: 'Muscat', countryCode: 'om' },
+  { slug: 'salalah', name: 'Salalah', countryCode: 'om' },
+  { slug: 'sohar', name: 'Sohar', countryCode: 'om' },
+
+  // Bahrain (3 Cities)
+  { slug: 'manama', name: 'Manama', countryCode: 'bh' },
+  { slug: 'muharraq', name: 'Muharraq', countryCode: 'bh' },
+  { slug: 'riffa', name: 'Riffa', countryCode: 'bh' },
 
   // United States (Top 15 Cities)
   { slug: 'new-york', name: 'New York', countryCode: 'us' },
@@ -638,6 +645,22 @@ export const CITIES: City[] = [
   { slug: 'quebec-city', name: 'Quebec City', countryCode: 'ca' },
   { slug: 'hamilton', name: 'Hamilton', countryCode: 'ca' },
   { slug: 'halifax', name: 'Halifax', countryCode: 'ca' },
+
+  // Latin America (9 Cities)
+  // Brazil (3 Cities)
+  { slug: 'sao-paulo', name: 'Sao Paulo', countryCode: 'br' },
+  { slug: 'rio-de-janeiro', name: 'Rio de Janeiro', countryCode: 'br' },
+  { slug: 'brasilia', name: 'Brasilia', countryCode: 'br' },
+
+  // Mexico (3 Cities)
+  { slug: 'mexico-city', name: 'Mexico City', countryCode: 'mx' },
+  { slug: 'guadalajara', name: 'Guadalajara', countryCode: 'mx' },
+  { slug: 'monterrey', name: 'Monterrey', countryCode: 'mx' },
+
+  // Colombia (3 Cities)
+  { slug: 'bogota', name: 'Bogota', countryCode: 'co' },
+  { slug: 'medellin', name: 'Medellin', countryCode: 'co' },
+  { slug: 'cali', name: 'Cali', countryCode: 'co' },
 
   // United Kingdom (Top 10 Cities) - Dual code support ('uk' and 'gb')
   { slug: 'london', name: 'London', countryCode: 'uk' },
@@ -672,8 +695,17 @@ export const CITIES: City[] = [
   { slug: 'hobart', name: 'Hobart', countryCode: 'au' },
   { slug: 'darwin', name: 'Darwin', countryCode: 'au' },
 
-  // Middle East & South Asia
+  // New Zealand (3 Cities)
+  { slug: 'auckland', name: 'Auckland', countryCode: 'nz' },
+  { slug: 'wellington', name: 'Wellington', countryCode: 'nz' },
+  { slug: 'christchurch', name: 'Christchurch', countryCode: 'nz' },
+
+  // Turkey (3 Cities)
   { slug: 'istanbul', name: 'Istanbul', countryCode: 'tr' },
+  { slug: 'ankara', name: 'Ankara', countryCode: 'tr' },
+  { slug: 'izmir', name: 'Izmir', countryCode: 'tr' },
+
+  // Middle East & South Asia
   { slug: 'mumbai', name: 'Mumbai', countryCode: 'in' },
   { slug: 'delhi', name: 'Delhi', countryCode: 'in' },
 
@@ -793,6 +825,11 @@ export const CITIES: City[] = [
   { slug: 'lodz', name: 'Lodz', countryCode: 'pl' },
   { slug: 'wroclaw', name: 'Wroclaw', countryCode: 'pl' },
 
+  // 11. Ireland ('ie' - 3 Cities)
+  { slug: 'dublin', name: 'Dublin', countryCode: 'ie' },
+  { slug: 'cork', name: 'Cork', countryCode: 'ie' },
+  { slug: 'galway', name: 'Galway', countryCode: 'ie' },
+
   // Top 10 African Countries (39 Cities)
   // 1. Nigeria ('ng')
   { slug: 'lagos', name: 'Lagos', countryCode: 'ng' },
@@ -911,6 +948,7 @@ export const COUNTRY_NAMES_UR: Record<string, string> = {
   ca: 'کینیڈا',
   mx: 'میکسیکو',
   br: 'برازیل',
+  co: 'کولمبیا',
   uk: 'برطانیہ',
   gb: 'برطانیہ',
   de: 'جرمنی',
@@ -961,6 +999,7 @@ export const COUNTRY_NAMES_AR: Record<string, string> = {
   ca: 'كندا',
   mx: 'المكسيك',
   br: 'البرازيل',
+  co: 'كولومبيا',
   uk: 'المملكة المتحدة',
   gb: 'المملكة المتحدة',
   de: 'ألمانيا',
@@ -1311,6 +1350,41 @@ export const CITY_NAMES_UR: Record<string, string> = {
   'addis-ababa': 'ادیس ابابا',
   'dire-dawa': 'دائرے داوا',
   mekelle: 'میکیلے',
+
+  // Brazil
+  'sao-paulo': 'ساؤ پالو',
+  'rio-de-janeiro': 'ریو ڈی جنیرو',
+  brasilia: 'براسیلیا',
+
+  // Mexico
+  'mexico-city': 'میکسیکو سٹی',
+  guadalajara: 'گوادلہارا',
+  monterrey: 'مونٹیری',
+
+  // Colombia
+  bogota: 'بوگوٹا',
+  medellin: 'میڈلین',
+  cali: 'کالی',
+
+  // Oman & Bahrain
+  salalah: 'صلالہ',
+  sohar: 'صحار',
+  muharraq: 'محرق',
+  riffa: 'رفاع',
+
+  // New Zealand
+  auckland: 'آکلینڈ',
+  wellington: 'ویلنگٹن',
+  christchurch: 'کرائسٹ چرچ',
+
+  // Turkey
+  ankara: 'انقرہ',
+  izmir: 'ازمیر',
+
+  // Ireland
+  dublin: 'ڈبلن',
+  cork: 'کارک',
+  galway: 'گالوے',
 };
 
 export const CITY_NAMES_AR: Record<string, string> = {
@@ -1628,6 +1702,41 @@ export const CITY_NAMES_AR: Record<string, string> = {
   'addis-ababa': 'أديس أبابا',
   'dire-dawa': 'ديري داوا',
   mekelle: 'ميكيلي',
+
+  // Brazil
+  'sao-paulo': 'ساو باولو',
+  'rio-de-janeiro': 'ريو دي جانيرو',
+  brasilia: 'برازيليا',
+
+  // Mexico
+  'mexico-city': 'مدينة مكسيكو',
+  guadalajara: 'غوادالاخارا',
+  monterrey: 'مونتيري',
+
+  // Colombia
+  bogota: 'بوغوتا',
+  medellin: 'ميديلين',
+  cali: 'كالي',
+
+  // Oman & Bahrain
+  salalah: 'صلالة',
+  sohar: 'صحار',
+  muharraq: 'المحرق',
+  riffa: 'الرفاع',
+
+  // New Zealand
+  auckland: 'أوكلاند',
+  wellington: 'ويلينغتون',
+  christchurch: 'كرايستشيرش',
+
+  // Turkey
+  ankara: 'أنقرة',
+  izmir: 'إزمير',
+
+  // Ireland
+  dublin: 'دبلن',
+  cork: 'كورك',
+  galway: 'غالواي',
 };
 
 export function getLocalizedCountryName(countryOrCode: Country | string, lang = 'en'): string {

@@ -30,6 +30,7 @@ export const COUNTRY_CURRENCIES: Record<string, CountryCurrency> = {
   ca: { countryCode: 'ca', currencyCode: 'CAD', symbol: 'CA$', name: 'Canadian Dollar', defaultFee: 60 },
   mx: { countryCode: 'mx', currencyCode: 'MXN', symbol: 'MX$', name: 'Mexican Peso', defaultFee: 300 },
   br: { countryCode: 'br', currencyCode: 'BRL', symbol: 'R$', name: 'Brazilian Real', defaultFee: 100 },
+  co: { countryCode: 'co', currencyCode: 'COP', symbol: 'COL$', name: 'Colombian Peso', defaultFee: 50000 },
 
   // Europe
   gb: { countryCode: 'gb', currencyCode: 'GBP', symbol: '£', name: 'British Pound', defaultFee: 40 },
