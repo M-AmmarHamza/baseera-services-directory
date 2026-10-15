@@ -40,6 +40,10 @@ export const COUNTRY_CURRENCIES: Record<string, CountryCurrency> = {
   nl: { countryCode: 'nl', currencyCode: 'EUR', symbol: '€', name: 'Euro', defaultFee: 50 },
   ie: { countryCode: 'ie', currencyCode: 'EUR', symbol: '€', name: 'Euro', defaultFee: 50 },
   ch: { countryCode: 'ch', currencyCode: 'CHF', symbol: 'CHF', name: 'Swiss Franc', defaultFee: 80 },
+  se: { countryCode: 'se', currencyCode: 'SEK', symbol: 'kr', name: 'Swedish Krona', defaultFee: 400 },
+  be: { countryCode: 'be', currencyCode: 'EUR', symbol: '€', name: 'Euro', defaultFee: 50 },
+  at: { countryCode: 'at', currencyCode: 'EUR', symbol: '€', name: 'Euro', defaultFee: 50 },
+  pl: { countryCode: 'pl', currencyCode: 'PLN', symbol: 'zł', name: 'Polish Zloty', defaultFee: 150 },
 
   // Asia Pacific & Oceania
   au: { countryCode: 'au', currencyCode: 'AUD', symbol: 'A$', name: 'Australian Dollar', defaultFee: 70 },

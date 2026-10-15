@@ -495,8 +495,12 @@ export const COUNTRIES: Country[] = [
   { code: 'it', name: 'Italy', defaultCity: 'rome', flag: '🇮🇹', region: 'Europe' },
   { code: 'es', name: 'Spain', defaultCity: 'madrid', flag: '🇪🇸', region: 'Europe' },
   { code: 'nl', name: 'Netherlands', defaultCity: 'amsterdam', flag: '🇳🇱', region: 'Europe' },
-  { code: 'ie', name: 'Ireland', defaultCity: 'dublin', flag: '🇮🇪', region: 'Europe' },
+  { code: 'se', name: 'Sweden', defaultCity: 'stockholm', flag: '🇸🇪', region: 'Europe' },
   { code: 'ch', name: 'Switzerland', defaultCity: 'zurich', flag: '🇨🇭', region: 'Europe' },
+  { code: 'be', name: 'Belgium', defaultCity: 'brussels', flag: '🇧🇪', region: 'Europe' },
+  { code: 'at', name: 'Austria', defaultCity: 'vienna', flag: '🇦🇹', region: 'Europe' },
+  { code: 'pl', name: 'Poland', defaultCity: 'warsaw', flag: '🇵🇱', region: 'Europe' },
+  { code: 'ie', name: 'Ireland', defaultCity: 'dublin', flag: '🇮🇪', region: 'Europe' },
 
   // Asia Pacific & Oceania
   { code: 'au', name: 'Australia', defaultCity: 'sydney', flag: '🇦🇺', region: 'Oceania' },
@@ -655,15 +659,76 @@ export const CITIES: City[] = [
   { slug: 'sydney', name: 'Sydney', countryCode: 'au' },
   { slug: 'melbourne', name: 'Melbourne', countryCode: 'au' },
 
-  // Europe & Asia
-  { slug: 'berlin', name: 'Berlin', countryCode: 'de' },
-  { slug: 'paris', name: 'Paris', countryCode: 'fr' },
+  // Asia
   { slug: 'istanbul', name: 'Istanbul', countryCode: 'tr' },
   { slug: 'kuala-lumpur', name: 'Kuala Lumpur', countryCode: 'my' },
   { slug: 'singapore', name: 'Singapore', countryCode: 'sg' },
   { slug: 'mumbai', name: 'Mumbai', countryCode: 'in' },
   { slug: 'delhi', name: 'Delhi', countryCode: 'in' },
   { slug: 'dhaka', name: 'Dhaka', countryCode: 'bd' },
+
+  // Top 10 European Countries (42 Cities)
+  // 1. Germany ('de')
+  { slug: 'berlin', name: 'Berlin', countryCode: 'de' },
+  { slug: 'munich', name: 'Munich', countryCode: 'de' },
+  { slug: 'frankfurt', name: 'Frankfurt', countryCode: 'de' },
+  { slug: 'hamburg', name: 'Hamburg', countryCode: 'de' },
+  { slug: 'cologne', name: 'Cologne', countryCode: 'de' },
+
+  // 2. France ('fr')
+  { slug: 'paris', name: 'Paris', countryCode: 'fr' },
+  { slug: 'marseille', name: 'Marseille', countryCode: 'fr' },
+  { slug: 'lyon', name: 'Lyon', countryCode: 'fr' },
+  { slug: 'toulouse', name: 'Toulouse', countryCode: 'fr' },
+  { slug: 'nice', name: 'Nice', countryCode: 'fr' },
+
+  // 3. Italy ('it')
+  { slug: 'rome', name: 'Rome', countryCode: 'it' },
+  { slug: 'milan', name: 'Milan', countryCode: 'it' },
+  { slug: 'naples', name: 'Naples', countryCode: 'it' },
+  { slug: 'turin', name: 'Turin', countryCode: 'it' },
+  { slug: 'florence', name: 'Florence', countryCode: 'it' },
+
+  // 4. Spain ('es')
+  { slug: 'madrid', name: 'Madrid', countryCode: 'es' },
+  { slug: 'barcelona', name: 'Barcelona', countryCode: 'es' },
+  { slug: 'valencia', name: 'Valencia', countryCode: 'es' },
+  { slug: 'seville', name: 'Seville', countryCode: 'es' },
+  { slug: 'zaragoza', name: 'Zaragoza', countryCode: 'es' },
+
+  // 5. Netherlands ('nl')
+  { slug: 'amsterdam', name: 'Amsterdam', countryCode: 'nl' },
+  { slug: 'rotterdam', name: 'Rotterdam', countryCode: 'nl' },
+  { slug: 'the-hague', name: 'The Hague', countryCode: 'nl' },
+  { slug: 'utrecht', name: 'Utrecht', countryCode: 'nl' },
+  { slug: 'eindhoven', name: 'Eindhoven', countryCode: 'nl' },
+
+  // 6. Sweden ('se')
+  { slug: 'stockholm', name: 'Stockholm', countryCode: 'se' },
+  { slug: 'gothenburg', name: 'Gothenburg', countryCode: 'se' },
+  { slug: 'malmo', name: 'Malmo', countryCode: 'se' },
+
+  // 7. Switzerland ('ch')
+  { slug: 'zurich', name: 'Zurich', countryCode: 'ch' },
+  { slug: 'geneva', name: 'Geneva', countryCode: 'ch' },
+  { slug: 'basel', name: 'Basel', countryCode: 'ch' },
+  { slug: 'bern', name: 'Bern', countryCode: 'ch' },
+
+  // 8. Belgium ('be')
+  { slug: 'brussels', name: 'Brussels', countryCode: 'be' },
+  { slug: 'antwerp', name: 'Antwerp', countryCode: 'be' },
+  { slug: 'ghent', name: 'Ghent', countryCode: 'be' },
+
+  // 9. Austria ('at')
+  { slug: 'vienna', name: 'Vienna', countryCode: 'at' },
+  { slug: 'graz', name: 'Graz', countryCode: 'at' },
+  { slug: 'linz', name: 'Linz', countryCode: 'at' },
+
+  // 10. Poland ('pl')
+  { slug: 'warsaw', name: 'Warsaw', countryCode: 'pl' },
+  { slug: 'krakow', name: 'Krakow', countryCode: 'pl' },
+  { slug: 'lodz', name: 'Lodz', countryCode: 'pl' },
+  { slug: 'wroclaw', name: 'Wroclaw', countryCode: 'pl' },
 
   // Top 10 African Countries (39 Cities)
   // 1. Nigeria ('ng')
@@ -790,8 +855,12 @@ export const COUNTRY_NAMES_UR: Record<string, string> = {
   it: 'اٹلی',
   es: 'اسپین',
   nl: 'نیدرلینڈز',
-  ie: 'آئرلینڈ',
+  se: 'سویڈن',
   ch: 'سوئٹزرلینڈ',
+  be: 'بیلجیم',
+  at: 'آسٹریا',
+  pl: 'پولینڈ',
+  ie: 'آئرلینڈ',
   au: 'آسٹریلیا',
   nz: 'نیوزی لینڈ',
   my: 'ملائیشیا',
@@ -832,8 +901,12 @@ export const COUNTRY_NAMES_AR: Record<string, string> = {
   it: 'إيطاليا',
   es: 'إسبانيا',
   nl: 'هولندا',
-  ie: 'أيرلندا',
+  se: 'السويد',
   ch: 'سويسرا',
+  be: 'بلجيكا',
+  at: 'النمسا',
+  pl: 'بولندا',
+  ie: 'أيرلندا',
   au: 'أستراليا',
   nz: 'نيوزيلندا',
   my: 'ماليزيا',
@@ -977,14 +1050,76 @@ export const CITY_NAMES_UR: Record<string, string> = {
   cardiff: 'کارڈف',
   sydney: 'سڈنی',
   melbourne: 'میلبورن',
-  berlin: 'برلن',
-  paris: 'پیرس',
   istanbul: 'استنبول',
   'kuala-lumpur': 'کوالالمپور',
   singapore: 'سنگاپور',
   mumbai: 'ممبئی',
   delhi: 'دہلی',
   dhaka: 'ڈھاکہ',
+
+  // Top 10 European Countries (42 Cities)
+  // Germany
+  berlin: 'برلن',
+  munich: 'میونخ',
+  frankfurt: 'فرینکفرٹ',
+  hamburg: 'ہیمبرگ',
+  cologne: 'کولون',
+
+  // France
+  paris: 'پیرس',
+  marseille: 'مارسیل',
+  lyon: 'لیون',
+  toulouse: 'ٹولوز',
+  nice: 'نائس',
+
+  // Italy
+  rome: 'روم',
+  milan: 'میلان',
+  naples: 'نیپلز',
+  turin: 'ٹیورن',
+  florence: 'فلورنس',
+
+  // Spain
+  madrid: 'میڈرڈ',
+  barcelona: 'بارسلونا',
+  valencia: 'ویلینسیا',
+  seville: 'اشبیلیہ (سیویل)',
+  zaragoza: 'سراگوسا',
+
+  // Netherlands
+  amsterdam: 'ایمسٹرڈم',
+  rotterdam: 'روٹرڈم',
+  'the-hague': 'دی ہیگ',
+  utrecht: 'یوٹریکٹ',
+  eindhoven: 'آئندھوون',
+
+  // Sweden
+  stockholm: 'اسٹاک ہوم',
+  gothenburg: 'گوٹنبرگ',
+  malmo: 'مالمو',
+
+  // Switzerland
+  zurich: 'زیورخ',
+  geneva: 'جنیوا',
+  basel: 'باسل',
+  bern: 'برن',
+
+  // Belgium
+  brussels: 'برسلز',
+  antwerp: 'اینٹورپ',
+  ghent: 'گینٹ',
+
+  // Austria
+  vienna: 'ویانا',
+  graz: 'گریز',
+  linz: 'لنزم',
+
+  // Poland
+  warsaw: 'وارسا',
+  krakow: 'کراکو',
+  lodz: 'لوڈز',
+  wroclaw: 'وروکلاو',
+
   // African Cities (Top 10 Countries)
   // Nigeria
   lagos: 'لاگوس',
@@ -1172,14 +1307,75 @@ export const CITY_NAMES_AR: Record<string, string> = {
   cardiff: 'كارديف',
   sydney: 'سيدني',
   melbourne: 'ملبورن',
-  berlin: 'برلين',
-  paris: 'باريس',
   istanbul: 'إسطنبول',
   'kuala-lumpur': 'كوالالمبور',
   singapore: 'سنغافورة',
   mumbai: 'مومباي',
   delhi: 'دلهي',
   dhaka: 'دكا',
+
+  // Top 10 European Countries (42 Cities)
+  // Germany
+  berlin: 'برلين',
+  munich: 'ميونخ',
+  frankfurt: 'فرانكفورت',
+  hamburg: 'هامبورغ',
+  cologne: 'كولونيا',
+
+  // France
+  paris: 'باريس',
+  marseille: 'مارسيليا',
+  lyon: 'ليون',
+  toulouse: 'تولوز',
+  nice: 'نيس',
+
+  // Italy
+  rome: 'روما',
+  milan: 'ميلانو',
+  naples: 'نابولي',
+  turin: 'تورينو',
+  florence: 'فلورنسا',
+
+  // Spain
+  madrid: 'مدريد',
+  barcelona: 'برشلونة',
+  valencia: 'فالنسيا',
+  seville: 'إشبيلية',
+  zaragoza: 'سرقسطة',
+
+  // Netherlands
+  amsterdam: 'أمستردام',
+  rotterdam: 'روتردام',
+  'the-hague': 'لاهاي',
+  utrecht: 'أوتريخت',
+  eindhoven: 'آيندهوفن',
+
+  // Sweden
+  stockholm: 'ستوكهولم',
+  gothenburg: 'غوتنبرغ',
+  malmo: 'مالمو',
+
+  // Switzerland
+  zurich: 'زيورخ',
+  geneva: 'جنيف',
+  basel: 'بازل',
+  bern: 'برن',
+
+  // Belgium
+  brussels: 'بروكسل',
+  antwerp: 'أنتويرب',
+  ghent: 'غنت',
+
+  // Austria
+  vienna: 'فيينا',
+  graz: 'غراتس',
+  linz: 'لينتس',
+
+  // Poland
+  warsaw: 'وارسو',
+  krakow: 'كراكوف',
+  lodz: 'وودج',
+  wroclaw: 'فروتسواف',
   // African Cities (Top 10 Countries)
   // Nigeria
   lagos: 'لاغوس',
@@ -1865,6 +2061,78 @@ export const CITY_DISTRICTS: Record<string, string[]> = {
     'Queens',
     'Bronx',
     'Staten Island',
+  ],
+
+  // Europe Hubs
+  berlin: [
+    'Mitte',
+    'Kreuzberg',
+    'Prenzlauer Berg',
+    'Charlottenburg',
+    'Friedrichshain',
+  ],
+  paris: [
+    'Le Marais',
+    'Montmartre',
+    'Latin Quarter',
+    'Champs-Élysées',
+    'Saint-Germain-des-Prés',
+  ],
+  rome: [
+    'Trastevere',
+    'Centro Storico',
+    'Prati',
+    'Monti',
+    'Testaccio',
+  ],
+  madrid: [
+    'Salamanca',
+    'Chamberí',
+    'Malasaña',
+    'Chueca',
+    'Retiro',
+  ],
+  amsterdam: [
+    'Centrum',
+    'Jordaan',
+    'De Pijp',
+    'Oud-West',
+    'Zuid',
+  ],
+  stockholm: [
+    'Gamla Stan',
+    'Södermalm',
+    'Östermalm',
+    'Norrmalm',
+    'Kungsholmen',
+  ],
+  zurich: [
+    'Altstadt',
+    'Aussersihl',
+    'Wiedikon',
+    'Enge',
+    'Oerlikon',
+  ],
+  brussels: [
+    'Pentagone',
+    'Ixelles',
+    'Saint-Gilles',
+    'Etterbeek',
+    'Uccle',
+  ],
+  vienna: [
+    'Innere Stadt',
+    'Leopoldstadt',
+    'Neubau',
+    'Josefstadt',
+    'Alsergrund',
+  ],
+  warsaw: [
+    'Śródmieście',
+    'Mokotów',
+    'Wola',
+    'Praga',
+    'Ursynów',
   ],
 
   // Africa Hubs
