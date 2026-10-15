@@ -197,7 +197,8 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
   // Format localized display name for city chip
   const getCityDisplayName = (city: SelectedCity): string => {
     const locCity = getLocalizedCityName(city.slug, lang);
-    return `${locCity}، ${city.countryCode.toUpperCase()}`;
+    const separator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
+    return `${locCity}${separator}${city.countryCode.toUpperCase()}`;
   };
 
   const getCityNameOnly = (city: SelectedCity): string => {

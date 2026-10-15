@@ -51,7 +51,8 @@ export default function CitySelector({ lang }: CitySelectorProps) {
 
   if (currentCity && currentCountry) {
     const locCity = getLocalizedCityName(currentCity.slug, lang);
-    activeLabel = `${locCity}، ${currentCountry.code.toUpperCase()}`;
+    const separator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
+    activeLabel = `${locCity}${separator}${currentCountry.code.toUpperCase()}`;
   } else if (currentCountry) {
     activeLabel = getLocalizedCountryName(currentCountry.code, lang);
   }

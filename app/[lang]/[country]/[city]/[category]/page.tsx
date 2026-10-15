@@ -88,6 +88,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
   const cityName = getLocalizedCityName(city, lang);
   const countryObj = getCountryByCode(country);
   const countryName = getLocalizedCountryName(countryObj, lang);
+  const commaSeparator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
 
   // Programmatic JSON-LD Schema (ItemList for Category Pages)
@@ -314,7 +315,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                     <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
                       <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                       <span className="truncate">
-                        {provider.district}، {cityName}
+                        {provider.district ? `${provider.district}${commaSeparator}${cityName}` : cityName}
                       </span>
                     </div>
 

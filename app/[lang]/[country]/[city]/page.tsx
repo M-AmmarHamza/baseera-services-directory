@@ -97,6 +97,7 @@ export default async function CityHomePage({ params }: PageProps) {
   const countryName = getLocalizedCountryName(countryObj, lang);
   const cityName = getLocalizedCityName(city, lang);
   const countryCode = country.toUpperCase();
+  const commaSeparator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
 
   // Structured Data: BreadcrumbList Schema
   const breadcrumbJsonLd = {
@@ -139,7 +140,7 @@ export default async function CityHomePage({ params }: PageProps) {
             <div className="flex items-center justify-center gap-2 mb-3 flex-wrap">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#006948] text-xs font-semibold border border-emerald-100">
                 <MapPin className="w-3.5 h-3.5 text-[#006948]" />
-                {cityName}، {countryCode}
+                {cityName}{commaSeparator}{countryCode}
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-semibold">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#006948] animate-pulse"></span>
@@ -340,7 +341,7 @@ export default async function CityHomePage({ params }: PageProps) {
                           </p>
                           <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
                             <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                            <span className="truncate">{pro.district}، {cityName}</span>
+                            <span className="truncate">{pro.district ? `${pro.district}${commaSeparator}${cityName}` : cityName}</span>
                           </div>
 
                           {/* Chips */}
