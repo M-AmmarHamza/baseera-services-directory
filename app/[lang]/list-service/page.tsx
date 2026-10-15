@@ -3,7 +3,15 @@
 import React, { useState, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { COUNTRIES, CATEGORIES, getCategoryName } from '@/lib/db';
+import {
+  COUNTRIES,
+  CATEGORIES,
+  getCategoryName,
+  getCitiesByCountry,
+  getLocalizedCountryName,
+  getLocalizedCityName,
+  City,
+} from '@/lib/db';
 import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
 import {
   ShieldCheck,
@@ -71,8 +79,26 @@ function ListServiceContent({ lang }: { lang: string }) {
   const [contactChannel, setContactChannel] = useState<ContactChannel>('whatsapp');
   const [contactNumber, setContactNumber] = useState('');
   const [secondaryPhone, setSecondaryPhone] = useState('');
-  const [countryCode, setCountryCode] = useState(defaultCountry);
-  const [cityName, setCityName] = useState(defaultCity);
+  // 1. STATE MANAGEMENT (Cascading Country & City Dropdowns)
+  const [selectedCountryId, setSelectedCountryId] = useState<string>(defaultCountry);
+  const [availableCities, setAvailableCities] = useState<City[]>(() => {
+    if (defaultCountry) {
+      return getCitiesByCountry(defaultCountry);
+    }
+    return [];
+  });
+  const [cityName, setCityName] = useState<string>(() => {
+    if (defaultCountry && defaultCity) {
+      const cities = getCitiesByCountry(defaultCountry);
+      const match = cities.find(
+        (c) => c.slug.toLowerCase() === defaultCity.toLowerCase()
+      );
+      if (match) return match.slug;
+      if (cities.length > 0) return cities[0].slug;
+    }
+    return '';
+  });
+  const countryCode = selectedCountryId;
   const [categoryId, setCategoryId] = useState(defaultCategory);
   const [tradeTitle, setTradeTitle] = useState('');
   const [shortBio, setShortBio] = useState('');
@@ -82,10 +108,20 @@ function ListServiceContent({ lang }: { lang: string }) {
 
   const selectedCurrency = getCountryCurrency(countryCode);
 
+  // 2. CASCADING LOGIC: Filter cities immediately and reset city selection on country change
   const handleCountryChange = (newCountryCode: string) => {
-    setCountryCode(newCountryCode);
-    const curr = getCountryCurrency(newCountryCode);
-    setStartingPrice(String(curr.defaultFee));
+    setSelectedCountryId(newCountryCode);
+    // Automatically reset/clear the City selection
+    setCityName('');
+
+    if (newCountryCode) {
+      const filtered = getCitiesByCountry(newCountryCode);
+      setAvailableCities(filtered);
+      const curr = getCountryCurrency(newCountryCode);
+      setStartingPrice(String(curr.defaultFee));
+    } else {
+      setAvailableCities([]);
+    }
   };
 
   // Image Upload states (Max 10MB, JPG/PNG/JPEG/WEBP)
@@ -198,11 +234,13 @@ function ListServiceContent({ lang }: { lang: string }) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !contactNumber.trim() || !cityName.trim()) {
+    if (!name.trim() || !contactNumber.trim() || !selectedCountryId.trim() || !cityName.trim()) {
       setErrorMsg(
         lang === 'ur'
-          ? 'براہِ کرم اپنا نام، رابطہ نمبر اور شہر درج کریں۔'
-          : 'Please enter your full name, primary contact number, and city.'
+          ? 'براہِ کرم اپنا نام، رابطہ نمبر، ملک اور شہر منتخب کریں۔'
+          : lang === 'ar'
+          ? 'يرجى إدخال الاسم ورقم الاتصال وتحديد الدولة والمدينة.'
+          : 'Please enter your full name, primary contact number, country, and select a city.'
       );
       return;
     }
@@ -531,37 +569,68 @@ function ListServiceContent({ lang }: { lang: string }) {
                 </div>
               </div>
 
-              {/* Country & City */}
+              {/* Country & City (Cascading Dependent Dropdown) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {/* 1. Country Selection */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-gray-900">
-                    {lang === 'ur' ? 'ملک *' : 'Country *'}
+                    {lang === 'ur' ? 'ملک *' : lang === 'ar' ? 'الدولة *' : 'Country *'}
                   </label>
                   <select
-                    value={countryCode}
+                    required
+                    value={selectedCountryId}
                     onChange={(e) => handleCountryChange(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-[#006948] focus:bg-white transition-all cursor-pointer"
                   >
+                    <option value="" disabled>
+                      {lang === 'ur' ? '-- ملک منتخب کریں --' : lang === 'ar' ? '-- اختر الدولة --' : '-- Select Country --'}
+                    </option>
                     {COUNTRIES.map((c) => (
                       <option key={c.code} value={c.code}>
-                        {c.flag} {c.name} ({c.code.toUpperCase()})
+                        {c.flag} {getLocalizedCountryName(c.code, lang)} ({c.code.toUpperCase()})
                       </option>
                     ))}
                   </select>
                 </div>
 
+                {/* 2. Cascading City Selection */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-900">
-                    {lang === 'ur' ? 'شہر کا نام *' : 'City Name *'}
-                  </label>
-                  <input
-                    type="text"
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-semibold text-gray-900">
+                      {lang === 'ur' ? 'شہر کا نام *' : lang === 'ar' ? 'اسم المدينة *' : 'City Name *'}
+                    </label>
+                    {selectedCountryId && availableCities.length > 0 && (
+                      <span className="text-[11px] text-gray-400 font-medium">
+                        {availableCities.length} {lang === 'ur' ? 'شہر دستیاب' : lang === 'ar' ? 'مدن متاحة' : 'cities available'}
+                      </span>
+                    )}
+                  </div>
+                  <select
                     required
+                    disabled={!selectedCountryId || availableCities.length === 0}
                     value={cityName}
                     onChange={(e) => setCityName(e.target.value)}
-                    placeholder="e.g. Karachi, Lahore, Dubai, London..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all capitalize"
-                  />
+                    className={`w-full px-3.5 py-2.5 rounded-xl border text-sm transition-all cursor-pointer ${
+                      !selectedCountryId || availableCities.length === 0
+                        ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-75'
+                        : 'bg-gray-50 border border-gray-200 text-gray-900 focus:outline-none focus:border-[#006948] focus:bg-white'
+                    } ${lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}`}
+                  >
+                    <option value="" disabled>
+                      {!selectedCountryId
+                        ? (lang === 'ur' ? 'پہلے ملک منتخب کریں...' : lang === 'ar' ? 'يرجى اختيار الدولة أولاً...' : 'Please select a country first...')
+                        : (lang === 'ur' ? '-- شہر منتخب کریں --' : lang === 'ar' ? '-- اختر المدينة --' : '-- Select Operating City --')}
+                    </option>
+                    {availableCities.map((city) => {
+                      const localizedTitle = getLocalizedCityName(city.slug, lang);
+                      const displayTitle = lang === 'en' ? city.name : localizedTitle;
+                      return (
+                        <option key={city.slug} value={city.slug}>
+                          {displayTitle}
+                        </option>
+                      );
+                    })}
+                  </select>
                 </div>
               </div>
 
