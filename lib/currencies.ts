@@ -52,6 +52,10 @@ export const COUNTRY_CURRENCIES: Record<string, CountryCurrency> = {
   sg: { countryCode: 'sg', currencyCode: 'SGD', symbol: 'S$', name: 'Singapore Dollar', defaultFee: 50 },
   id: { countryCode: 'id', currencyCode: 'IDR', symbol: 'Rp', name: 'Indonesian Rupiah', defaultFee: 100000 },
   jp: { countryCode: 'jp', currencyCode: 'JPY', symbol: '¥', name: 'Japanese Yen', defaultFee: 5000 },
+  ph: { countryCode: 'ph', currencyCode: 'PHP', symbol: '₱', name: 'Philippine Peso', defaultFee: 500 },
+  th: { countryCode: 'th', currencyCode: 'THB', symbol: '฿', name: 'Thai Baht', defaultFee: 500 },
+  vn: { countryCode: 'vn', currencyCode: 'VND', symbol: '₫', name: 'Vietnamese Dong', defaultFee: 200000 },
+  kr: { countryCode: 'kr', currencyCode: 'KRW', symbol: '₩', name: 'South Korean Won', defaultFee: 30000 },
 
   // Africa
   za: { countryCode: 'za', currencyCode: 'ZAR', symbol: 'R', name: 'South African Rand', defaultFee: 350 },
@@ -95,8 +99,8 @@ export function formatVisitingPrice(price: number | string | undefined | null, c
   const num = typeof price === 'number' ? price : Number(String(price || '').replace(/[^0-9.]/g, ''));
   const validNum = !isNaN(num) && num > 0 ? num : currency.defaultFee;
 
-  // Symbols that conventionally appear right before the number without space: $, £, €, ¥, ₹, ₺
-  const compactSymbols = ['$', '£', '€', '¥', '₹', '₺'];
+  // Symbols that conventionally appear right before the number without space: $, £, €, ¥, ₹, ₺, ₱, ฿, ₩
+  const compactSymbols = ['$', '£', '€', '¥', '₹', '₺', '₱', '฿', '₩'];
   if (compactSymbols.includes(currency.symbol)) {
     return `${currency.symbol}${validNum}`;
   }

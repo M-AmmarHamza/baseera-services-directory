@@ -505,10 +505,14 @@ export const COUNTRIES: Country[] = [
   // Asia Pacific & Oceania
   { code: 'au', name: 'Australia', defaultCity: 'sydney', flag: '🇦🇺', region: 'Oceania' },
   { code: 'nz', name: 'New Zealand', defaultCity: 'auckland', flag: '🇳🇿', region: 'Oceania' },
-  { code: 'my', name: 'Malaysia', defaultCity: 'kuala-lumpur', flag: '🇲🇾', region: 'Asia' },
-  { code: 'sg', name: 'Singapore', defaultCity: 'singapore', flag: '🇸🇬', region: 'Asia' },
   { code: 'id', name: 'Indonesia', defaultCity: 'jakarta', flag: '🇮🇩', region: 'Asia' },
+  { code: 'my', name: 'Malaysia', defaultCity: 'kuala-lumpur', flag: '🇲🇾', region: 'Asia' },
+  { code: 'sg', name: 'Singapore', defaultCity: 'singapore-city', flag: '🇸🇬', region: 'Asia' },
+  { code: 'ph', name: 'Philippines', defaultCity: 'manila', flag: '🇵🇭', region: 'Asia' },
+  { code: 'th', name: 'Thailand', defaultCity: 'bangkok', flag: '🇹🇭', region: 'Asia' },
+  { code: 'vn', name: 'Vietnam', defaultCity: 'ho-chi-minh-city', flag: '🇻🇳', region: 'Asia' },
   { code: 'jp', name: 'Japan', defaultCity: 'tokyo', flag: '🇯🇵', region: 'Asia' },
+  { code: 'kr', name: 'South Korea', defaultCity: 'seoul', flag: '🇰🇷', region: 'Asia' },
 
   // Africa (Top 10 African Countries)
   { code: 'ng', name: 'Nigeria', defaultCity: 'lagos', flag: '🇳🇬', region: 'Africa' },
@@ -668,13 +672,63 @@ export const CITIES: City[] = [
   { slug: 'hobart', name: 'Hobart', countryCode: 'au' },
   { slug: 'darwin', name: 'Darwin', countryCode: 'au' },
 
-  // Asia
+  // Middle East & South Asia
   { slug: 'istanbul', name: 'Istanbul', countryCode: 'tr' },
-  { slug: 'kuala-lumpur', name: 'Kuala Lumpur', countryCode: 'my' },
-  { slug: 'singapore', name: 'Singapore', countryCode: 'sg' },
   { slug: 'mumbai', name: 'Mumbai', countryCode: 'in' },
   { slug: 'delhi', name: 'Delhi', countryCode: 'in' },
+
+  // Top Asian Countries (33 Cities)
+  // 1. Indonesia ('id')
+  { slug: 'jakarta', name: 'Jakarta', countryCode: 'id' },
+  { slug: 'surabaya', name: 'Surabaya', countryCode: 'id' },
+  { slug: 'bandung', name: 'Bandung', countryCode: 'id' },
+  { slug: 'medan', name: 'Medan', countryCode: 'id' },
+  { slug: 'denpasar', name: 'Denpasar', countryCode: 'id' },
+
+  // 2. Malaysia ('my')
+  { slug: 'kuala-lumpur', name: 'Kuala Lumpur', countryCode: 'my' },
+  { slug: 'george-town', name: 'George Town', countryCode: 'my' },
+  { slug: 'johor-bahru', name: 'Johor Bahru', countryCode: 'my' },
+  { slug: 'shah-alam', name: 'Shah Alam', countryCode: 'my' },
+
+  // 3. Singapore ('sg')
+  { slug: 'singapore-city', name: 'Singapore City', countryCode: 'sg' },
+  { slug: 'singapore', name: 'Singapore', countryCode: 'sg' },
+
+  // 4. Philippines ('ph')
+  { slug: 'manila', name: 'Manila', countryCode: 'ph' },
+  { slug: 'quezon-city', name: 'Quezon City', countryCode: 'ph' },
+  { slug: 'cebu-city', name: 'Cebu City', countryCode: 'ph' },
+  { slug: 'davao-city', name: 'Davao City', countryCode: 'ph' },
+
+  // 5. Thailand ('th')
+  { slug: 'bangkok', name: 'Bangkok', countryCode: 'th' },
+  { slug: 'chiang-mai', name: 'Chiang Mai', countryCode: 'th' },
+  { slug: 'phuket', name: 'Phuket', countryCode: 'th' },
+  { slug: 'pattaya', name: 'Pattaya', countryCode: 'th' },
+
+  // 6. Vietnam ('vn')
+  { slug: 'ho-chi-minh-city', name: 'Ho Chi Minh City', countryCode: 'vn' },
+  { slug: 'hanoi', name: 'Hanoi', countryCode: 'vn' },
+  { slug: 'da-nang', name: 'Da Nang', countryCode: 'vn' },
+
+  // 7. Bangladesh ('bd')
   { slug: 'dhaka', name: 'Dhaka', countryCode: 'bd' },
+  { slug: 'chittagong', name: 'Chittagong', countryCode: 'bd' },
+  { slug: 'sylhet', name: 'Sylhet', countryCode: 'bd' },
+  { slug: 'rajshahi', name: 'Rajshahi', countryCode: 'bd' },
+
+  // 8. Japan ('jp')
+  { slug: 'tokyo', name: 'Tokyo', countryCode: 'jp' },
+  { slug: 'osaka', name: 'Osaka', countryCode: 'jp' },
+  { slug: 'yokohama', name: 'Yokohama', countryCode: 'jp' },
+  { slug: 'kyoto', name: 'Kyoto', countryCode: 'jp' },
+
+  // 9. South Korea ('kr')
+  { slug: 'seoul', name: 'Seoul', countryCode: 'kr' },
+  { slug: 'busan', name: 'Busan', countryCode: 'kr' },
+  { slug: 'incheon', name: 'Incheon', countryCode: 'kr' },
+  { slug: 'daegu', name: 'Daegu', countryCode: 'kr' },
 
   // Top 10 European Countries (42 Cities)
   // 1. Germany ('de')
@@ -875,7 +929,11 @@ export const COUNTRY_NAMES_UR: Record<string, string> = {
   my: 'ملائیشیا',
   sg: 'سنگاپور',
   id: 'انڈونیشیا',
+  ph: 'فلپائن',
+  th: 'تھائی لینڈ',
+  vn: 'ویتنام',
   jp: 'جاپان',
+  kr: 'جنوبی کوریا',
   za: 'جنوبی افریقہ',
   eg: 'مصر',
   ng: 'نائجیریا',
@@ -921,7 +979,11 @@ export const COUNTRY_NAMES_AR: Record<string, string> = {
   my: 'ماليزيا',
   sg: 'سنغافورة',
   id: 'إندونيسيا',
+  ph: 'الفلبين',
+  th: 'تايلاند',
+  vn: 'فيتنام',
   jp: 'اليابان',
+  kr: 'كوريا الجنوبية',
   za: 'جنوب أفريقيا',
   eg: 'مصر',
   ng: 'نيجيريا',
@@ -1069,12 +1131,63 @@ export const CITY_NAMES_UR: Record<string, string> = {
   newcastle: 'نیو کیسل',
   hobart: 'ہوبارٹ',
   darwin: 'ڈارون',
+  // Middle East & South Asia
   istanbul: 'استنبول',
-  'kuala-lumpur': 'کوالالمپور',
-  singapore: 'سنگاپور',
   mumbai: 'ممبئی',
   delhi: 'دہلی',
+
+  // Top Asian Countries (33 Cities)
+  // 1. Indonesia ('id')
+  jakarta: 'جکارتہ',
+  surabaya: 'سورابایا',
+  bandung: 'بانڈونگ',
+  medan: 'میدان',
+  denpasar: 'ڈنپاسار',
+
+  // 2. Malaysia ('my')
+  'kuala-lumpur': 'کوالالمپور',
+  'george-town': 'جارج ٹاؤن',
+  'johor-bahru': 'جوہر باہرُو',
+  'shah-alam': 'شاہ عالم',
+
+  // 3. Singapore ('sg')
+  'singapore-city': 'سنگاپور سٹی',
+  singapore: 'سنگاپور',
+
+  // 4. Philippines ('ph')
+  manila: 'منیلا',
+  'quezon-city': 'کیوزون سٹی',
+  'cebu-city': 'سیبو سٹی',
+  'davao-city': 'داواؤ سٹی',
+
+  // 5. Thailand ('th')
+  bangkok: 'بینکاک',
+  'chiang-mai': 'چیانگ مائی',
+  phuket: 'فوکٹ',
+  pattaya: 'پٹایا',
+
+  // 6. Vietnam ('vn')
+  'ho-chi-minh-city': 'ہو چی منہ سٹی',
+  hanoi: 'ہنوئی',
+  'da-nang': 'دا نانگ',
+
+  // 7. Bangladesh ('bd')
   dhaka: 'ڈھاکہ',
+  chittagong: 'چٹاگانگ',
+  sylhet: 'سلہٹ',
+  rajshahi: 'راجشاہی',
+
+  // 8. Japan ('jp')
+  tokyo: 'ٹوکیو',
+  osaka: 'اوساکا',
+  yokohama: 'یوکوہاما',
+  kyoto: 'کیوٹو',
+
+  // 9. South Korea ('kr')
+  seoul: 'سیول',
+  busan: 'بوسان',
+  incheon: 'انچیون',
+  daegu: 'ڈیگو',
 
   // Top 10 European Countries (42 Cities)
   // Germany
@@ -1336,12 +1449,63 @@ export const CITY_NAMES_AR: Record<string, string> = {
   newcastle: 'نيوكاسل',
   hobart: 'هوبارت',
   darwin: 'داروين',
+  // Middle East & South Asia
   istanbul: 'إسطنبول',
-  'kuala-lumpur': 'كوالالمبور',
-  singapore: 'سنغافورة',
   mumbai: 'مومباي',
   delhi: 'دلهي',
+
+  // Top Asian Countries (33 Cities)
+  // 1. Indonesia ('id')
+  jakarta: 'جاكرتا',
+  surabaya: 'سورابايا',
+  bandung: 'باندونغ',
+  medan: 'ميدان',
+  denpasar: 'دنپاسار',
+
+  // 2. Malaysia ('my')
+  'kuala-lumpur': 'كوالالمبور',
+  'george-town': 'جورج تاون',
+  'johor-bahru': 'جوهر بهرو',
+  'shah-alam': 'شاه علم',
+
+  // 3. Singapore ('sg')
+  'singapore-city': 'مدينة سنغافورة',
+  singapore: 'سنغافورة',
+
+  // 4. Philippines ('ph')
+  manila: 'مانيلا',
+  'quezon-city': 'مدينة كيزون',
+  'cebu-city': 'مدينة سيبو',
+  'davao-city': 'مدينة دافاو',
+
+  // 5. Thailand ('th')
+  bangkok: 'بانكوك',
+  'chiang-mai': 'تشيانغ ماي',
+  phuket: 'بوكيت',
+  pattaya: 'باتايا',
+
+  // 6. Vietnam ('vn')
+  'ho-chi-minh-city': 'مدينة هو تشي منه',
+  hanoi: 'هانوي',
+  'da-nang': 'دا نانغ',
+
+  // 7. Bangladesh ('bd')
   dhaka: 'دكا',
+  chittagong: 'شيتاغونغ',
+  sylhet: 'سلهت',
+  rajshahi: 'راجشاهي',
+
+  // 8. Japan ('jp')
+  tokyo: 'طوكيو',
+  osaka: 'أوساكا',
+  yokohama: 'يوكوهاما',
+  kyoto: 'كيوتو',
+
+  // 9. South Korea ('kr')
+  seoul: 'سيول',
+  busan: 'بوسان',
+  incheon: 'إنشيون',
+  daegu: 'دايغو',
 
   // Top 10 European Countries (42 Cities)
   // Germany
@@ -2235,6 +2399,73 @@ export const CITY_DISTRICTS: Record<string, string[]> = {
     'Fremantle',
     'Subiaco',
     'Scarborough',
+  ],
+
+  // Asia Hubs
+  tokyo: [
+    'Shinjuku',
+    'Shibuya',
+    'Ginza',
+    'Roppongi',
+    'Minato',
+    'Chiyoda',
+  ],
+  seoul: [
+    'Gangnam',
+    'Hongdae',
+    'Itaewon',
+    'Myeongdong',
+    'Jongno',
+    'Mapo',
+  ],
+  bangkok: [
+    'Sukhumvit',
+    'Silom',
+    'Sathorn',
+    'Siam',
+    'Thonglor',
+  ],
+  jakarta: [
+    'Menteng',
+    'Kuningan',
+    'Sudirman',
+    'Kemang',
+    'Kelapa Gading',
+  ],
+  'kuala-lumpur': [
+    'Bukit Bintang',
+    'KLCC',
+    'Bangsar',
+    'Mont Kiara',
+    'Damansara',
+  ],
+  'singapore-city': [
+    'Marina Bay',
+    'Orchard Road',
+    'Jurong',
+    'Tampines',
+    'Woodlands',
+  ],
+  'ho-chi-minh-city': [
+    'District 1',
+    'District 2 (Thao Dien)',
+    'District 3',
+    'Binh Thanh',
+    'District 7',
+  ],
+  dhaka: [
+    'Gulshan',
+    'Banani',
+    'Dhanmondi',
+    'Uttara',
+    'Mirpur',
+  ],
+  manila: [
+    'Makati',
+    'BGC',
+    'Ortigas',
+    'Ermita',
+    'Malate',
   ],
 };
 

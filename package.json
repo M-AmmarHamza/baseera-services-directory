@@ -15,7 +15,8 @@
     "seed:cities:intl": "node scripts/seed-international-cities.mjs",
     "seed:cities:africa": "node scripts/seed-african-cities.mjs",
     "seed:cities:europe": "node scripts/seed-european-cities.mjs",
-    "seed:cities:au": "node scripts/seed-australia-cities.mjs"
+    "seed:cities:au": "node scripts/seed-australia-cities.mjs",
+    "seed:cities:asia": "node scripts/seed-asian-cities.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
