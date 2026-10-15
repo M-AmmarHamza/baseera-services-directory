@@ -306,10 +306,10 @@ function ListServiceContent({ lang }: { lang: string }) {
               <span className="text-xs bg-emerald-50 text-[#006948] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-100">
                 🎉 {lang === 'ur' ? 'پروفائل لائیو ہو گیا!' : 'Profile Created & Live!'}
               </span>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-gray-950 mt-3">
+              <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight text-gray-950 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-6 pt-2' : 'leading-tight mt-3'}`}>
                 {lang === 'ur' ? `بصیرہ پر خوش آمدید، ${name}!` : `Welcome to Baseera, ${name}!`}
               </h1>
-              <p className="text-base text-gray-600 mt-2 max-w-md mx-auto leading-relaxed">
+              <p className={`text-base text-gray-600 max-w-md mx-auto overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-6' : 'leading-relaxed mt-2'}`}>
                 {lang === 'ur'
                   ? 'آپ کا پروفائل کامیابی سے بن چکا ہے۔ اب کسٹمرز آپ سے بغیر کسی کمیشن کے براہِ راست رابطہ کر سکتے ہیں۔'
                   : 'Your public service page has been created dynamically. Customers can now discover your services and contact you directly with zero commission.'}
@@ -346,10 +346,10 @@ function ListServiceContent({ lang }: { lang: string }) {
           </div>
         ) : (
           /* Registration Form */
-          <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-xs flex flex-col gap-6">
+          <div className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-xs flex flex-col gap-6 overflow-visible">
             
             {/* Header */}
-            <div>
+            <div className="overflow-visible">
               <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#006948] text-xs font-bold border border-emerald-200">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#006948]" />
@@ -360,14 +360,14 @@ function ListServiceContent({ lang }: { lang: string }) {
                   {lang === 'ur' ? 'فوری پبلک لسٹنگ' : 'Instant Public Profile'}
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-gray-950">
+              <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight text-gray-950 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-6 pt-2' : 'leading-tight'}`}>
                 {lang === 'ur'
                   ? 'بطور سروس پرووائیڈر / کاریگر رجسٹر ہوں'
                   : lang === 'ar'
                   ? 'سجل كفني أو مقدم خدمة محلي'
                   : 'Register as a Local Specialist'}
               </h1>
-              <p className="text-base text-gray-600 mt-1 leading-relaxed">
+              <p className={`text-base text-gray-600 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-4' : 'mt-1 leading-relaxed'}`}>
                 {lang === 'ur'
                   ? 'بصیرہ پر اپنی سروس کا پروفائل شائع کریں اور اپنے شہر کے گاہکوں سے براہِ راست رابطہ حاصل کریں۔'
                   : 'Publish your service profile on Baseera. Customers in your city connect directly with you without any agency cut.'}

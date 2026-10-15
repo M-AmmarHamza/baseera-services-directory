@@ -22,9 +22,9 @@ export default {
         outline: '#6d7a72',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        urdu: ['Noto Nastaliq Urdu', 'Inter', 'serif'],
-        arabic: ['Noto Sans Arabic', 'Cairo', 'sans-serif']
+        sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
+        urdu: ['var(--font-urdu)', 'Noto Nastaliq Urdu', 'serif'],
+        arabic: ['var(--font-tajawal)', 'Noto Sans Arabic', 'Cairo', 'sans-serif']
       }
     },
   },

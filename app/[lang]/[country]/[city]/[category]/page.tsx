@@ -77,7 +77,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
   const countryCode = country.toUpperCase();
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 pb-24 md:pb-16 font-sans">
+    <div className={`min-h-screen bg-white text-neutral-900 pb-24 md:pb-16 ${lang === 'ur' ? 'font-urdu' : 'font-sans'}`}>
       {/* Breadcrumbs Navigation */}
       <div className="border-b border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
@@ -99,15 +99,15 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
       <section className="border-b border-gray-200 bg-white py-8 sm:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
+            <div className="overflow-visible">
               <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-2">
                 <span className="w-2 h-2 rounded-full bg-[#059669]" />
                 <span>{providers.length} Verified Specialists Available</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-neutral-900">
+              <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-6 pt-2' : 'leading-tight'}`}>
                 Top {categoryName} in {cityName}
               </h1>
-              <p className="text-base text-gray-600 mt-1 max-w-2xl leading-relaxed">
+              <p className={`text-base text-gray-600 max-w-2xl overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5]' : 'mt-1 leading-relaxed'}`}>
                 Compare verified specialist profiles, ratings, service areas, and connect directly on WhatsApp with zero middlemen commission.
               </p>
             </div>
@@ -128,16 +128,16 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         {providers.length === 0 ? (
           /* 3. EMPTY STATE COMPONENT (FOR LEAD CAPTURING) */
-          <div className="max-w-xl mx-auto text-center py-12 px-6 bg-white border border-gray-200 rounded-2xl my-8">
+          <div className="max-w-xl mx-auto text-center py-12 px-6 bg-white border border-gray-200 rounded-2xl my-8 overflow-visible">
             <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#059669] mx-auto mb-4">
               <Sparkles className="w-7 h-7" />
             </div>
 
-            <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900 mb-2 leading-snug">
+            <h2 className={`text-xl sm:text-2xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-4 pt-1.5' : 'leading-snug mb-2'}`}>
               We are launching in {cityName} soon! Register your business now.
             </h2>
 
-            <p className="text-base text-gray-600 max-w-md mx-auto mb-6 leading-relaxed">
+            <p className={`text-base text-gray-600 max-w-md mx-auto overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-8' : 'leading-relaxed mb-6'}`}>
               Be among the first verified {categoryName.toLowerCase()} in {cityName}. Gain direct client inquiries straight to your WhatsApp with zero platform commission.
             </p>
 

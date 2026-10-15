@@ -125,10 +125,10 @@ export default async function CityHomePage({ params }: PageProps) {
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl text-gray-950 tracking-tight font-bold leading-tight mt-1 mb-3">
+            <h1 className={`text-2xl sm:text-3xl text-gray-950 tracking-tight font-bold overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-6 pt-2' : 'leading-tight mt-1 mb-3'}`}>
               Find Trusted Local Services in {cityName}
             </h1>
-            <p className="text-base text-gray-600 leading-relaxed mb-6 max-w-2xl">
+            <p className={`text-base text-gray-600 max-w-2xl overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-8' : 'leading-relaxed mb-6'}`}>
               Connect directly with verified local specialists across {cityName} without intermediaries, commissions, or delay.
             </p>
 
@@ -187,11 +187,11 @@ export default async function CityHomePage({ params }: PageProps) {
           {/* Original Browse by Specialty Grid */}
           <section className="flex flex-col">
             <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-950 tracking-tight leading-snug">
+              <div className="overflow-visible">
+                <h2 className={`text-xl sm:text-2xl font-semibold text-gray-950 tracking-tight overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-3 pt-1.5' : 'leading-snug'}`}>
                   Browse by Specialty
                 </h2>
-                <p className="text-sm text-gray-500 font-medium">
+                <p className={`text-sm text-gray-500 font-medium overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
                   Verified community technicians &amp; cooks
                 </p>
               </div>
@@ -205,12 +205,12 @@ export default async function CityHomePage({ params }: PageProps) {
                 <Link
                   key={cat.id}
                   href={`/${lang}/${country}/${city}/${cat.slug}`}
-                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group"
+                  className="flex flex-col items-center justify-center p-3.5 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group overflow-visible"
                 >
                   <div className="w-12 h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-2 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
                     <CategoryIcon id={cat.id} className="w-5 h-5" />
                   </div>
-                  <span className="font-bold text-xs text-gray-900 group-hover:text-[#006948] transition-colors leading-tight">
+                  <span className={`font-bold text-xs text-gray-900 group-hover:text-[#006948] transition-colors leading-tight ${lang === 'ur' ? 'font-urdu leading-[2.2] min-h-[2.5rem] py-0.5' : ''} overflow-visible`}>
                     {getCategoryName(cat, lang)}
                   </span>
                   <span className="text-xs text-gray-400 font-medium mt-0.5">
@@ -223,13 +223,13 @@ export default async function CityHomePage({ params }: PageProps) {
 
           {/* Verified Specialists Section: Render registered providers or invitation CTA */}
           {providers.length > 0 ? (
-            <section className="flex flex-col gap-4">
+            <section className="flex flex-col gap-4 overflow-visible">
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-semibold text-gray-950 tracking-tight leading-snug">
+                <div className="overflow-visible">
+                  <h2 className={`text-xl sm:text-2xl font-semibold text-gray-950 tracking-tight overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-2 pt-1' : 'leading-snug'}`}>
                     Featured Verified Specialists
                   </h2>
-                  <p className="text-sm text-gray-500">
+                  <p className={`text-sm text-gray-500 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
                     Direct connection with zero intermediary commissions in {cityName}
                   </p>
                 </div>

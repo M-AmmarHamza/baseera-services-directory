@@ -6,7 +6,7 @@ import { Plus } from 'lucide-react';
 import CitySelector from '@/components/CitySelector';
 import BottomNav from '@/components/BottomNav';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { tajawal, inter } from '@/app/fonts';
+import { tajawal, inter, notoNastaliqUrdu } from '@/app/fonts';
 
 export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'ur' }, { lang: 'ar' }];
@@ -25,11 +25,11 @@ export default async function RootLayout({
   const dict = await getDictionary(lang);
 
   return (
-    <html lang={lang} dir={isRTL ? 'rtl' : 'ltr'} className={`${tajawal.variable} ${inter.variable}`}>
+    <html lang={lang} dir={isRTL ? 'rtl' : 'ltr'} className={`${tajawal.variable} ${inter.variable} ${notoNastaliqUrdu.variable}`}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
       </head>
-      <body className={`${isRTL ? 'font-tajawal' : 'font-sans'} bg-[#f9f9ff] text-[#141b2b] min-h-screen flex flex-col antialiased selection:bg-emerald-100 selection:text-emerald-900`}>
+      <body className={`${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'} bg-[#f9f9ff] text-[#141b2b] min-h-screen flex flex-col antialiased selection:bg-emerald-100 selection:text-emerald-900`}>
         {/* Global Desktop & Mobile Header */}
         <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/90 shadow-2xs">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">

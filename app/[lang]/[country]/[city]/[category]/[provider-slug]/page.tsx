@@ -354,9 +354,9 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
           </div>
 
           {/* Name & Trade Title */}
-          <div className="space-y-1.5">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight leading-tight text-neutral-900">
+          <div className="space-y-1.5 overflow-visible">
+            <div className="flex flex-wrap items-center gap-2 overflow-visible">
+              <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-4 pt-2' : 'leading-tight'}`}>
                 {provider.name}
               </h1>
               {provider.is_verified && (
@@ -366,7 +366,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               )}
             </div>
 
-            <p className="text-base font-semibold text-[#059669]">
+            <p className={`text-base font-semibold text-[#059669] overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3]' : ''}`}>
               {provider.trade_title}
             </p>
 
@@ -394,30 +394,30 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 px-2 sm:px-6">
           <div className="lg:col-span-2 space-y-6">
             {/* Bio */}
-            <div className="p-6 border border-gray-200 rounded-2xl bg-white">
-              <h2 className="text-xl font-semibold text-neutral-900 mb-2 leading-snug">
+            <div className="p-6 border border-gray-200 rounded-2xl bg-white overflow-visible">
+              <h2 className={`text-xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-4 pt-1' : 'leading-snug mb-2'}`}>
                 About &amp; Professional Experience
               </h2>
-              <p className="text-base text-gray-700 leading-relaxed whitespace-pre-line">
+              <p className={`text-base text-gray-700 whitespace-pre-line overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5]' : 'leading-relaxed'}`}>
                 {provider.short_bio}
               </p>
             </div>
 
             {/* DYNAMIC CORE SPECIALIZATIONS */}
-            <div className="p-6 border border-gray-200 rounded-2xl bg-white">
+            <div className="p-6 border border-gray-200 rounded-2xl bg-white overflow-visible">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-neutral-900 leading-snug">
+                <h2 className={`text-xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3]' : 'leading-snug'}`}>
                   Core Specializations
                 </h2>
                 <span className="text-xs text-[#059669] font-bold">Category Verified</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {specializations.map((spec, i) => (
-                  <div key={i} className="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100">
+                  <div key={i} className="flex items-start gap-2.5 p-3 rounded-xl bg-gray-50 border border-gray-100 overflow-visible">
                     <CheckCircle2 className="w-4 h-4 text-[#059669] shrink-0 mt-0.5" />
-                    <div>
-                      <h3 className="text-base sm:text-lg font-semibold text-neutral-900 leading-snug">{spec.title}</h3>
-                      <p className="text-sm text-gray-600 mt-0.5 leading-relaxed">{spec.desc}</p>
+                    <div className="overflow-visible">
+                      <h3 className={`text-base sm:text-lg font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2] mb-1' : 'leading-snug'}`}>{spec.title}</h3>
+                      <p className={`text-sm text-gray-600 mt-0.5 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : 'leading-relaxed'}`}>{spec.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -425,8 +425,8 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
             </div>
 
             {/* Service Area Tags */}
-            <div className="p-6 border border-gray-200 rounded-2xl bg-white">
-              <h2 className="text-xl font-semibold text-neutral-900 mb-3 leading-snug">
+            <div className="p-6 border border-gray-200 rounded-2xl bg-white overflow-visible">
+              <h2 className={`text-xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-4 pt-1' : 'leading-snug mb-3'}`}>
                 Service Area Coverage in {cityName}
               </h2>
               <div className="flex flex-wrap gap-2">

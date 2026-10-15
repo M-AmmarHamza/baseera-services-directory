@@ -145,9 +145,9 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
                     />
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <h3 className="text-lg font-semibold leading-snug text-neutral-900 group-hover:text-[#006948] transition-colors truncate">
+                  <div className="flex-1 min-w-0 overflow-visible">
+                    <div className="flex items-center gap-1.5 overflow-visible">
+                      <h3 className={`text-lg font-semibold text-neutral-900 group-hover:text-[#006948] transition-colors truncate ${lang === 'ur' ? 'font-urdu leading-[2.2] py-0.5' : 'leading-snug'}`}>
                         {provider.name}
                       </h3>
                       {provider.is_verified && (
@@ -156,7 +156,7 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
                         </span>
                       )}
                     </div>
-                    <p className="text-sm font-semibold text-[#006948] truncate mt-0.5">
+                    <p className={`text-sm font-semibold text-[#006948] truncate mt-0.5 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
                       {provider.trade_title}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1 text-sm text-amber-600 font-semibold">
@@ -168,7 +168,7 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
                 </div>
 
                 {/* Location */}
-                <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
+                <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3 overflow-visible">
                   <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                   <span className="truncate">
                     {provider.district}, {cityDisplay}
@@ -176,7 +176,7 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
                 </div>
 
                 {/* Short Bio Snippet */}
-                <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed mb-4">
+                <p className={`text-sm text-gray-600 mb-4 line-clamp-2 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5]' : 'leading-relaxed'}`}>
                   {provider.short_bio}
                 </p>
               </div>
