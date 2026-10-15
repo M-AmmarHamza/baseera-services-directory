@@ -37,6 +37,8 @@ import {
   getCitiesByCountry,
   CATEGORIES,
   getCategoryName,
+  getLocalizedCountryName,
+  getLocalizedCityName,
   toTitleCase,
 } from '@/lib/db';
 
@@ -79,10 +81,22 @@ const CATEGORY_ICON_MAP: Record<string, React.ComponentType<{ className?: string
 export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
   const { lang, country } = await params;
   const countryObj = getCountryByCode(country);
-  const countryName = countryObj.name;
+  const countryName = getLocalizedCountryName(countryObj, lang);
 
-  const title = `Top Local Services & Verified Technicians in ${countryName} | Baseera`;
-  const description = `Hire the best verified professionals in ${countryName}. From expert AC repair to creative interior designers, connect directly via WhatsApp with zero booking fees.`;
+  const title =
+    lang === 'ur'
+      ? `${countryName} میں تصدیق شدہ کاریگر اور لوکل سروسز | بصیرہ`
+      : lang === 'ar'
+      ? `أفضل الخدمات والفنيين المعتمدين في ${countryName} | بصيرة`
+      : `Top Local Services & Verified Technicians in ${countryName} | Baseera`;
+
+  const description =
+    lang === 'ur'
+      ? `${countryName} میں بہترین تصدیق شدہ ماہرین کی خدمات حاصل کریں۔ اے سی ریپئر سے لے کر انٹیریئر ڈیزائنرز تک، زیرو بکنگ فیس کے ساتھ براہِ راست واٹس ایپ پر رابطہ کریں۔`
+      : lang === 'ar'
+      ? `استعن بأفضل المهنيين المعتمدين في ${countryName}. من تصليح المكيفات إلى مصممي الديكور، تواصل مباشرة عبر واتساب بدون رسوم حجز.`
+      : `Hire the best verified professionals in ${countryName}. From expert AC repair to creative interior designers, connect directly via WhatsApp with zero booking fees.`;
+
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}`;
 
   return {
@@ -100,7 +114,7 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
       title,
       description,
       url: canonicalUrl,
-      siteName: 'Baseera Local Services Directory',
+      siteName: lang === 'ur' ? 'بصیرہ ڈائریکٹری' : lang === 'ar' ? 'دليل بصيرة' : 'Baseera Local Services Directory',
       locale: lang === 'ur' ? 'ur_PK' : lang === 'ar' ? 'ar_AE' : 'en_US',
       type: 'website',
     },
@@ -110,7 +124,7 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
 export default async function CountryPage({ params }: CountryPageProps) {
   const { lang, country } = await params;
   const countryObj = getCountryByCode(country);
-  const countryName = countryObj.name;
+  const countryName = getLocalizedCountryName(countryObj, lang);
   const cities = getCitiesByCountry(country);
   const defaultCitySlug = countryObj.defaultCity || cities[0]?.slug || 'capital';
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}`;
@@ -131,7 +145,7 @@ export default async function CountryPage({ params }: CountryPageProps) {
   };
 
   return (
-    <div className={`min-h-screen bg-white text-neutral-900 pb-20 ${lang === 'ur' ? 'font-urdu' : 'font-sans'}`}>
+    <div className={`min-h-screen bg-white text-neutral-900 pb-20 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
       {/* Programmatic JSON-LD Schema */}
       <script
         type="application/ld+json"
@@ -145,7 +159,7 @@ export default async function CountryPage({ params }: CountryPageProps) {
             <Link href={`/${lang}`} className="hover:text-[#059669] transition-colors">
               {lang === 'ur' ? 'مرکزی صفحہ' : lang === 'ar' ? 'الرئيسية' : 'Home'}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
             <span className="text-neutral-900 font-semibold">{countryName}</span>
           </nav>
         </div>
@@ -156,15 +170,29 @@ export default async function CountryPage({ params }: CountryPageProps) {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-4">
             <span className="text-base">{countryObj.flag}</span>
-            <span>{lang === 'ur' ? 'ملک گیر تصدیق شدہ نیٹ ورک' : `${countryName} Verified Specialist Hub`}</span>
+            <span>
+              {lang === 'ur'
+                ? 'ملک گیر تصدیق شدہ نیٹ ورک'
+                : lang === 'ar'
+                ? 'شبكة موثقة على مستوى الدولة'
+                : `${countryName} Verified Specialist Hub`}
+            </span>
           </div>
 
           <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-6 pt-2' : 'leading-tight mb-4'}`}>
-            Verified Local Professionals in {countryName}
+            {lang === 'ur'
+              ? `${countryName} میں تصدیق شدہ لوکل سروسز اور کاریگر`
+              : lang === 'ar'
+              ? `فنيون وخدمات محلية موثقة في ${countryName}`
+              : `Verified Local Professionals in ${countryName}`}
           </h1>
 
           <p className={`text-base text-gray-600 max-w-2xl mx-auto overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-8' : 'leading-relaxed mb-8'}`}>
-            Hire the best verified professionals in {countryName}. From expert AC repair to creative interior designers, connect directly via WhatsApp with zero booking fees.
+            {lang === 'ur'
+              ? `${countryName} میں بہترین تصدیق شدہ ماہرین کی خدمات حاصل کریں۔ اے سی ریپئر سے لے کر انٹیریئر ڈیزائنرز تک، زیرو بکنگ فیس کے ساتھ براہِ راست واٹس ایپ پر رابطہ کریں۔`
+              : lang === 'ar'
+              ? `استعن بأفضل المهنيين المعتمدين في ${countryName}. من تصليح المكيفات إلى مصممي الديكور، تواصل مباشرة عبر واتساب بدون رسوم حجز.`
+              : `Hire the best verified professionals in ${countryName}. From expert AC repair to creative interior designers, connect directly via WhatsApp with zero booking fees.`}
           </p>
         </div>
       </section>
@@ -174,14 +202,22 @@ export default async function CountryPage({ params }: CountryPageProps) {
         <div className="flex items-end justify-between gap-4 mb-6">
           <div className="overflow-visible">
             <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-2 pt-1' : 'leading-snug'}`}>
-              Popular Cities in {countryName}
+              {lang === 'ur'
+                ? `${countryName} کے مشہور شہر`
+                : lang === 'ar'
+                ? `المدن الرئيسية في ${countryName}`
+                : `Popular Cities in ${countryName}`}
             </h2>
             <p className={`text-sm text-gray-500 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-              Select your city to connect with nearby verified technicians
+              {lang === 'ur'
+                ? 'قریبی تصدیق شدہ کاریگروں سے رابطے کے لیے اپنا شہر منتخب کریں'
+                : lang === 'ar'
+                ? 'اختر مدينتك للتواصل مع الفنيين المعتمدين بالقرب منك'
+                : 'Select your city to connect with nearby verified technicians'}
             </p>
           </div>
           <span className="text-xs font-semibold text-[#006948] bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
-            {cities.length} {cities.length === 1 ? 'City' : 'Cities'}
+            {cities.length} {lang === 'ur' ? 'شہر' : lang === 'ar' ? 'مدن' : cities.length === 1 ? 'City' : 'Cities'}
           </span>
         </div>
 
@@ -198,14 +234,14 @@ export default async function CountryPage({ params }: CountryPageProps) {
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-gray-900 group-hover:text-[#006948] transition-colors">
-                    {city.name}
+                    {getLocalizedCityName(city.slug, lang)}
                   </h3>
                   <span className="text-xs text-gray-500">
-                    Explore Specialists →
+                    {lang === 'ur' ? 'کاریگر دیکھیں ←' : lang === 'ar' ? 'استكشف الفنيين ←' : 'Explore Specialists →'}
                   </span>
                 </div>
               </div>
-              <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#006948] group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#006948] group-hover:translate-x-1 transition-all rtl:rotate-180" />
             </Link>
           ))}
         </div>
@@ -216,10 +252,18 @@ export default async function CountryPage({ params }: CountryPageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-6">
             <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-2 pt-1' : 'leading-snug'}`}>
-              Browse 24+ Verified Specialties in {countryName}
+              {lang === 'ur'
+                ? `${countryName} میں 24+ تصدیق شدہ شعبہ جات دیکھیں`
+                : lang === 'ar'
+                ? `تصفح أكثر من 24 تخصصاً معتمداً في ${countryName}`
+                : `Browse 24+ Verified Specialties in ${countryName}`}
             </h2>
             <p className={`text-sm text-gray-500 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-              Direct WhatsApp booking with zero platform commission
+              {lang === 'ur'
+                ? 'زیرو کمیشن اور براہِ راست واٹس ایپ رابطہ'
+                : lang === 'ar'
+                ? 'حجز مباشر عبر واتساب بدون أي عمولة'
+                : 'Direct WhatsApp booking with zero platform commission'}
             </p>
           </div>
 
@@ -235,7 +279,7 @@ export default async function CountryPage({ params }: CountryPageProps) {
                   <div className="w-11 h-11 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-2 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
                     <IconComp className="w-5 h-5" />
                   </div>
-                  <span className="text-xs font-bold text-gray-900 group-hover:text-[#006948] line-clamp-2 leading-tight">
+                  <span className={`text-xs font-bold text-gray-900 group-hover:text-[#006948] line-clamp-2 leading-tight ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
                     {getCategoryName(cat, lang)}
                   </span>
                 </Link>

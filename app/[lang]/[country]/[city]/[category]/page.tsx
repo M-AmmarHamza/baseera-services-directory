@@ -16,6 +16,8 @@ import {
   getCategoryBySlug,
   getCategoryName,
   getCountryByCode,
+  getLocalizedCountryName,
+  getLocalizedCityName,
   toTitleCase,
 } from '@/lib/db';
 import { formatVisitingPrice } from '@/lib/currencies';
@@ -35,13 +37,25 @@ const DOMAIN = 'https://baseera-services-directory.vercel.app';
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { lang, country, city, category } = await params;
   const catObj = getCategoryBySlug(category);
-  const categoryName = catObj ? catObj.name : toTitleCase(category);
-  const cityName = toTitleCase(city);
+  const categoryName = getCategoryName(catObj, lang);
+  const cityName = getLocalizedCityName(city, lang);
   const countryObj = getCountryByCode(country);
-  const countryName = countryObj.name;
+  const countryName = getLocalizedCountryName(countryObj, lang);
 
-  const title = `Best ${categoryName} in ${cityName}, ${countryName} | Top Rated Profiles`;
-  const description = `Looking for a reliable ${categoryName} in ${cityName}? Browse verified profiles, check ratings, view portfolios, and chat directly on WhatsApp. No middlemen!`;
+  const title =
+    lang === 'ur'
+      ? `${cityName} میں بہترین تصدیق شدہ ${categoryName} | بصیرہ`
+      : lang === 'ar'
+      ? `أفضل ${categoryName} في ${cityName}، ${countryName} | ملفات معتمدة`
+      : `Best ${categoryName} in ${cityName}, ${countryName} | Top Rated Profiles`;
+
+  const description =
+    lang === 'ur'
+      ? `کیا آپ ${cityName} میں قابل اعتماد ${categoryName} تلاش کر رہے ہیں؟ تصدیق شدہ پروفائلز دیکھیں، ریٹنگز جانچیں اور بغیر کسی کمیشن کے براہِ راست واٹس ایپ پر رابطہ کریں۔`
+      : lang === 'ar'
+      ? `هل تبحث عن ${categoryName} موثوق في ${cityName}؟ تصفح الملفات المعتمدة، واطلع على التقييمات، وتواصل مباشرة عبر واتساب بدون وسيط!`
+      : `Looking for a reliable ${categoryName} in ${cityName}? Browse verified profiles, check ratings, view portfolios, and chat directly on WhatsApp. No middlemen!`;
+
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
 
   return {
@@ -59,7 +73,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       title,
       description,
       url: canonicalUrl,
-      siteName: 'Baseera Local Services Directory',
+      siteName: lang === 'ur' ? 'بصیرہ ڈائریکٹری' : lang === 'ar' ? 'دليل بصيرة' : 'Baseera Local Services Directory',
       locale: lang === 'ur' ? 'ur_PK' : lang === 'ar' ? 'ar_AE' : 'en_US',
       type: 'website',
     },
@@ -70,10 +84,10 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
   const { lang, country, city, category } = await params;
   const providers = await getProviders(city, category);
   const catObj = getCategoryBySlug(category);
-  const categoryName = catObj ? catObj.name : toTitleCase(category);
-  const cityName = toTitleCase(city);
+  const categoryName = getCategoryName(catObj, lang);
+  const cityName = getLocalizedCityName(city, lang);
   const countryObj = getCountryByCode(country);
-  const countryName = countryObj.name;
+  const countryName = getLocalizedCountryName(countryObj, lang);
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
 
   // Programmatic JSON-LD Schema (ItemList for Category Pages)
@@ -109,7 +123,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
   };
 
   return (
-    <div className={`min-h-screen bg-white text-neutral-900 pb-24 md:pb-16 ${lang === 'ur' ? 'font-urdu' : 'font-sans'}`}>
+    <div className={`min-h-screen bg-white text-neutral-900 pb-24 md:pb-16 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
       {/* Dynamic ItemList JSON-LD Injection */}
       <script
         type="application/ld+json"
@@ -123,15 +137,15 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
             <Link href={`/${lang}`} className="hover:text-[#059669] transition-colors">
               {lang === 'ur' ? 'مرکزی صفحہ' : lang === 'ar' ? 'الرئيسية' : 'Home'}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
             <Link href={`/${lang}/${country.toLowerCase()}`} className="hover:text-[#059669] transition-colors">
               {countryName}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
             <Link href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`} className="hover:text-[#059669] transition-colors">
               {cityName}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
             <span className="text-neutral-900 font-semibold">{categoryName}</span>
           </nav>
         </div>
@@ -144,13 +158,27 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
             <div className="overflow-visible">
               <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-2">
                 <span className="w-2 h-2 rounded-full bg-[#059669]" />
-                <span>{providers.length} Verified Specialists Available</span>
+                <span>
+                  {lang === 'ur'
+                    ? `${providers.length} تصدیق شدہ کاریگر دستیاب`
+                    : lang === 'ar'
+                    ? `${providers.length} فني معتمد متاح`
+                    : `${providers.length} Verified Specialists Available`}
+                </span>
               </div>
               <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-6 pt-2' : 'leading-tight'}`}>
-                Top-Rated {categoryName} in {cityName}
+                {lang === 'ur'
+                  ? `${cityName} میں بہترین تصدیق شدہ ${categoryName}`
+                  : lang === 'ar'
+                  ? `أفضل ${categoryName} معتمدين في ${cityName}`
+                  : `Top-Rated ${categoryName} in ${cityName}`}
               </h1>
               <p className={`text-base text-gray-600 max-w-2xl overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5]' : 'mt-1 leading-relaxed'}`}>
-                Compare verified specialist profiles, ratings, service areas, and connect directly on WhatsApp with zero middlemen commission.
+                {lang === 'ur'
+                  ? 'تصدیق شدہ کاریگروں کے پروفائلز، ریٹنگز، سروس کے علاقے دیکھیں اور بغیر کسی مڈل مین کمیشن کے براہِ راست واٹس ایپ پر رابطہ کریں۔'
+                  : lang === 'ar'
+                  ? 'قارن بين ملفات الفنيين المعتمدين، والتقييمات، ومناطق الخدمة، وتواصل مباشرة عبر واتساب بدون أي عمولة وسيط.'
+                  : 'Compare verified specialist profiles, ratings, service areas, and connect directly on WhatsApp with zero middlemen commission.'}
               </p>
             </div>
 
@@ -160,7 +188,13 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white hover:border-[#059669] hover:text-[#059669] text-sm font-semibold text-neutral-900 transition-colors shrink-0"
             >
               <PlusCircle className="w-4 h-4 text-[#059669]" />
-              <span>List Your Service in {cityName}</span>
+              <span>
+                {lang === 'ur'
+                  ? `${cityName} میں اپنی سروس درج کریں`
+                  : lang === 'ar'
+                  ? `أضف خدمتك في ${cityName}`
+                  : `List Your Service in ${cityName}`}
+              </span>
             </Link>
           </div>
         </div>
@@ -176,11 +210,19 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
             </div>
 
             <h2 className={`text-xl sm:text-2xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-4 pt-1.5' : 'leading-snug mb-2'}`}>
-              We are launching {categoryName} services in {cityName} soon!
+              {lang === 'ur'
+                ? `ہم بہت جلد ${cityName} میں ${categoryName} کی سروسز شروع کر رہے ہیں!`
+                : lang === 'ar'
+                ? `سنقوم بإطلاق خدمات ${categoryName} في ${cityName} قريباً!`
+                : `We are launching ${categoryName} services in ${cityName} soon!`}
             </h2>
 
             <p className={`text-base text-gray-600 max-w-md mx-auto overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-8' : 'leading-relaxed mb-6'}`}>
-              Be among the first verified {categoryName.toLowerCase()} in {cityName}. Gain direct client inquiries straight to your WhatsApp with zero platform commission.
+              {lang === 'ur'
+                ? `${cityName} میں سب سے پہلے تصدیق شدہ ${categoryName} بنیں۔ بغیر کسی فیس یا کمیشن کے براہِ راست اپنے واٹس ایپ پر کسٹمرز حاصل کریں۔`
+                : lang === 'ar'
+                ? `كن من أوائل فنيي ${categoryName} المعتمدين في ${cityName}. احصل على طلبات العملاء مباشرة على واتساب بدون عمولة.`
+                : `Be among the first verified ${categoryName.toLowerCase()} in ${cityName}. Gain direct client inquiries straight to your WhatsApp with zero platform commission.`}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -188,14 +230,16 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                 href={`/${lang}/list-service?country=${country}&city=${city}&category=${category}`}
                 className="w-full sm:w-auto bg-[#059669] hover:bg-[#047857] text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors inline-flex items-center justify-center gap-2"
               >
-                <span>Register Your Business</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>
+                  {lang === 'ur' ? 'بطور کاریگر رجسٹر ہوں' : lang === 'ar' ? 'سجل كمهني' : 'Register Your Business'}
+                </span>
+                <ArrowRight className="w-4 h-4 rtl:rotate-180" />
               </Link>
               <Link
                 href={`/${lang}`}
                 className="w-full sm:w-auto bg-white hover:bg-gray-50 border border-gray-200 text-neutral-900 text-sm font-semibold px-5 py-3 rounded-xl transition-colors inline-flex items-center justify-center"
               >
-                Browse All Services
+                {lang === 'ur' ? 'تمام سروسز دیکھیں' : lang === 'ar' ? 'تصفح جميع الخدمات' : 'Browse All Services'}
               </Link>
             </div>
           </div>
@@ -205,7 +249,11 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
             {providers.map((provider) => {
               const cleanPhone = provider.whatsapp_number.replace(/[^0-9]/g, '');
               const whatsappMessage = encodeURIComponent(
-                `Hello ${provider.name}, I saw your verified profile on Baseera in ${cityName}. I would like to inquire about your ${categoryName} services.`
+                lang === 'ur'
+                  ? `السلام علیکم ${provider.name}، میں نے بصیرہ پر آپ کا تصدیق شدہ پروفائل دیکھا ہے۔ مجھے ${cityName} میں آپ کی ${categoryName} سروسز کے لیے معلومات درکار ہیں۔`
+                  : lang === 'ar'
+                  ? `مرحباً ${provider.name}، لقد شاهدت ملفك الموثق على منصة بصيرة في ${cityName}. أود الاستفسار عن خدمات ${categoryName}.`
+                  : `Hello ${provider.name}, I saw your verified profile on Baseera in ${cityName}. I would like to inquire about your ${categoryName} services.`
               );
               const directWhatsAppUrl = `https://wa.me/${cleanPhone}?text=${whatsappMessage}`;
               const profileHref = `/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${provider.slug}`;
@@ -236,7 +284,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                           {/* Green "Verified" Badge */}
                           {provider.is_verified && (
                             <span
-                              title="Verified Specialist"
+                              title={lang === 'ur' ? 'تصدیق شدہ کاریگر' : lang === 'ar' ? 'فني معتمد' : 'Verified Specialist'}
                               className="inline-flex items-center text-[#059669] shrink-0"
                             >
                               <BadgeCheck className="w-4 h-4 fill-emerald-50 text-[#059669]" />
@@ -256,7 +304,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                             <span>{provider.rating.toFixed(1)}</span>
                           </div>
                           <span className="text-gray-400 font-normal">
-                            ({provider.review_count} reviews)
+                            ({provider.review_count} {lang === 'ur' ? 'تبصرے' : lang === 'ar' ? 'تقييم' : 'reviews'})
                           </span>
                         </div>
                       </div>
@@ -266,12 +314,12 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                     <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
                       <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
                       <span className="truncate">
-                        {provider.district}, {cityName}
+                        {provider.district}، {cityName}
                       </span>
                     </div>
 
                     {/* Short Description */}
-                    <p className="text-base text-gray-600 line-clamp-2 sm:line-clamp-3 leading-relaxed mb-4">
+                    <p className={`text-base text-gray-600 line-clamp-2 sm:line-clamp-3 leading-relaxed mb-4 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
                       {provider.short_bio}
                     </p>
 
@@ -287,7 +335,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                       ))}
                       {provider.service_area.length > 3 && (
                         <span className="px-1.5 py-0.5 text-gray-400 text-xs font-medium">
-                          +{provider.service_area.length - 3} more
+                          +{provider.service_area.length - 3} {lang === 'ur' ? 'مزید' : lang === 'ar' ? 'إضافي' : 'more'}
                         </span>
                       )}
                     </div>
@@ -312,7 +360,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                       className="bg-[#059669] hover:bg-[#047857] text-white text-sm font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-colors inline-flex items-center justify-center gap-1.5 shrink-0 shadow-2xs"
                     >
                       <MessageCircle className="w-4 h-4 fill-current" />
-                      <span>Chat on WhatsApp</span>
+                      <span>{lang === 'ur' ? 'واٹس ایپ پر رابطہ کریں' : lang === 'ar' ? 'محادثة واتساب' : 'Chat on WhatsApp'}</span>
                     </a>
                   </div>
                 </div>

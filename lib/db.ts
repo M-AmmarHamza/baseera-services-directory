@@ -610,6 +610,179 @@ export function getCitiesByCountry(countryCode: string): City[] {
   return [{ slug: defCity, name: toTitleCase(defCity), countryCode: norm }];
 }
 
+export const COUNTRY_NAMES_UR: Record<string, string> = {
+  pk: 'پاکستان',
+  ae: 'متحدہ عرب امارات',
+  sa: 'سعودی عرب',
+  qa: 'قطر',
+  kw: 'کویت',
+  bh: 'بحرین',
+  om: 'عمان',
+  in: 'بھارت',
+  bd: 'بنگلہ دیش',
+  tr: 'ترکی',
+  us: 'امریکہ',
+  ca: 'کینیڈا',
+  mx: 'میکسیکو',
+  br: 'برازیل',
+  gb: 'برطانیہ',
+  de: 'جرمنی',
+  fr: 'فرانس',
+  it: 'اٹلی',
+  es: 'اسپین',
+  nl: 'نیدرلینڈز',
+  ie: 'آئرلینڈ',
+  ch: 'سوئٹزرلینڈ',
+  au: 'آسٹریلیا',
+  nz: 'نیوزی لینڈ',
+  my: 'ملائیشیا',
+  sg: 'سنگاپور',
+  id: 'انڈونیشیا',
+  jp: 'جاپان',
+  za: 'جنوبی افریقہ',
+  eg: 'مصر',
+  ng: 'نائجیریا',
+  ke: 'کینیا',
+};
+
+export const COUNTRY_NAMES_AR: Record<string, string> = {
+  pk: 'باكستان',
+  ae: 'الإمارات العربية المتحدة',
+  sa: 'المملكة العربية السعودية',
+  qa: 'قطر',
+  kw: 'الكويت',
+  bh: 'البحرين',
+  om: 'عُمان',
+  in: 'الهند',
+  bd: 'بنغلاديش',
+  tr: 'تركيا',
+  us: 'الولايات المتحدة',
+  ca: 'كندا',
+  mx: 'المكسيك',
+  br: 'البرازيل',
+  gb: 'المملكة المتحدة',
+  de: 'ألمانيا',
+  fr: 'فرنسا',
+  it: 'إيطاليا',
+  es: 'إسبانيا',
+  nl: 'هولندا',
+  ie: 'أيرلندا',
+  ch: 'سويسرا',
+  au: 'أستراليا',
+  nz: 'نيوزيلندا',
+  my: 'ماليزيا',
+  sg: 'سنغافورة',
+  id: 'إندونيسيا',
+  jp: 'اليابان',
+  za: 'جنوب أفريقيا',
+  eg: 'مصر',
+  ng: 'نيجيريا',
+  ke: 'كينيا',
+};
+
+export const CITY_NAMES_UR: Record<string, string> = {
+  karachi: 'کراچی',
+  lahore: 'لاہور',
+  islamabad: 'اسلام آباد',
+  rawalpindi: 'راولپنڈی',
+  faisalabad: 'فیصل آباد',
+  dubai: 'دبئی',
+  sharjah: 'شارجہ',
+  'abu-dhabi': 'ابوظہبی',
+  ajman: 'عجمان',
+  riyadh: 'ریاض',
+  jeddah: 'جدہ',
+  dammam: 'دمام',
+  doha: 'دوحہ',
+  kuwait: 'کویت سٹی',
+  manama: 'منامہ',
+  muscat: 'مسقط',
+  london: 'لندن',
+  manchester: 'مانچسٹر',
+  birmingham: 'برمنگھم',
+  'new-york': 'نیویارک',
+  houston: 'ہیوسٹن',
+  chicago: 'شکاگو',
+  'los-angeles': 'لاس اینجلس',
+  toronto: 'ٹورنٹو',
+  vancouver: 'وینکوور',
+  sydney: 'سڈنی',
+  melbourne: 'میلبورن',
+  berlin: 'برلن',
+  paris: 'پیرس',
+  istanbul: 'استنبول',
+  'kuala-lumpur': 'کوالالمپور',
+  singapore: 'سنگاپور',
+  mumbai: 'ممبئی',
+  delhi: 'دہلی',
+  dhaka: 'ڈھاکہ',
+  cairo: 'قاہرہ',
+  johannesburg: 'جوہانسبرگ',
+  lagos: 'لاگوس',
+  abuja: 'ابوجا',
+  nairobi: 'نیروبی',
+};
+
+export const CITY_NAMES_AR: Record<string, string> = {
+  karachi: 'كراتشي',
+  lahore: 'لاهور',
+  islamabad: 'إسلام آباد',
+  rawalpindi: 'راولبندي',
+  faisalabad: 'فيصل آباد',
+  dubai: 'دبي',
+  sharjah: 'الشارقة',
+  'abu-dhabi': 'أبوظبي',
+  ajman: 'عجمان',
+  riyadh: 'الرياض',
+  jeddah: 'جدة',
+  dammam: 'الدمام',
+  doha: 'الدوحة',
+  kuwait: 'مدينة الكويت',
+  manama: 'المنامة',
+  muscat: 'مسقط',
+  london: 'لندن',
+  manchester: 'مانشستر',
+  birmingham: 'برمنغهام',
+  'new-york': 'نيويورك',
+  houston: 'هيوستن',
+  chicago: 'شيكاغو',
+  'los-angeles': 'لوس أنجلوس',
+  toronto: 'تورونتو',
+  vancouver: 'فانكوفر',
+  sydney: 'سيدني',
+  melbourne: 'ملبورن',
+  berlin: 'برلين',
+  paris: 'باريس',
+  istanbul: 'إسطنبول',
+  'kuala-lumpur': 'كوالالمبور',
+  singapore: 'سنغافورة',
+  mumbai: 'مومباي',
+  delhi: 'دلهي',
+  dhaka: 'دكا',
+  cairo: 'القاهرة',
+  johannesburg: 'جوهانسبرغ',
+  lagos: 'لاغوس',
+  abuja: 'أبوجا',
+  nairobi: 'نيروبي',
+};
+
+export function getLocalizedCountryName(countryOrCode: Country | string, lang = 'en'): string {
+  const code = typeof countryOrCode === 'string' ? countryOrCode.toLowerCase() : countryOrCode.code.toLowerCase();
+  if (lang === 'ur' && COUNTRY_NAMES_UR[code]) return COUNTRY_NAMES_UR[code];
+  if (lang === 'ar' && COUNTRY_NAMES_AR[code]) return COUNTRY_NAMES_AR[code];
+  if (typeof countryOrCode === 'object' && countryOrCode.name) return countryOrCode.name;
+  const c = getCountryByCode(code);
+  return c.name;
+}
+
+export function getLocalizedCityName(cityOrSlug: City | string, lang = 'en'): string {
+  const slug = typeof cityOrSlug === 'string' ? cityOrSlug.toLowerCase() : cityOrSlug.slug.toLowerCase();
+  if (lang === 'ur' && CITY_NAMES_UR[slug]) return CITY_NAMES_UR[slug];
+  if (lang === 'ar' && CITY_NAMES_AR[slug]) return CITY_NAMES_AR[slug];
+  if (typeof cityOrSlug === 'object' && cityOrSlug.name) return cityOrSlug.name;
+  return toTitleCase(slug);
+}
+
 export interface CategoryDef {
   id: string;
   slug: string;
@@ -900,7 +1073,10 @@ export const CATEGORIES: CategoryDef[] = [
   },
 ];
 
-export function getCategoryName(cat: CategoryDef, lang: string): string {
+export function getCategoryName(catOrSlug: CategoryDef | string | undefined | null, lang = 'en'): string {
+  if (!catOrSlug) return '';
+  const cat = typeof catOrSlug === 'string' ? getCategoryBySlug(catOrSlug) : catOrSlug;
+  if (!cat) return typeof catOrSlug === 'string' ? toTitleCase(catOrSlug) : '';
   if (lang === 'ur' && cat.nameUr) return cat.nameUr;
   if (lang === 'ar' && cat.nameAr) return cat.nameAr;
   return cat.name;

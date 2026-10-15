@@ -18,11 +18,22 @@ export default function SearchBar({
   country,
   city,
   defaultValue = '',
-  placeholder = 'Search plumber in orangi, electrician, ac repair...',
-  searchButtonText = 'Search',
+  placeholder,
+  searchButtonText,
 }: SearchBarProps) {
   const [query, setQuery] = useState(defaultValue);
   const router = useRouter();
+
+  const effectivePlaceholder =
+    placeholder ||
+    (lang === 'ur'
+      ? 'الیکٹریشن، پلمبر، اے سی سروس، ہوم شیف تلاش کریں...'
+      : lang === 'ar'
+      ? 'ابحث عن فني كهرباء، سباكة، تكييف...'
+      : 'Search plumber, electrician, ac repair, home chef...');
+
+  const effectiveButtonText =
+    searchButtonText || (lang === 'ur' ? 'تلاش کریں' : lang === 'ar' ? 'بحث' : 'Search');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +58,7 @@ export default function SearchBar({
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={placeholder}
+          placeholder={effectivePlaceholder}
           className="w-full bg-transparent text-sm focus:outline-none placeholder-gray-400 font-medium py-1"
         />
         {query && (
@@ -63,33 +74,35 @@ export default function SearchBar({
           type="submit"
           className="bg-[#006948] hover:bg-[#00855d] text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-colors shrink-0 shadow-xs"
         >
-          {searchButtonText}
+          {effectiveButtonText}
         </button>
       </form>
 
       {/* Popular quick searches */}
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-emerald-100/90 font-medium">
-        <span className="text-xs text-emerald-200 font-semibold">Popular:</span>
+        <span className="text-xs text-emerald-200 font-semibold">
+          {lang === 'ur' ? 'مقبول:' : lang === 'ar' ? 'الأكثر طلباً:' : 'Popular:'}
+        </span>
         <button
           type="button"
-          onClick={() => handleQuickFilter('plumber in orangi')}
+          onClick={() => handleQuickFilter(lang === 'ur' ? 'پلمبر' : lang === 'ar' ? 'سباك' : 'plumber in orangi')}
           className="bg-white/15 hover:bg-white/25 text-white px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
         >
-          Plumber in Orangi
+          {lang === 'ur' ? 'پلمبر' : lang === 'ar' ? 'سباك' : 'Plumber in Orangi'}
         </button>
         <button
           type="button"
-          onClick={() => handleQuickFilter('electrician in pechs')}
+          onClick={() => handleQuickFilter(lang === 'ur' ? 'الیکٹریشن' : lang === 'ar' ? 'كهربائي' : 'electrician in pechs')}
           className="bg-white/15 hover:bg-white/25 text-white px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
         >
-          Electrician in PECHS
+          {lang === 'ur' ? 'الیکٹریشن' : lang === 'ar' ? 'كهربائي' : 'Electrician in PECHS'}
         </button>
         <button
           type="button"
-          onClick={() => handleQuickFilter('ac repair gulshan')}
+          onClick={() => handleQuickFilter(lang === 'ur' ? 'اے سی ریپئر' : lang === 'ar' ? 'تصليح تكييف' : 'ac repair gulshan')}
           className="bg-white/15 hover:bg-white/25 text-white px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
         >
-          AC in Gulshan
+          {lang === 'ur' ? 'اے سی ریپئر' : lang === 'ar' ? 'تصليح تكييف' : 'AC in Gulshan'}
         </button>
       </div>
     </div>

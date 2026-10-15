@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Check, Globe, Search, X, MapPin } from 'lucide-react';
-import { COUNTRIES, CITIES, Country } from '@/lib/db';
+import { COUNTRIES, CITIES, Country, getLocalizedCountryName, getLocalizedCityName } from '@/lib/db';
 
 interface CitySelectorProps {
   lang: string;
@@ -51,10 +51,11 @@ export default function CitySelector({ lang }: CitySelectorProps) {
   let activeFlag = '🌍';
 
   if (currentCity && currentCountry) {
-    activeLabel = `${currentCity.name}, ${currentCountry.code.toUpperCase()}`;
+    const locCity = getLocalizedCityName(currentCity.slug, lang);
+    activeLabel = `${locCity}، ${currentCountry.code.toUpperCase()}`;
     activeFlag = currentCountry.flag;
   } else if (currentCountry) {
-    activeLabel = `${currentCountry.name}`;
+    activeLabel = getLocalizedCountryName(currentCountry.code, lang);
     activeFlag = currentCountry.flag;
   }
 
@@ -147,7 +148,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                   <div key={country.code} className="py-1.5 px-3">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-gray-500 mb-1">
                       <span>{country.flag}</span>
-                      <span>{country.name}</span>
+                      <span>{getLocalizedCountryName(country.code, lang)}</span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-1">
@@ -164,7 +165,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                                 : 'text-gray-700 hover:bg-gray-50'
                             }`}
                           >
-                            <span className="truncate">{city.name}</span>
+                            <span className="truncate">{getLocalizedCityName(city.slug, lang)}</span>
                             {isSelected && <Check className="w-3 h-3 text-[#059669] shrink-0" />}
                           </Link>
                         );
@@ -259,7 +260,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                   <div key={country.code} className="py-3">
                     <div className="flex items-center gap-2 px-1 mb-2 text-xs font-bold text-gray-700">
                       <span>{country.flag}</span>
-                      <span>{country.name}</span>
+                      <span>{getLocalizedCountryName(country.code, lang)}</span>
                     </div>
 
                     <div className="grid grid-cols-2 gap-1.5">
@@ -276,7 +277,7 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                                 : 'bg-gray-50/70 text-neutral-800 hover:bg-gray-100 font-medium'
                             }`}
                           >
-                            <span className="truncate">{city.name}</span>
+                            <span className="truncate">{getLocalizedCityName(city.slug, lang)}</span>
                             {isSelected && <Check className="w-3.5 h-3.5 text-[#059669] shrink-0" />}
                           </Link>
                         );

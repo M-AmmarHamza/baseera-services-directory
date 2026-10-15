@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
-import { CATEGORIES, getCategoryBySlug, getCategoryName } from '@/lib/db';
+import { CATEGORIES, getCategoryBySlug, getCategoryName, getLocalizedCityName } from '@/lib/db';
 import { searchProviders } from '@/lib/search';
 import { formatVisitingPrice } from '@/lib/currencies';
 import SearchBar from '@/components/SearchBar';
@@ -34,16 +34,33 @@ export async function generateMetadata({
   params,
   searchParams,
 }: SearchPageProps): Promise<Metadata> {
-  const { city } = await params;
+  const { lang, city } = await params;
   const { q } = await searchParams;
   const query = q || '';
-  const cityName = city.charAt(0).toUpperCase() + city.slice(1);
+  const cityName = getLocalizedCityName(city, lang);
+
+  const title = query
+    ? lang === 'ur'
+      ? `"${query}" کے نتائج - ${cityName} | بصیرہ`
+      : lang === 'ar'
+      ? `نتائج البحث عن "${query}" في ${cityName} | بصيرة`
+      : `Results for "${query}" in ${cityName} | Baseera`
+    : lang === 'ur'
+    ? `${cityName} میں تصدیق شدہ کاریگر تلاش کریں | بصیرہ`
+    : lang === 'ar'
+    ? `ابحث عن فنيين معتمدين في ${cityName} | بصيرة`
+    : `Search Verified Technicians in ${cityName} | Baseera`;
+
+  const description =
+    lang === 'ur'
+      ? `${cityName} میں تصدیق شدہ پلمبر، الیکٹریشن، اے سی ٹیکنیشن اور کاریگر تلاش کریں۔ زیرو کمیشن، براہِ راست واٹس ایپ رابطہ۔`
+      : lang === 'ar'
+      ? `ابحث عن فنيين معتمدين في ${cityName}. تواصل مباشرة عبر واتساب بدون عمولة.`
+      : `Search verified plumbers, electricians, AC technicians, and home chefs across ${cityName}. Direct WhatsApp contact with zero platform fee.`;
 
   return {
-    title: query
-      ? `Results for "${query}" in ${cityName} | Baseera`
-      : `Search Verified Technicians in ${cityName} | Baseera`,
-    description: `Search verified plumbers, electricians, AC technicians, and home chefs across ${cityName}. Direct WhatsApp contact with zero platform fee.`,
+    title,
+    description,
   };
 }
 
@@ -54,7 +71,7 @@ export default async function SearchResultsPage({
   const { lang, country, city } = await params;
   const { q } = await searchParams;
   const dict = await getDictionary(lang);
-  const cityName = city.charAt(0).toUpperCase() + city.slice(1);
+  const cityName = getLocalizedCityName(city, lang);
 
   const analysis = await searchProviders(city, q || '');
   const {
@@ -67,19 +84,21 @@ export default async function SearchResultsPage({
   } = analysis;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
       
       {/* Breadcrumb Navigation */}
       <nav aria-label="Breadcrumb" className="flex items-center text-xs font-semibold text-gray-500 gap-1.5 overflow-x-auto whitespace-nowrap py-1">
-        <Link href={`/${lang}/pk/karachi`} className="hover:text-emerald-800 transition-colors">
+        <Link href={`/${lang}`} className="hover:text-emerald-800 transition-colors">
           {dict.header?.home || dict.nav?.home || "Home"}
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
-        <Link href={`/${lang}/${country}/${city}`} className="hover:text-emerald-800 transition-colors">
+        <Link href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`} className="hover:text-emerald-800 transition-colors">
           {cityName}
         </Link>
         <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
-        <span className="text-emerald-800 font-bold">Search</span>
+        <span className="text-emerald-800 font-bold">
+          {lang === 'ur' ? 'تلاش' : lang === 'ar' ? 'بحث' : 'Search'}
+        </span>
       </nav>
 
       {/* Search Header Banner */}
@@ -87,15 +106,19 @@ export default async function SearchResultsPage({
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 text-emerald-200 text-xs font-bold uppercase tracking-wider">
             <Search className="w-3.5 h-3.5" />
-            <span>Search Results in {cityName}</span>
+            <span>
+              {lang === 'ur' ? `${cityName} میں تلاش کے نتائج` : lang === 'ar' ? `نتائج البحث في ${cityName}` : `Search Results in ${cityName}`}
+            </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h1 className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${lang === 'ur' ? 'font-urdu leading-[2.3]' : ''}`}>
             {originalQuery ? (
               <span>
-                Search: &ldquo;<span className="text-emerald-200">{originalQuery}</span>&rdquo;
+                {lang === 'ur' ? 'تلاش: ' : lang === 'ar' ? 'البحث: ' : 'Search: '}&ldquo;<span className="text-emerald-200">{originalQuery}</span>&rdquo;
               </span>
             ) : (
-              <span>Search Verified Local Technicians</span>
+              <span>
+                {lang === 'ur' ? 'تصدیق شدہ مقامی کاریگر تلاش کریں' : lang === 'ar' ? 'ابحث عن فنيين معتمدين' : 'Search Verified Local Technicians'}
+              </span>
             )}
           </h1>
         </div>
@@ -137,15 +160,15 @@ export default async function SearchResultsPage({
         <section className="flex flex-col gap-6">
           <div className="flex items-center justify-between border-b border-gray-200 pb-3">
             <div>
-              <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 leading-snug">
-                Verified Specialists Matching Your Query
+              <h2 className={`text-xl sm:text-2xl font-semibold text-gray-900 leading-snug ${lang === 'ur' ? 'font-urdu leading-[2.3]' : ''}`}>
+                {lang === 'ur' ? 'آپ کی تلاش کے مطابق تصدیق شدہ کاریگر' : lang === 'ar' ? 'فنيون معتمدون متوافقون مع بحثك' : 'Verified Specialists Matching Your Query'}
               </h2>
-              <p className="text-sm text-gray-500 mt-0.5">
-                {exactMatches.length} verified technician{exactMatches.length > 1 ? 's' : ''} directly available on WhatsApp
+              <p className={`text-sm text-gray-500 mt-0.5 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
+                {exactMatches.length} {lang === 'ur' ? 'کاریگر براہِ راست واٹس ایپ پر دستیاب' : lang === 'ar' ? 'فني متاح عبر واتساب' : `verified technician${exactMatches.length > 1 ? 's' : ''} directly available on WhatsApp`}
               </p>
             </div>
             <span className="text-xs font-bold bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200">
-              {exactMatches.length} Found
+              {exactMatches.length} {lang === 'ur' ? 'دستیاب' : lang === 'ar' ? 'متاح' : 'Found'}
             </span>
           </div>
 
@@ -200,7 +223,7 @@ export default async function SearchResultsPage({
                       </div>
                     </div>
 
-                    <p className="text-base text-gray-600 line-clamp-3 leading-relaxed mt-4">
+                    <p className={`text-base text-gray-600 line-clamp-3 leading-relaxed mt-4 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
                       {pro.short_bio}
                     </p>
 
@@ -234,13 +257,19 @@ export default async function SearchResultsPage({
 
                     <div className="flex items-center gap-2">
                       <Link
-                        href={`/${lang}/${country}/${city}/${pro.category_id}/${pro.slug}`}
+                        href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${pro.category_id}/${pro.slug}`}
                         className="py-2.5 px-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold text-sm transition-colors"
                       >
                         {dict.common.viewProfile}
                       </Link>
                       <a
-                        href={`https://wa.me/${pro.whatsapp_number.replace(/\+/g, '')}?text=${encodeURIComponent(`Assalam-o-Alaikum ${pro.name}, I found your profile on Baseera ${cityName}. I am looking for service in ${detectedArea || pro.district}.`)}`}
+                        href={`https://wa.me/${pro.whatsapp_number.replace(/\+/g, '')}?text=${encodeURIComponent(
+                          lang === 'ur'
+                            ? `السلام علیکم ${pro.name}، میں نے بصیرہ پر آپ کا پروفائل دیکھا ہے۔ مجھے ${detectedArea || pro.district} میں سروس درکار ہے۔`
+                            : lang === 'ar'
+                            ? `مرحباً ${pro.name}، شاهدت ملفك على منصة بصيرة في ${cityName}. أود الاستفسار عن خدماتك في ${detectedArea || pro.district}.`
+                            : `Assalam-o-Alaikum ${pro.name}, I found your profile on Baseera ${cityName}. I am looking for service in ${detectedArea || pro.district}.`
+                        )}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.99] text-white py-2.5 px-3.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
@@ -263,11 +292,19 @@ export default async function SearchResultsPage({
           </div>
 
           <div className="flex flex-col gap-2">
-            <h2 className="text-2xl font-extrabold text-gray-950 tracking-tight">
-              No Verified {detectedCategoryName || 'Technicians'} Found Specifically in &ldquo;{detectedArea || originalQuery}&rdquo;
+            <h2 className={`text-2xl font-extrabold text-gray-950 tracking-tight ${lang === 'ur' ? 'font-urdu leading-[2.3]' : ''}`}>
+              {lang === 'ur'
+                ? `"${detectedArea || originalQuery}" میں کوئی تصدیق شدہ کاریگر نہیں ملا`
+                : lang === 'ar'
+                ? `لم يتم العثور على فني معتمد في "${detectedArea || originalQuery}"`
+                : `No Verified ${detectedCategoryName || 'Technicians'} Found Specifically in "${detectedArea || originalQuery}"`}
             </h2>
-            <p className="text-sm text-gray-600 max-w-xl mx-auto leading-relaxed">
-              We did not find a registered {detectedCategoryName ? detectedCategoryName.toLowerCase() : 'service provider'} with dedicated service coverage in {detectedArea || 'this specific neighborhood'} yet.
+            <p className={`text-sm text-gray-600 max-w-xl mx-auto leading-relaxed ${lang === 'ur' ? 'font-urdu leading-[2.5]' : ''}`}>
+              {lang === 'ur'
+                ? `ہمیں ${detectedArea || 'اس علاقے'} میں فی الحال کوئی رجسٹرڈ کاریگر نہیں ملا۔`
+                : lang === 'ar'
+                ? `لم نجد فني مسجل يغطي ${detectedArea || 'هذه المنطقة'} حالياً.`
+                : `We did not find a registered ${detectedCategoryName ? detectedCategoryName.toLowerCase() : 'service provider'} with dedicated service coverage in ${detectedArea || 'this specific neighborhood'} yet.`}
             </p>
           </div>
 
@@ -276,21 +313,41 @@ export default async function SearchResultsPage({
             <div className="flex items-center gap-2">
               <Headphones className="w-5 h-5 text-emerald-700" />
               <span className="font-bold text-sm text-gray-900">
-                Need urgent assistance in {detectedArea || cityName}?
+                {lang === 'ur'
+                  ? `${detectedArea || cityName} میں فوری مدد چاہیے؟`
+                  : lang === 'ar'
+                  ? `هل تحتاج إلى مساعدة عاجلة في ${detectedArea || cityName}؟`
+                  : `Need urgent assistance in ${detectedArea || cityName}?`}
               </span>
             </div>
             <p className="text-xs text-gray-600 leading-relaxed">
-              Our regional coordinator can arrange a mobile verified specialist from a neighboring sector for your task.
+              {lang === 'ur'
+                ? 'ہمارا علاقائی کوآرڈینیٹر قریبی سیکٹر سے آپ کے لیے تصدیق شدہ ماہر کا بندوبست کر سکتا ہے۔'
+                : lang === 'ar'
+                ? 'يمكن لمنسقنا الإقليمي توفير فني معتمد من المناطق المجاورة لمساعدتك.'
+                : 'Our regional coordinator can arrange a mobile verified specialist from a neighboring sector for your task.'}
             </p>
 
             <a
-              href={`https://wa.me/923332145890?text=${encodeURIComponent(`Assalam-o-Alaikum Baseera, I need a verified ${detectedCategoryName || 'technician'} in ${detectedArea || originalQuery} (${cityName}). Can you help connect me?`)}`}
+              href={`https://wa.me/923332145890?text=${encodeURIComponent(
+                lang === 'ur'
+                  ? `السلام علیکم بصیرہ، مجھے ${detectedArea || originalQuery} (${cityName}) میں ایک تصدیق شدہ کاریگر کی ضرورت ہے۔ کیا آپ مدد کر سکتے ہیں؟`
+                  : lang === 'ar'
+                  ? `مرحباً بصيرة، أحتاج إلى فني معتمد في ${detectedArea || originalQuery} (${cityName}). هل يمكنكم المساعدة؟`
+                  : `Assalam-o-Alaikum Baseera, I need a verified ${detectedCategoryName || 'technician'} in ${detectedArea || originalQuery} (${cityName}). Can you help connect me?`
+              )}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.99] text-white py-3 px-6 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all self-start shadow-sm"
             >
               <WhatsAppIcon className="w-4 h-4 text-white shrink-0" />
-              <span>Request {detectedCategoryName || 'Specialist'} via WhatsApp Coordinator</span>
+              <span>
+                {lang === 'ur'
+                  ? 'واٹس ایپ کوآرڈینیٹر سے رابطہ کریں'
+                  : lang === 'ar'
+                  ? 'طلب فني عبر منسق الواتساب'
+                  : `Request ${detectedCategoryName || 'Specialist'} via WhatsApp Coordinator`}
+              </span>
               <ArrowRight className="w-4 h-4 text-white shrink-0 rtl:rotate-180" />
             </a>
           </div>
@@ -300,10 +357,18 @@ export default async function SearchResultsPage({
             <div className="w-full pt-6 border-t border-gray-100 flex flex-col gap-4 text-start">
               <div>
                 <h3 className="text-sm font-bold text-gray-900">
-                  Verified {detectedCategoryName} in Other Areas of {cityName}
+                  {lang === 'ur'
+                    ? `${cityName} کے دیگر علاقوں میں تصدیق شدہ ماہرین`
+                    : lang === 'ar'
+                    ? `فنيون معتمدون في مناطق أخرى من ${cityName}`
+                    : `Verified ${detectedCategoryName} in Other Areas of ${cityName}`}
                 </h3>
                 <p className="text-xs text-gray-500">
-                  These verified experts operate in neighboring districts and may travel to {detectedArea || 'your area'} on advance booking:
+                  {lang === 'ur'
+                    ? `یہ تصدیق شدہ ماہرین قریبی اضلاع میں کام کرتے ہیں اور پیشگی بکنگ پر ${detectedArea || 'آپ کے علاقے'} میں آ سکتے ہیں:`
+                    : lang === 'ar'
+                    ? `هؤلاء الفنيون يعملون في مناطق مجاورة ويمكنهم الوصول إلى ${detectedArea || 'منطقتك'} بالحجز المسبق:`
+                    : `These verified experts operate in neighboring districts and may travel to ${detectedArea || 'your area'} on advance booking:`}
                 </p>
               </div>
 
@@ -323,10 +388,10 @@ export default async function SearchResultsPage({
                       </div>
                     </div>
                     <Link
-                      href={`/${lang}/${country}/${city}/${pro.category_id}/${pro.slug}`}
+                      href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${pro.category_id}/${pro.slug}`}
                       className="px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-semibold text-gray-700 hover:bg-white shrink-0 transition-colors"
                     >
-                      View
+                      {dict.common.viewProfile || 'View'}
                     </Link>
                   </div>
                 ))}
@@ -336,14 +401,16 @@ export default async function SearchResultsPage({
 
           {/* Explore all categories */}
           <div className="w-full pt-4 border-t border-gray-100 flex flex-wrap justify-center items-center gap-2">
-            <span className="text-xs text-gray-500 font-medium">Browse All Categories:</span>
+            <span className="text-xs text-gray-500 font-medium">
+              {lang === 'ur' ? 'تمام کیٹیگریز دیکھیں:' : lang === 'ar' ? 'تصفح جميع التخصصات:' : 'Browse All Categories:'}
+            </span>
             {CATEGORIES.slice(0, 5).map((c) => (
               <Link
                 key={c.id}
-                href={`/${lang}/${country}/${city}/${c.slug}`}
+                href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${c.slug}`}
                 className="text-xs bg-gray-100 hover:bg-emerald-50 hover:text-emerald-800 text-gray-700 font-semibold px-3 py-1 rounded-full transition-colors"
               >
-                {c.name}
+                {getCategoryName(c, lang)}
               </Link>
             ))}
           </div>

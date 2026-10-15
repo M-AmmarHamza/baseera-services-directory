@@ -20,6 +20,8 @@ import {
   getCategoryBySlug,
   getCategoryName,
   getCountryByCode,
+  getLocalizedCountryName,
+  getLocalizedCityName,
   toTitleCase,
 } from '@/lib/db';
 import { getProviderCoverUrl, getProviderAvatarUrl } from '@/lib/category-banners';
@@ -213,15 +215,27 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     };
   }
 
-  const cityName = toTitleCase(city);
-  const categoryName = categoryInfo ? categoryInfo.name : toTitleCase(category);
+  const cityName = getLocalizedCityName(city, lang);
+  const categoryName = getCategoryName(categoryInfo, lang);
   const providerName = provider.name;
   const countryObj = getCountryByCode(country);
-  const countryName = countryObj.name;
+  const countryName = getLocalizedCountryName(countryObj, lang);
 
   // Exact Programmatic SEO Formula
-  const title = `${providerName} - Expert ${categoryName} in ${cityName} | Baseera`;
-  const description = `Contact ${providerName} for professional ${categoryName} services in ${cityName}. View their work gallery, core specialties, and message directly on WhatsApp.`;
+  const title =
+    lang === 'ur'
+      ? `${providerName} - ${cityName} میں ماہر ${categoryName} | بصیرہ`
+      : lang === 'ar'
+      ? `${providerName} - فني ${categoryName} معتمد في ${cityName} | بصيرة`
+      : `${providerName} - Expert ${categoryName} in ${cityName} | Baseera`;
+
+  const description =
+    lang === 'ur'
+      ? `${cityName} میں ${categoryName} سروسز کے لیے ${providerName} سے رابطہ کریں۔ کام کی تصاویر دیکھیں، ریٹنگز جانچیں اور براہِ راست واٹس ایپ کریں۔`
+      : lang === 'ar'
+      ? `تواصل مع ${providerName} للحصول على خدمات ${categoryName} في ${cityName}. اطلع على معرض الأعمال وتواصل مباشرة عبر واتساب.`
+      : `Contact ${providerName} for professional ${categoryName} services in ${cityName}. View their work gallery, core specialties, and message directly on WhatsApp.`;
+
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`;
 
   return {
@@ -239,7 +253,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
       title,
       description,
       url: canonicalUrl,
-      siteName: 'Baseera Local Services Directory',
+      siteName: lang === 'ur' ? 'بصیرہ ڈائریکٹری' : lang === 'ar' ? 'دليل بصيرة' : 'Baseera Local Services Directory',
       images: [
         {
           url: getProviderCoverUrl(provider),
@@ -261,15 +275,16 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
   const provider = await getProviderBySlug(city, category, slug);
   const categoryInfo = getCategoryBySlug(category);
-  const categoryName = categoryInfo ? categoryInfo.name : toTitleCase(category);
+  const categoryName = getCategoryName(categoryInfo, lang);
   const dict = await getDictionary(lang);
 
   if (!provider) {
     notFound();
   }
 
-  const cityName = toTitleCase(city);
+  const cityName = getLocalizedCityName(city, lang);
   const countryObj = getCountryByCode(country);
+  const countryName = getLocalizedCountryName(countryObj, lang);
   const countryCode = countryObj.code.toUpperCase();
   const providerName = provider.name;
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`;
@@ -317,11 +332,15 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     CATEGORY_SPECIALIZATIONS['electrician'];
 
   const whatsappMessage = encodeURIComponent(
-    `Assalam-o-Alaikum ${provider.name}, I found your verified profile on Baseera directory in ${cityName}. I need consultation for ${categoryName}. Are you available today?`
+    lang === 'ur'
+      ? `السلام علیکم ${provider.name}، میں نے بصیرہ پر آپ کا تصدیق شدہ پروفائل دیکھا ہے۔ مجھے ${cityName} میں آپ کی ${categoryName} سروسز کے لیے معلومات درکار ہیں۔ کیا آپ آج دستیاب ہیں؟`
+      : lang === 'ar'
+      ? `مرحباً ${provider.name}، لقد شاهدت ملفك الموثق على منصة بصيرة في ${cityName}. أود الاستفسار عن خدمات ${categoryName}. هل أنت متاح اليوم؟`
+      : `Assalam-o-Alaikum ${provider.name}, I found your verified profile on Baseera directory in ${cityName}. I need consultation for ${categoryName}. Are you available today?`
   );
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 pb-28 font-sans">
+    <div className={`min-h-screen bg-white text-neutral-900 pb-28 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
       {/* Dynamic JSON-LD Injection */}
       <script
         type="application/ld+json"
@@ -333,21 +352,21 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3">
           <nav className="flex items-center gap-1.5 text-xs text-gray-500 overflow-x-auto whitespace-nowrap">
             <Link href={`/${lang}`} className="hover:text-[#059669] transition-colors">
-              Home
+              {lang === 'ur' ? 'مرکزی صفحہ' : lang === 'ar' ? 'الرئيسية' : 'Home'}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
             <Link href={`/${lang}/${country.toLowerCase()}`} className="hover:text-[#059669] transition-colors">
-              {countryObj.name}
+              {countryName}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
             <Link href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`} className="hover:text-[#059669] transition-colors">
               {cityName}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
             <Link href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`} className="hover:text-[#059669] transition-colors capitalize">
               {categoryName}
             </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
             <span className="text-neutral-900 font-semibold truncate">{providerName}</span>
           </nav>
         </div>
@@ -357,7 +376,11 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
         {/* H2 for Portfolio: Work Showcase & Projects by ${providerName} */}
         <div className="mb-3">
           <h2 className={`text-base sm:text-lg font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3]' : 'leading-snug'}`}>
-            Work Showcase & Projects by {providerName}
+            {lang === 'ur'
+              ? `${providerName} کے کام کی تصاویر اور پروجیکٹس`
+              : lang === 'ar'
+              ? `معرض أعمال ومشاريع ${providerName}`
+              : `Work Showcase & Projects by ${providerName}`}
           </h2>
         </div>
 
@@ -380,7 +403,13 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
             {provider.is_available && (
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200">
                 <span className="w-2 h-2 rounded-full bg-[#059669]" />
-                <span>Available for Service Today</span>
+                <span>
+                  {lang === 'ur'
+                    ? 'آج سروس کے لیے دستیاب'
+                    : lang === 'ar'
+                    ? 'متاح للخدمة اليوم'
+                    : 'Available for Service Today'}
+                </span>
               </div>
             )}
           </div>
@@ -392,7 +421,10 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                 {providerName}
               </h1>
               {provider.is_verified && (
-                <span title="Verified by Baseera" className="inline-flex items-center text-[#059669]">
+                <span
+                  title={lang === 'ur' ? 'بصیرہ سے تصدیق شدہ' : lang === 'ar' ? 'موثق من قبل بصيرة' : 'Verified by Baseera'}
+                  className="inline-flex items-center text-[#059669]"
+                >
                   <BadgeCheck className="w-6 h-6 fill-emerald-50 text-[#059669]" />
                 </span>
               )}
@@ -412,17 +444,21 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               <div className="flex items-center gap-1 text-amber-600 font-bold">
                 <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
                 <span>{provider.rating.toFixed(1)}</span>
-                <span className="text-gray-400 font-normal">({provider.review_count} client reviews)</span>
+                <span className="text-gray-400 font-normal">
+                  ({provider.review_count} {lang === 'ur' ? 'کسٹمر ریویوز' : lang === 'ar' ? 'تقييمات عملاء' : 'client reviews'})
+                </span>
               </div>
 
               <div className="flex items-center gap-1">
                 <MapPin className="w-4 h-4 text-gray-400" />
-                <span>{provider.district}, {cityName}</span>
+                <span>{provider.district}، {cityName}</span>
               </div>
 
               <div className="flex items-center gap-1">
                 <Zap className="w-4 h-4 text-[#059669]" />
-                <span>{provider.total_leads}+ Client Connections</span>
+                <span>
+                  {provider.total_leads}+ {lang === 'ur' ? 'کسٹمر رابطے' : lang === 'ar' ? 'طلب عميل' : 'Client Connections'}
+                </span>
               </div>
             </div>
           </div>
@@ -434,7 +470,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
             {/* Bio */}
             <div className="p-6 border border-gray-200 rounded-2xl bg-white overflow-visible">
               <h2 className={`text-xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-4 pt-1' : 'leading-snug mb-2'}`}>
-                About &amp; Professional Experience
+                {lang === 'ur' ? 'تعارف اور پیشہ ورانہ تجربہ' : lang === 'ar' ? 'نبذة عن الخبرة المهنية' : 'About & Professional Experience'}
               </h2>
               <p className={`text-base text-gray-700 whitespace-pre-line overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5]' : 'leading-relaxed'}`}>
                 {provider.short_bio}
@@ -445,9 +481,11 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
             <div className="p-6 border border-gray-200 rounded-2xl bg-white overflow-visible">
               <div className="flex items-center justify-between mb-4">
                 <h2 className={`text-xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3]' : 'leading-snug'}`}>
-                  Core Specializations
+                  {lang === 'ur' ? 'اہم مہارتیں اور خدمات' : lang === 'ar' ? 'التخصصات والخدمات الأساسية' : 'Core Specializations'}
                 </h2>
-                <span className="text-xs text-[#059669] font-bold">Category Verified</span>
+                <span className="text-xs text-[#059669] font-bold">
+                  {lang === 'ur' ? 'کیٹیگری تصدیق شدہ' : lang === 'ar' ? 'تخصص معتمد' : 'Category Verified'}
+                </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {specializations.map((spec, i) => (
@@ -465,7 +503,11 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
             {/* Service Area Tags */}
             <div className="p-6 border border-gray-200 rounded-2xl bg-white overflow-visible">
               <h2 className={`text-xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-4 pt-1' : 'leading-snug mb-3'}`}>
-                Service Area Coverage in {cityName}
+                {lang === 'ur'
+                  ? `${cityName} میں سروس ایریا اور علاقے`
+                  : lang === 'ar'
+                  ? `نطاق الخدمة في ${cityName}`
+                  : `Service Area Coverage in ${cityName}`}
               </h2>
               <div className="flex flex-wrap gap-2">
                 {provider.service_area.map((area, idx) => (
@@ -484,24 +526,36 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               <div className="p-4 border border-gray-200 rounded-xl bg-white flex items-center gap-3">
                 <ShieldCheck className="w-6 h-6 text-[#059669] shrink-0" />
                 <div>
-                  <div className="text-xs font-bold text-neutral-900">Verified Specialist</div>
-                  <div className="text-xs text-gray-500">Identity & Trade Approved</div>
+                  <div className="text-xs font-bold text-neutral-900">
+                    {lang === 'ur' ? 'تصدیق شدہ کاریگر' : lang === 'ar' ? 'فني معتمد' : 'Verified Specialist'}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {lang === 'ur' ? 'شناخت اور مہارت کی تصدیق' : lang === 'ar' ? 'التحقق من الهوية والمهارة' : 'Identity & Trade Approved'}
+                  </div>
                 </div>
               </div>
 
               <div className="p-4 border border-gray-200 rounded-xl bg-white flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-[#059669] shrink-0" />
                 <div>
-                  <div className="text-xs font-bold text-neutral-900">Direct Pay</div>
-                  <div className="text-xs text-gray-500">No Booking Fees</div>
+                  <div className="text-xs font-bold text-neutral-900">
+                    {lang === 'ur' ? 'براہِ راست ادائیگی' : lang === 'ar' ? 'دفع مباشر' : 'Direct Pay'}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {lang === 'ur' ? 'کوئی پیشگی یا بکنگ فیس نہیں' : lang === 'ar' ? 'بدون رسوم حجز مسبقة' : 'No Booking Fees'}
+                  </div>
                 </div>
               </div>
 
               <div className="p-4 border border-gray-200 rounded-xl bg-white flex items-center gap-3">
                 <Clock className="w-6 h-6 text-[#059669] shrink-0" />
                 <div>
-                  <div className="text-xs font-bold text-neutral-900">Fast Response</div>
-                  <div className="text-xs text-gray-500">Direct WhatsApp</div>
+                  <div className="text-xs font-bold text-neutral-900">
+                    {lang === 'ur' ? 'فوری جواب' : lang === 'ar' ? 'استجابة سريعة' : 'Fast Response'}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {lang === 'ur' ? 'براہِ راست واٹس ایپ' : lang === 'ar' ? 'محادثة واتساب مباشرة' : 'Direct WhatsApp'}
+                  </div>
                 </div>
               </div>
             </div>
@@ -513,13 +567,17 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               {/* Plain Text Visiting Charges */}
               <div className="pb-4 mb-4 border-b border-gray-100">
                 <span className="text-xs uppercase tracking-wider font-semibold text-gray-500 block mb-1">
-                  Visiting Charges
+                  {lang === 'ur' ? 'وزٹ چارجز' : lang === 'ar' ? 'رسوم الزيارة' : 'Visiting Charges'}
                 </span>
                 <div className="text-lg font-bold text-neutral-900">
                   {formatVisitingPrice(provider.starting_price, provider.country_code || country)}
                 </div>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">
-                  Pay directly upon inspection. No online prepayment or platform commission.
+                  {lang === 'ur'
+                    ? 'کام دیکھنے کے بعد براہِ راست کاریگر کو ادا کریں۔ کوئی ایڈوانس یا مڈل مین کمیشن نہیں۔'
+                    : lang === 'ar'
+                    ? 'الدفع مباشرة للفني عند الفحص. بدون دفع مسبق أو عمولة للمنصة.'
+                    : 'Pay directly upon inspection. No online prepayment or platform commission.'}
                 </p>
               </div>
 
@@ -532,7 +590,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                   className="w-full py-3 bg-[#059669] hover:bg-[#047857] active:scale-[0.99] text-white transition-all rounded-xl flex items-center justify-center gap-2 font-semibold text-sm"
                 >
                   <WhatsAppIcon className="w-4 h-4 fill-current" />
-                  <span>Chat on WhatsApp</span>
+                  <span>{lang === 'ur' ? 'واٹس ایپ پر رابطہ کریں' : lang === 'ar' ? 'محادثة عبر واتساب' : 'Chat on WhatsApp'}</span>
                 </a>
 
                 <a
@@ -540,18 +598,36 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                   className="w-full py-2.5 border border-gray-200 hover:bg-gray-50 text-gray-800 rounded-xl flex items-center justify-center gap-2 font-semibold text-sm transition-colors"
                 >
                   <Phone className="w-3.5 h-3.5 text-gray-600" />
-                  <span>Call Direct ({provider.whatsapp_number})</span>
+                  <span>
+                    {lang === 'ur'
+                      ? `براہِ راست کال کریں (${provider.whatsapp_number})`
+                      : lang === 'ar'
+                      ? `اتصال هاتفي مباشر (${provider.whatsapp_number})`
+                      : `Call Direct (${provider.whatsapp_number})`}
+                  </span>
                 </a>
               </div>
 
               <div className="text-xs text-gray-600 space-y-2 border-t border-gray-100 pt-4 mt-4">
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
-                  <span>Free cancellation before specialist arrival</span>
+                  <span>
+                    {lang === 'ur'
+                      ? 'کاریگر کی آمد سے پہلے مفت منسوخی'
+                      : lang === 'ar'
+                      ? 'إلغاء مجاني قبل وصول الفني'
+                      : 'Free cancellation before specialist arrival'}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
-                  <span>Negotiate major repairs on-site directly</span>
+                  <span>
+                    {lang === 'ur'
+                      ? 'بڑے کاموں اور میٹریل کے ریٹس موقع پر طے کریں'
+                      : lang === 'ar'
+                      ? 'التفاوض المباشر على الإصلاحات الكبرى في الموقع'
+                      : 'Negotiate major repairs on-site directly'}
+                  </span>
                 </div>
               </div>
             </div>

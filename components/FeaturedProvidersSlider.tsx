@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Provider, getCategoryBySlug, getCategoryName } from '@/lib/db';
+import { Provider, getCategoryBySlug, getCategoryName, getLocalizedCityName } from '@/lib/db';
 import { formatVisitingPrice } from '@/lib/currencies';
 import {
   Star,
@@ -121,12 +121,14 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
           const profileUrl = `/${lang}/${provider.country_code}/${provider.city_slug}/${provider.category_id}/${provider.slug}`;
           const cleanPhone = provider.whatsapp_number.replace(/[^0-9]/g, '');
           const whatsappLink = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-            `Salam ${provider.name}, saw your verified profile on Baseera directory. I need service assistance.`
+            lang === 'ur'
+              ? `السلام علیکم ${provider.name}، میں نے بصیرہ ڈائریکٹری پر آپ کا تصدیق شدہ پروفائل دیکھا ہے۔ مجھے سروس درکار ہے۔`
+              : lang === 'ar'
+              ? `مرحباً ${provider.name}، شاهدت ملفك الموثق على منصة بصيرة. أود الاستفسار عن خدماتك.`
+              : `Salam ${provider.name}, saw your verified profile on Baseera directory. I need service assistance.`
           )}`;
 
-          const cityDisplay = provider.city_slug
-            ? provider.city_slug.charAt(0).toUpperCase() + provider.city_slug.slice(1)
-            : 'Karachi';
+          const cityDisplay = getLocalizedCityName(provider.city_slug, lang);
 
           const catObj = getCategoryBySlug(provider.category_id);
           const categoryName = catObj ? getCategoryName(catObj, lang) : provider.category_id;
@@ -208,7 +210,7 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
                   title={`Chat directly with ${provider.name} on WhatsApp`}
                 >
                   <WhatsAppIcon className="w-4 h-4 fill-current shrink-0" />
-                  <span>WhatsApp</span>
+                  <span>{lang === 'ur' ? 'واٹس ایپ' : lang === 'ar' ? 'واتساب' : 'WhatsApp'}</span>
                 </button>
               </div>
             </Link>
