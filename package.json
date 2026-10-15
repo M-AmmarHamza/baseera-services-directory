@@ -10,6 +10,7 @@
     "start": "next start",
     "test": "node api/health.js",
     "seed:cities:uae": "node scripts/seed-uae-cities.mjs",
+    "seed:cities:sa": "node scripts/seed-saudi-arabia-cities.mjs",
     "seed:cities:pk": "node scripts/seed-pakistan-cities.mjs"
   },
   "dependencies": {
