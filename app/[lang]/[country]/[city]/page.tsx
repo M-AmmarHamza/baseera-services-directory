@@ -10,6 +10,7 @@ import {
   getCategoryBySlug,
   getLocalizedCountryName,
   getLocalizedCityName,
+  getCityDistricts,
 } from '@/lib/db';
 import SearchBar from '@/components/SearchBar';
 import {
@@ -91,6 +92,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CityHomePage({ params }: PageProps) {
   const { lang, country, city } = await params;
   const providers = await getProviders(city);
+  const districts = await getCityDistricts(city);
   const countryObj = getCountryByCode(country);
   const countryName = getLocalizedCountryName(countryObj, lang);
   const cityName = getLocalizedCityName(city, lang);
@@ -171,45 +173,26 @@ export default async function CityHomePage({ params }: PageProps) {
               />
             </div>
 
-            {/* Quick District Filter Chips */}
-            <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
-              <Link
-                href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`}
-                className="px-3.5 py-1.5 rounded-full bg-[#006948] text-white text-xs font-semibold shadow-xs"
-              >
-                {lang === 'ur' ? 'تمام علاقے' : lang === 'ar' ? 'جميع المناطق' : 'All Districts'}
-              </Link>
-              <Link
-                href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/search?q=dha`}
-                className="px-3.5 py-1.5 rounded-full bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold border border-gray-200 transition-colors"
-              >
-                DHA & Clifton
-              </Link>
-              <Link
-                href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/search?q=gulshan`}
-                className="px-3.5 py-1.5 rounded-full bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold border border-gray-200 transition-colors"
-              >
-                Gulshan-e-Iqbal
-              </Link>
-              <Link
-                href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/search?q=pechs`}
-                className="px-3.5 py-1.5 rounded-full bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold border border-gray-200 transition-colors"
-              >
-                PECHS
-              </Link>
-              <Link
-                href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/search?q=orangi`}
-                className="px-3.5 py-1.5 rounded-full bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold border border-gray-200 transition-colors"
-              >
-                Orangi Town
-              </Link>
-              <Link
-                href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/search?q=nazimabad`}
-                className="px-3.5 py-1.5 rounded-full bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold border border-gray-200 transition-colors"
-              >
-                North Nazimabad
-              </Link>
-            </div>
+            {/* Quick District Filter Chips (Strictly Dynamic & City-Scoped) */}
+            {districts.length > 0 && (
+              <div className="flex items-center justify-center gap-2 mt-4 flex-wrap">
+                <Link
+                  href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`}
+                  className="px-3.5 py-1.5 rounded-full bg-[#006948] text-white text-xs font-semibold shadow-xs"
+                >
+                  {lang === 'ur' ? 'تمام علاقے' : lang === 'ar' ? 'جميع المناطق' : 'All Districts'}
+                </Link>
+                {districts.map((district) => (
+                  <Link
+                    key={district}
+                    href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/search?q=${encodeURIComponent(district)}`}
+                    className="px-3.5 py-1.5 rounded-full bg-white hover:bg-gray-100 text-gray-700 text-xs font-semibold border border-gray-200 transition-colors"
+                  >
+                    {district}
+                  </Link>
+                ))}
+              </div>
+            )}
           </section>
 
           {/* Browse by Specialty Grid */}

@@ -1545,3 +1545,206 @@ export async function getAllProviders(): Promise<Provider[]> {
 
   return combined;
 }
+
+export const CITY_DISTRICTS: Record<string, string[]> = {
+  // Pakistan
+  karachi: [
+    'DHA & Clifton',
+    'Gulshan-e-Iqbal',
+    'PECHS',
+    'North Nazimabad',
+    'Bahadurabad',
+    'Federal B Area',
+    'Malir',
+    'Korangi',
+    'Saddar',
+  ],
+  lahore: [
+    'DHA Phase 1-8',
+    'Gulberg',
+    'Johar Town',
+    'Model Town',
+    'Cantt',
+    'Bahria Town',
+    'Askari',
+  ],
+  islamabad: [
+    'Sector F-7',
+    'Sector F-8',
+    'Sector F-10',
+    'Sector G-9',
+    'Sector G-11',
+    'Sector E-11',
+    'Bahria Town',
+    'DHA Phase 2',
+  ],
+  rawalpindi: [
+    'Saddar',
+    'Bahria Town',
+    'Satellite Town',
+    'Chaklala Scheme',
+    'Westridge',
+  ],
+  faisalabad: [
+    'D Ground',
+    'Madina Town',
+    'Civil Lines',
+    'Jinnah Colony',
+    'Samanabad',
+  ],
+  multan: [
+    'Gulgasht Colony',
+    'Cantt',
+    'Bosan Road',
+    'Shah Rukn-e-Alam',
+  ],
+  peshawar: [
+    'Hayatabad',
+    'University Town',
+    'Cantt',
+    'Saddar',
+  ],
+
+  // UAE
+  dubai: [
+    'Deira',
+    'Business Bay',
+    'Downtown Dubai',
+    'Al Quoz',
+    'Jumeirah',
+    'Dubai Marina',
+    'Al Barsha',
+  ],
+  'abu-dhabi': [
+    'Al Danah',
+    'Al Reem Island',
+    'Al Khalidiya',
+    'Yas Island',
+    'Musaffah',
+  ],
+  sharjah: [
+    'Al Majaz',
+    'Al Nahda',
+    'Al Taawun',
+    'Muwaileh',
+  ],
+
+  // Saudi Arabia
+  riyadh: [
+    'Al Olaya',
+    'Al Malqa',
+    'Al Nakheel',
+    'Al Yasmin',
+    'Al Sulaimaniyah',
+  ],
+  jeddah: [
+    'Al Hamra',
+    'Al Rawdah',
+    'Al Naeem',
+    'Al Zahra',
+    'Al Salamah',
+  ],
+  dammam: [
+    'Al Faisaliyah',
+    'Al Shatie',
+    'Al Jalawiyah',
+  ],
+
+  // Qatar
+  doha: [
+    'West Bay',
+    'The Pearl',
+    'Al Sadd',
+    'Lusail',
+    'Al Mansoura',
+  ],
+
+  // Kuwait
+  'kuwait-city': [
+    'Sharq',
+    'Salmiya',
+    'Hawalli',
+    'Dasman',
+  ],
+
+  // United Kingdom
+  london: [
+    'Westminster',
+    'Camden',
+    'Kensington',
+    'Greenwich',
+    'Islington',
+    'Canary Wharf',
+  ],
+
+  // United States
+  'new-york': [
+    'Manhattan',
+    'Brooklyn',
+    'Queens',
+    'Bronx',
+    'Staten Island',
+  ],
+};
+
+export async function getCityDistricts(citySlug: string): Promise<string[]> {
+  const normCity = (citySlug || '').toLowerCase().trim();
+  if (!normCity) return [];
+
+  const districtsSet = new Set<string>();
+
+  // 1. Seeded districts mapped to this specific city
+  if (CITY_DISTRICTS[normCity]) {
+    for (const d of CITY_DISTRICTS[normCity]) {
+      districtsSet.add(d);
+    }
+  }
+
+  // 2. Query dynamic providers registered in this city from Supabase
+  try {
+    const dbRows = await fetchSupabase<any[]>(
+      `providers?select=district,service_area,cities!inner(slug)&cities.slug=eq.${encodeURIComponent(normCity)}`
+    );
+    if (dbRows && Array.isArray(dbRows)) {
+      for (const row of dbRows) {
+        if (row.district && typeof row.district === 'string') {
+          const trimmed = row.district.trim();
+          if (trimmed && trimmed.toLowerCase() !== normCity) {
+            districtsSet.add(trimmed);
+          }
+        }
+        if (Array.isArray(row.service_area)) {
+          for (const area of row.service_area) {
+            if (typeof area === 'string') {
+              const trimmed = area.trim();
+              if (trimmed && trimmed.toLowerCase() !== normCity) {
+                districtsSet.add(trimmed);
+              }
+            }
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('getCityDistricts fetch note:', err);
+  }
+
+  // 3. Dynamic districts from local SEED_PROVIDERS matching this city
+  const seedsInCity = SEED_PROVIDERS.filter(
+    (p) => p.city_slug.toLowerCase() === normCity
+  );
+  for (const sp of seedsInCity) {
+    if (sp.district && sp.district.trim() && sp.district.toLowerCase() !== normCity) {
+      districtsSet.add(sp.district.trim());
+    }
+    if (Array.isArray(sp.service_area)) {
+      for (const area of sp.service_area) {
+        if (typeof area === 'string' && area.trim() && area.toLowerCase() !== normCity) {
+          districtsSet.add(area.trim());
+        }
+      }
+    }
+  }
+
+  return Array.from(districtsSet).slice(0, 10);
+}
