@@ -506,11 +506,17 @@ export const COUNTRIES: Country[] = [
   { code: 'id', name: 'Indonesia', defaultCity: 'jakarta', flag: '🇮🇩', region: 'Asia' },
   { code: 'jp', name: 'Japan', defaultCity: 'tokyo', flag: '🇯🇵', region: 'Asia' },
 
-  // Africa
+  // Africa (Top 10 African Countries)
+  { code: 'ng', name: 'Nigeria', defaultCity: 'lagos', flag: '🇳🇬', region: 'Africa' },
   { code: 'za', name: 'South Africa', defaultCity: 'johannesburg', flag: '🇿🇦', region: 'Africa' },
   { code: 'eg', name: 'Egypt', defaultCity: 'cairo', flag: '🇪🇬', region: 'Africa' },
-  { code: 'ng', name: 'Nigeria', defaultCity: 'lagos', flag: '🇳🇬', region: 'Africa' },
   { code: 'ke', name: 'Kenya', defaultCity: 'nairobi', flag: '🇰🇪', region: 'Africa' },
+  { code: 'gh', name: 'Ghana', defaultCity: 'accra', flag: '🇬🇭', region: 'Africa' },
+  { code: 'ma', name: 'Morocco', defaultCity: 'casablanca', flag: '🇲🇦', region: 'Africa' },
+  { code: 'tz', name: 'Tanzania', defaultCity: 'dar-es-salaam', flag: '🇹🇿', region: 'Africa' },
+  { code: 'ug', name: 'Uganda', defaultCity: 'kampala', flag: '🇺🇬', region: 'Africa' },
+  { code: 'dz', name: 'Algeria', defaultCity: 'algiers', flag: '🇩🇿', region: 'Africa' },
+  { code: 'et', name: 'Ethiopia', defaultCity: 'addis-ababa', flag: '🇪🇹', region: 'Africa' },
 ];
 
 export const CITIES: City[] = [
@@ -649,7 +655,7 @@ export const CITIES: City[] = [
   { slug: 'sydney', name: 'Sydney', countryCode: 'au' },
   { slug: 'melbourne', name: 'Melbourne', countryCode: 'au' },
 
-  // Europe & Asia & Africa
+  // Europe & Asia
   { slug: 'berlin', name: 'Berlin', countryCode: 'de' },
   { slug: 'paris', name: 'Paris', countryCode: 'fr' },
   { slug: 'istanbul', name: 'Istanbul', countryCode: 'tr' },
@@ -658,11 +664,66 @@ export const CITIES: City[] = [
   { slug: 'mumbai', name: 'Mumbai', countryCode: 'in' },
   { slug: 'delhi', name: 'Delhi', countryCode: 'in' },
   { slug: 'dhaka', name: 'Dhaka', countryCode: 'bd' },
-  { slug: 'cairo', name: 'Cairo', countryCode: 'eg' },
-  { slug: 'johannesburg', name: 'Johannesburg', countryCode: 'za' },
+
+  // Top 10 African Countries (39 Cities)
+  // 1. Nigeria ('ng')
   { slug: 'lagos', name: 'Lagos', countryCode: 'ng' },
   { slug: 'abuja', name: 'Abuja', countryCode: 'ng' },
+  { slug: 'port-harcourt', name: 'Port Harcourt', countryCode: 'ng' },
+  { slug: 'kano', name: 'Kano', countryCode: 'ng' },
+  { slug: 'ibadan', name: 'Ibadan', countryCode: 'ng' },
+
+  // 2. South Africa ('za')
+  { slug: 'johannesburg', name: 'Johannesburg', countryCode: 'za' },
+  { slug: 'cape-town', name: 'Cape Town', countryCode: 'za' },
+  { slug: 'durban', name: 'Durban', countryCode: 'za' },
+  { slug: 'pretoria', name: 'Pretoria', countryCode: 'za' },
+  { slug: 'port-elizabeth', name: 'Port Elizabeth', countryCode: 'za' },
+
+  // 3. Egypt ('eg')
+  { slug: 'cairo', name: 'Cairo', countryCode: 'eg' },
+  { slug: 'alexandria', name: 'Alexandria', countryCode: 'eg' },
+  { slug: 'giza', name: 'Giza', countryCode: 'eg' },
+  { slug: 'sharm-el-sheikh', name: 'Sharm El Sheikh', countryCode: 'eg' },
+
+  // 4. Kenya ('ke')
   { slug: 'nairobi', name: 'Nairobi', countryCode: 'ke' },
+  { slug: 'mombasa', name: 'Mombasa', countryCode: 'ke' },
+  { slug: 'kisumu', name: 'Kisumu', countryCode: 'ke' },
+  { slug: 'nakuru', name: 'Nakuru', countryCode: 'ke' },
+
+  // 5. Ghana ('gh')
+  { slug: 'accra', name: 'Accra', countryCode: 'gh' },
+  { slug: 'kumasi', name: 'Kumasi', countryCode: 'gh' },
+  { slug: 'tamale', name: 'Tamale', countryCode: 'gh' },
+  { slug: 'sekondi-takoradi', name: 'Sekondi-Takoradi', countryCode: 'gh' },
+
+  // 6. Morocco ('ma')
+  { slug: 'casablanca', name: 'Casablanca', countryCode: 'ma' },
+  { slug: 'rabat', name: 'Rabat', countryCode: 'ma' },
+  { slug: 'marrakech', name: 'Marrakech', countryCode: 'ma' },
+  { slug: 'tangier', name: 'Tangier', countryCode: 'ma' },
+
+  // 7. Tanzania ('tz')
+  { slug: 'dar-es-salaam', name: 'Dar es Salaam', countryCode: 'tz' },
+  { slug: 'dodoma', name: 'Dodoma', countryCode: 'tz' },
+  { slug: 'arusha', name: 'Arusha', countryCode: 'tz' },
+  { slug: 'zanzibar-city', name: 'Zanzibar City', countryCode: 'tz' },
+
+  // 8. Uganda ('ug')
+  { slug: 'kampala', name: 'Kampala', countryCode: 'ug' },
+  { slug: 'entebbe', name: 'Entebbe', countryCode: 'ug' },
+  { slug: 'jinja', name: 'Jinja', countryCode: 'ug' },
+
+  // 9. Algeria ('dz')
+  { slug: 'algiers', name: 'Algiers', countryCode: 'dz' },
+  { slug: 'oran', name: 'Oran', countryCode: 'dz' },
+  { slug: 'constantine', name: 'Constantine', countryCode: 'dz' },
+
+  // 10. Ethiopia ('et')
+  { slug: 'addis-ababa', name: 'Addis Ababa', countryCode: 'et' },
+  { slug: 'dire-dawa', name: 'Dire Dawa', countryCode: 'et' },
+  { slug: 'mekelle', name: 'Mekelle', countryCode: 'et' },
 ];
 
 export function toTitleCase(str: string): string {
@@ -741,6 +802,12 @@ export const COUNTRY_NAMES_UR: Record<string, string> = {
   eg: 'مصر',
   ng: 'نائجیریا',
   ke: 'کینیا',
+  gh: 'گھانا',
+  ma: 'مراکش',
+  tz: 'تنزانیہ',
+  ug: 'یوگنڈا',
+  dz: 'الجزائر',
+  et: 'ایتھوپیا',
 };
 
 export const COUNTRY_NAMES_AR: Record<string, string> = {
@@ -777,6 +844,12 @@ export const COUNTRY_NAMES_AR: Record<string, string> = {
   eg: 'مصر',
   ng: 'نيجيريا',
   ke: 'كينيا',
+  gh: 'غانا',
+  ma: 'المغرب',
+  tz: 'تنزانيا',
+  ug: 'أوغندا',
+  dz: 'الجزائر',
+  et: 'إثيوبيا',
 };
 
 export const CITY_NAMES_UR: Record<string, string> = {
@@ -912,11 +985,65 @@ export const CITY_NAMES_UR: Record<string, string> = {
   mumbai: 'ممبئی',
   delhi: 'دہلی',
   dhaka: 'ڈھاکہ',
-  cairo: 'قاہرہ',
-  johannesburg: 'جوہانسبرگ',
+  // African Cities (Top 10 Countries)
+  // Nigeria
   lagos: 'لاگوس',
   abuja: 'ابوجا',
+  'port-harcourt': 'پورٹ ہارکورٹ',
+  kano: 'کانو',
+  ibadan: 'عبادان',
+
+  // South Africa
+  johannesburg: 'جوہانسبرگ',
+  'cape-town': 'کیپ ٹاؤن',
+  durban: 'ڈربن',
+  pretoria: 'پریٹوریا',
+  'port-elizabeth': 'پورٹ الزبتھ',
+
+  // Egypt
+  cairo: 'قاہرہ',
+  alexandria: 'اسکندریہ',
+  giza: 'جیزہ',
+  'sharm-el-sheikh': 'شرم الشیخ',
+
+  // Kenya
   nairobi: 'نیروبی',
+  mombasa: 'ممباسا',
+  kisumu: 'کسومو',
+  nakuru: 'نکورو',
+
+  // Ghana
+  accra: 'اکرا',
+  kumasi: 'کوماسی',
+  tamale: 'تمالی',
+  'sekondi-takoradi': 'سیکونڈی تکورادی',
+
+  // Morocco
+  casablanca: 'دار البیضاء (کاسا بلانکا)',
+  rabat: 'رباط',
+  marrakech: 'مراکش',
+  tangier: 'طنجہ',
+
+  // Tanzania
+  'dar-es-salaam': 'دار السلام',
+  dodoma: 'ڈوڈوما',
+  arusha: 'اروشا',
+  'zanzibar-city': 'زنجبار سٹی',
+
+  // Uganda
+  kampala: 'کمپالا',
+  entebbe: 'اینتیبے',
+  jinja: 'جنجا',
+
+  // Algeria
+  algiers: 'الجزائر شہر',
+  oran: 'وہران',
+  constantine: 'قسنطینہ',
+
+  // Ethiopia
+  'addis-ababa': 'ادیس ابابا',
+  'dire-dawa': 'دائرے داوا',
+  mekelle: 'میکیلے',
 };
 
 export const CITY_NAMES_AR: Record<string, string> = {
@@ -1053,11 +1180,65 @@ export const CITY_NAMES_AR: Record<string, string> = {
   mumbai: 'مومباي',
   delhi: 'دلهي',
   dhaka: 'دكا',
-  cairo: 'القاهرة',
-  johannesburg: 'جوهانسبرغ',
+  // African Cities (Top 10 Countries)
+  // Nigeria
   lagos: 'لاغوس',
   abuja: 'أبوجا',
+  'port-harcourt': 'بورت هاركورت',
+  kano: 'كانو',
+  ibadan: 'إبادان',
+
+  // South Africa
+  johannesburg: 'جوهانسبرغ',
+  'cape-town': 'كيب تاون',
+  durban: 'ديربان',
+  pretoria: 'بريتوريا',
+  'port-elizabeth': 'بورت إليزابيث',
+
+  // Egypt
+  cairo: 'القاهرة',
+  alexandria: 'الإسكندرية',
+  giza: 'الجيزة',
+  'sharm-el-sheikh': 'شرم الشيخ',
+
+  // Kenya
   nairobi: 'نيروبي',
+  mombasa: 'مومباسا',
+  kisumu: 'كيسومو',
+  nakuru: 'ناكورو',
+
+  // Ghana
+  accra: 'أكرا',
+  kumasi: 'كوماسي',
+  tamale: 'تامالي',
+  'sekondi-takoradi': 'سيكوندي تاكورادي',
+
+  // Morocco
+  casablanca: 'الدار البيضاء',
+  rabat: 'الرباط',
+  marrakech: 'مراكش',
+  tangier: 'طنجة',
+
+  // Tanzania
+  'dar-es-salaam': 'دار السلام',
+  dodoma: 'دودوما',
+  arusha: 'أروشا',
+  'zanzibar-city': 'مدينة زنجبار',
+
+  // Uganda
+  kampala: 'كامبالا',
+  entebbe: 'عنتيبي',
+  jinja: 'جينجا',
+
+  // Algeria
+  algiers: 'الجزائر',
+  oran: 'وهران',
+  constantine: 'قسنطينة',
+
+  // Ethiopia
+  'addis-ababa': 'أديس أبابا',
+  'dire-dawa': 'ديري داوا',
+  mekelle: 'ميكيلي',
 };
 
 export function getLocalizedCountryName(countryOrCode: Country | string, lang = 'en'): string {
@@ -1684,6 +1865,47 @@ export const CITY_DISTRICTS: Record<string, string[]> = {
     'Queens',
     'Bronx',
     'Staten Island',
+  ],
+
+  // Africa Hubs
+  cairo: [
+    'Zamalek',
+    'Maadi',
+    'Nasr City',
+    'Heliopolis',
+    'New Cairo',
+    'Dokki',
+  ],
+  lagos: [
+    'Victoria Island',
+    'Ikoyi',
+    'Lekki Phase 1',
+    'Ikeja',
+    'Yaba',
+    'Surulere',
+  ],
+  johannesburg: [
+    'Sandton',
+    'Rosebank',
+    'Randburg',
+    'Midrand',
+    'Soweto',
+    'Fourways',
+  ],
+  nairobi: [
+    'Westlands',
+    'Kilimani',
+    'Karen',
+    'Lavington',
+    'Upper Hill',
+    'Kileleshwa',
+  ],
+  casablanca: [
+    'Maârif',
+    'Anfa',
+    'Gauthier',
+    'Bourgogne',
+    'Ain Diab',
   ],
 };
 

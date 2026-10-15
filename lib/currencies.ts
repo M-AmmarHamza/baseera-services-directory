@@ -53,6 +53,12 @@ export const COUNTRY_CURRENCIES: Record<string, CountryCurrency> = {
   za: { countryCode: 'za', currencyCode: 'ZAR', symbol: 'R', name: 'South African Rand', defaultFee: 350 },
   ng: { countryCode: 'ng', currencyCode: 'NGN', symbol: '₦', name: 'Nigerian Naira', defaultFee: 5000 },
   ke: { countryCode: 'ke', currencyCode: 'KES', symbol: 'KSh', name: 'Kenyan Shilling', defaultFee: 1500 },
+  gh: { countryCode: 'gh', currencyCode: 'GHS', symbol: 'GH₵', name: 'Ghanaian Cedi', defaultFee: 150 },
+  ma: { countryCode: 'ma', currencyCode: 'MAD', symbol: 'MAD', name: 'Moroccan Dirham', defaultFee: 150 },
+  tz: { countryCode: 'tz', currencyCode: 'TZS', symbol: 'TSh', name: 'Tanzanian Shilling', defaultFee: 25000 },
+  ug: { countryCode: 'ug', currencyCode: 'UGX', symbol: 'USh', name: 'Ugandan Shilling', defaultFee: 35000 },
+  dz: { countryCode: 'dz', currencyCode: 'DZD', symbol: 'DA', name: 'Algerian Dinar', defaultFee: 1500 },
+  et: { countryCode: 'et', currencyCode: 'ETB', symbol: 'Br', name: 'Ethiopian Birr', defaultFee: 500 },
 };
 
 export const DEFAULT_CURRENCY: CountryCurrency = {
