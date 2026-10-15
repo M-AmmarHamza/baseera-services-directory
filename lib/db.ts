@@ -1,5 +1,6 @@
 // Baseera Data Access Layer (Supabase + Resilient Local Seed Data)
 import { createClient } from '@supabase/supabase-js';
+import { cleanNumericPrice, getCountryCurrency } from './currencies';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -911,7 +912,7 @@ function mapDbProvider(row: any, fallbackCity: string = 'karachi'): Provider {
     whatsapp_number: row.whatsapp_number,
     avatar_url: row.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(row.name)}`,
     short_bio: row.short_bio || '',
-    starting_price: Number(row.starting_price) || 500,
+    starting_price: cleanNumericPrice(row.starting_price, getCountryCurrency(countryCode).defaultFee),
     rating: Number(row.rating) || 4.8,
     review_count: Number(row.review_count) || 10,
     total_leads: Number(row.total_leads) || 25,

@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
 import { CATEGORIES } from '@/lib/db';
 import { searchProviders } from '@/lib/search';
+import { formatVisitingPrice } from '@/lib/currencies';
 import SearchBar from '@/components/SearchBar';
 import {
   MapPin,
@@ -226,7 +227,7 @@ export default async function SearchResultsPage({
                     <div>
                       <span className="text-xs text-gray-500 font-medium block">{dict.profile.pricingFrom}</span>
                       <span className="text-base font-extrabold text-gray-900">
-                        Rs. {pro.starting_price}
+                        {formatVisitingPrice(pro.starting_price, pro.country_code || country)}
                       </span>
                     </div>
 

@@ -15,6 +15,7 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import { getProviders, getCategoryBySlug, CATEGORIES } from '@/lib/db';
+import { formatVisitingPrice } from '@/lib/currencies';
 import { getDictionary } from '@/lib/get-dictionary';
 
 interface CategoryPageProps {
@@ -254,10 +255,10 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                   <div className="pt-3.5 sm:pt-4 border-t border-gray-100 flex items-center justify-between gap-2.5">
                     <div>
                       <span className="text-xs uppercase font-bold text-gray-400 block">
-                        Visiting Charges
+                        {lang === 'ur' ? 'وزٹ چارجز' : lang === 'ar' ? 'رسوم الزيارة' : 'Visiting Charges'}
                       </span>
                       <span className="text-sm font-bold text-neutral-900">
-                        Rs. {provider.starting_price}
+                        {formatVisitingPrice(provider.starting_price, provider.country_code || country)}
                       </span>
                     </div>
 

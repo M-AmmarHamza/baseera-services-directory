@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateEnglishSlug } from '@/lib/transliterate';
 import { getCategoryBySlug, getCountryByCode } from '@/lib/db';
+import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
         short_bio: short_bio?.trim() || `${resolvedTradeTitle} serving ${cleanCityName}. Direct communication with zero commission.`,
         is_verified: true, // auto-verified for seamless dynamic creation
         is_available: true,
-        starting_price: Number(starting_price) || 500,
+        starting_price: cleanNumericPrice(starting_price, getCountryCurrency(country_code).defaultFee),
         rating: 5.0,
         review_count: 1,
         total_leads: 0,

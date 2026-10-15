@@ -3,6 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Provider } from '@/lib/db';
+import { formatVisitingPrice } from '@/lib/currencies';
 import {
   Star,
   BadgeCheck,
@@ -188,11 +189,7 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
                     {lang === 'ur' ? 'وزٹ چارجز' : lang === 'ar' ? 'رسوم الزيارة' : 'Visiting Charges'}
                   </span>
                   <span className="text-sm sm:text-base font-bold text-neutral-900 block mt-0.5 whitespace-nowrap">
-                    {provider.country_code === 'ae'
-                      ? `AED ${provider.starting_price}`
-                      : provider.country_code === 'sa'
-                      ? `SAR ${provider.starting_price}`
-                      : `Rs. ${provider.starting_price}`}
+                    {formatVisitingPrice(provider.starting_price, provider.country_code)}
                   </span>
                 </div>
 

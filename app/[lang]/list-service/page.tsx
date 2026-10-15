@@ -4,6 +4,7 @@ import React, { useState, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { COUNTRIES, CATEGORIES, getCategoryName } from '@/lib/db';
+import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
 import {
   ShieldCheck,
   ArrowRight,
@@ -75,8 +76,16 @@ function ListServiceContent({ lang }: { lang: string }) {
   const [tradeTitle, setTradeTitle] = useState('');
   const [shortBio, setShortBio] = useState('');
   const [serviceArea, setServiceArea] = useState('');
-  const [startingPrice, setStartingPrice] = useState('800');
+  const [startingPrice, setStartingPrice] = useState(() => String(getCountryCurrency(defaultCountry).defaultFee));
   const [profileType, setProfileType] = useState<'individual' | 'shop'>('individual');
+
+  const selectedCurrency = getCountryCurrency(countryCode);
+
+  const handleCountryChange = (newCountryCode: string) => {
+    setCountryCode(newCountryCode);
+    const curr = getCountryCurrency(newCountryCode);
+    setStartingPrice(String(curr.defaultFee));
+  };
 
   // Image Upload states (Max 10MB, JPG/PNG/JPEG/WEBP)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -215,7 +224,7 @@ function ListServiceContent({ lang }: { lang: string }) {
           trade_title: tradeTitle.trim(),
           short_bio: shortBio.trim(),
           service_area: serviceArea.split(',').map((s) => s.trim()).filter(Boolean),
-          starting_price: Number(startingPrice) || 500,
+          starting_price: cleanNumericPrice(startingPrice, getCountryCurrency(countryCode).defaultFee),
           profile_type: profileType,
           avatar_url: avatarBase64,
           cover_url: coverBase64,
@@ -514,7 +523,7 @@ function ListServiceContent({ lang }: { lang: string }) {
                   </label>
                   <select
                     value={countryCode}
-                    onChange={(e) => setCountryCode(e.target.value)}
+                    onChange={(e) => handleCountryChange(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:border-[#006948] focus:bg-white transition-all cursor-pointer"
                   >
                     {COUNTRIES.map((c) => (
@@ -776,22 +785,34 @@ function ListServiceContent({ lang }: { lang: string }) {
                 />
               </div>
 
-              {/* Visiting Charges (Plain Text, Zero Heavy Pricing) */}
+              {/* Visiting Charges (Country-localized input with dynamic currency badge) */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-900">
-                  {lang === 'ur' ? 'وزٹنگ چارجز / فیس (اختیاری)' : 'Visiting Charges (Optional)'}
-                </label>
-                <input
-                  type="text"
-                  value={startingPrice}
-                  onChange={(e) => setStartingPrice(e.target.value)}
-                  placeholder="e.g. Rs. 800 or AED 100"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all"
-                />
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-gray-900">
+                    {lang === 'ur' ? 'وزٹنگ چارجز / فیس (اختیاری)' : 'Visiting Charges (Optional)'}
+                  </label>
+                  <span className="text-xs font-bold text-[#006948] bg-emerald-50 px-2.5 py-0.5 rounded-md border border-emerald-200">
+                    {selectedCurrency.symbol} ({selectedCurrency.currencyCode})
+                  </span>
+                </div>
+                <div className="relative flex items-center">
+                  <span className="absolute start-3.5 text-sm font-bold text-gray-500 pointer-events-none select-none">
+                    {selectedCurrency.symbol}
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={startingPrice}
+                    onChange={(e) => setStartingPrice(e.target.value)}
+                    placeholder={`${selectedCurrency.defaultFee}`}
+                    className="w-full ps-14 pe-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all font-semibold"
+                  />
+                </div>
                 <span className="text-xs text-gray-500">
                   {lang === 'ur'
-                    ? 'یہ صرف معلومات کے لیے ہے، بصیرہ پر کوئی آن لائن پیمنٹ یا فکسڈ ای کامرس ریٹ نہیں ہے۔'
-                    : 'This is strictly for initial consultation estimate. No online payment or fixed e-commerce checkout.'}
+                    ? `آپ کے منتخب کردہ ملک (${COUNTRIES.find(c => c.code === countryCode)?.name || 'Pakistan'}) کی کرنسی ${selectedCurrency.symbol} (${selectedCurrency.currencyCode}) میں وزٹ فیس کا ابتدائی تخمینہ۔`
+                    : `Initial consultation estimate in ${selectedCurrency.name} (${selectedCurrency.symbol}). Standard for ${COUNTRIES.find(c => c.code === countryCode)?.name || 'selected country'}.`}
                 </span>
               </div>
 

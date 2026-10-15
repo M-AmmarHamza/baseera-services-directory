@@ -17,6 +17,7 @@ import { WhatsAppIcon } from '@/components/Icons';
 import { getDictionary } from '@/lib/get-dictionary';
 import { getProviderBySlug, getCategoryBySlug } from '@/lib/db';
 import { getProviderCoverUrl, getProviderAvatarUrl } from '@/lib/category-banners';
+import { formatVisitingPrice } from '@/lib/currencies';
 import ProviderImageSlider from '@/components/ProviderImageSlider';
 import ProviderContactFAB from '@/components/ProviderContactFAB';
 
@@ -271,7 +272,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     image: [effectiveCover, effectiveAvatar],
     telephone: provider.whatsapp_number,
     url: canonicalUrl,
-    priceRange: `Rs. ${provider.starting_price}`,
+    priceRange: formatVisitingPrice(provider.starting_price, provider.country_code || country),
     address: {
       '@type': 'PostalAddress',
       addressLocality: cityName,
@@ -483,7 +484,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                   Visiting Charges
                 </span>
                 <div className="text-lg font-bold text-neutral-900">
-                  Rs. {provider.starting_price}
+                  {formatVisitingPrice(provider.starting_price, provider.country_code || country)}
                 </div>
                 <p className="text-xs text-gray-500 mt-1 leading-relaxed">
                   Pay directly upon inspection. No online prepayment or platform commission.
