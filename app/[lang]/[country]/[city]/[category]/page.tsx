@@ -203,8 +203,8 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                           )}
                         </div>
 
-                        <p className="text-sm font-medium text-gray-600 truncate mt-0.5">
-                          {provider.trade_title}
+                        <p className={`text-xs sm:text-sm font-bold text-[#059669] truncate mt-0.5 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
+                          {categoryName}
                         </p>
 
                         {/* Star Rating */}

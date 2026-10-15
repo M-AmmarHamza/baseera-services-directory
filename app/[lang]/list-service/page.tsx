@@ -15,6 +15,7 @@ import {
   X,
   HelpCircle,
   ImageIcon,
+  AlertCircle,
 } from 'lucide-react';
 import { WhatsAppIcon } from '@/components/Icons';
 
@@ -239,7 +240,7 @@ function ListServiceContent({ lang }: { lang: string }) {
           publicUrl: data.publicUrl,
         });
       } else {
-        setErrorMsg(data.error || 'Failed to publish profile. Please try again.');
+        setErrorMsg(data.message || data.error || 'Failed to publish profile. Please try again.');
       }
     } catch (err: any) {
       setErrorMsg(err?.message || 'Network error while publishing profile.');
@@ -384,8 +385,11 @@ function ListServiceContent({ lang }: { lang: string }) {
             </div>
 
             {errorMsg && (
-              <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-semibold">
-                {errorMsg}
+              <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-sm text-red-800 font-semibold flex items-start gap-3 shadow-xs">
+                <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                <div className="flex-1 leading-relaxed">
+                  {errorMsg}
+                </div>
               </div>
             )}
 
@@ -513,6 +517,18 @@ function ListServiceContent({ lang }: { lang: string }) {
                     ? 'کسٹمرز کے رابطہ بٹن اس نمبر پر ڈائریکٹ کال یا میسج کھولیں گے۔'
                     : 'Customer inquiry buttons on your profile will connect directly via your chosen method.'}
                 </span>
+
+                {/* Single Profile Policy Notice */}
+                <div className="p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/80 text-xs text-emerald-950 flex items-start gap-2.5 mt-1">
+                  <ShieldCheck className="w-4 h-4 text-[#006948] shrink-0 mt-0.5" />
+                  <span className="leading-relaxed">
+                    {lang === 'ur'
+                      ? 'قاعدہ: بصیرہ پر ایک فون / واٹس ایپ نمبر پر صرف ایک تصدیق شدہ پروفائل بنائی جا سکتی ہے۔ ایک ہی کاریگر کے مختلف کیٹیگریز میں الگ الگ ڈپلیکیٹ پروفائلز بنانا سختی سے منع ہے۔'
+                      : lang === 'ar'
+                      ? 'قاعدة هامة: يُسمح بملف شخصي واحد موثق فقط لكل رقم هاتف / واتساب. يُحظر إنشاء حسابات مكررة بنفس الرقم عبر فئات متعددة.'
+                      : 'Important Policy: Only one verified profile per phone / WhatsApp number is permitted on Baseera. Registering duplicate profiles across multiple categories using the same number is strictly prohibited.'}
+                  </span>
+                </div>
               </div>
 
               {/* Country & City */}

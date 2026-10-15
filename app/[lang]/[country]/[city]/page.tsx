@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { getProviders, CATEGORIES, getCountryByCode, getAllProviders, getCategoryName } from '@/lib/db';
+import { getProviders, CATEGORIES, getCountryByCode, getAllProviders, getCategoryName, getCategoryBySlug } from '@/lib/db';
 import SearchBar from '@/components/SearchBar';
 import {
   CategoryIcon,
@@ -250,6 +250,8 @@ export default async function CityHomePage({ params }: PageProps) {
                     'https://lh3.googleusercontent.com/aida-public/AB6AXuBK9qWTJzXQzuvOCxeaY9oaT5QnMSIE_WRvPrYq3ndOxqfGwgRJiuusiLQI6ptKnL9aXydagk97uFwsxC7j-gxTH2VH5N_HAJpsT3T0CG_IE0OBqsRNY1C_6XY0VC8sNDh1YBotW-weRk3E7XwleN6ZT1cvkRynmWL_e-anI_it8xQNPs3oqJRRO7Xrk7PfW-P6i2RwcClJxEboVmdY8ZF6bL0HcCJgGu5qW0x9sje5DlC6qn7x4H7V';
 
                   const profileLink = `/${lang}/${country}/${city}/${pro.category_id}/${pro.slug}`;
+                  const catObj = getCategoryBySlug(pro.category_id);
+                  const categoryName = catObj ? getCategoryName(catObj, lang) : pro.category_id;
                   const defaultTags =
                     pro.service_area && pro.service_area.length > 0
                       ? pro.service_area.slice(0, 3)
@@ -296,8 +298,8 @@ export default async function CityHomePage({ params }: PageProps) {
                               {pro.is_available ? 'Available' : 'Quick Reply'}
                             </span>
                           </div>
-                          <p className="text-sm text-[#006948] font-semibold mt-0.5 truncate">
-                            {pro.trade_title}
+                          <p className={`text-xs sm:text-sm text-[#006948] font-bold mt-0.5 truncate ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
+                            {categoryName}
                           </p>
                           <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
                             <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />

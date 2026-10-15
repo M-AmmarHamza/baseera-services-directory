@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Provider } from '@/lib/db';
+import { Provider, getCategoryBySlug, getCategoryName } from '@/lib/db';
 import { formatVisitingPrice } from '@/lib/currencies';
 import {
   Star,
@@ -128,6 +128,9 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
             ? provider.city_slug.charAt(0).toUpperCase() + provider.city_slug.slice(1)
             : 'Karachi';
 
+          const catObj = getCategoryBySlug(provider.category_id);
+          const categoryName = catObj ? getCategoryName(catObj, lang) : provider.category_id;
+
           return (
             <Link
               key={`${provider.id}-${index}`}
@@ -135,7 +138,7 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
               className="bg-white border border-gray-200 hover:border-[#006948] rounded-2xl p-4 sm:p-5 w-[280px] xs:w-[300px] sm:w-[320px] shrink-0 flex flex-col justify-between shadow-2xs hover:shadow-md transition-all group duration-200"
             >
               <div>
-                {/* Header: Avatar, Name, Verified Badge & Trade */}
+                {/* Header: Avatar, Name, Verified Badge & Primary Category */}
                 <div className="flex items-start gap-3 mb-3">
                   <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 shrink-0 group-hover:ring-2 group-hover:ring-[#006948] transition-all">
                     <img
@@ -157,8 +160,9 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
                         </span>
                       )}
                     </div>
-                    <p className={`text-sm font-semibold text-[#006948] truncate mt-0.5 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-                      {provider.trade_title}
+                    {/* Primary Category (Full, clearly visible, never truncated description) */}
+                    <p className={`text-xs sm:text-sm font-bold text-[#006948] truncate mt-0.5 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
+                      {categoryName}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1 text-sm text-amber-600 font-semibold">
                       <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 shrink-0" />

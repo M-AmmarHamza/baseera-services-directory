@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { WhatsAppIcon } from '@/components/Icons';
 import { getDictionary } from '@/lib/get-dictionary';
-import { getProviderBySlug, getCategoryBySlug } from '@/lib/db';
+import { getProviderBySlug, getCategoryBySlug, getCategoryName } from '@/lib/db';
 import { getProviderCoverUrl, getProviderAvatarUrl } from '@/lib/category-banners';
 import { formatVisitingPrice } from '@/lib/currencies';
 import ProviderImageSlider from '@/components/ProviderImageSlider';
@@ -250,6 +250,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
   const provider = await getProviderBySlug(city, category, slug);
   const categoryInfo = getCategoryBySlug(category);
+  const categoryName = categoryInfo ? getCategoryName(categoryInfo, lang) : category;
   const dict = await getDictionary(lang);
 
   if (!provider) {
@@ -372,8 +373,13 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               )}
             </div>
 
-            <p className={`text-base font-semibold text-[#059669] overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3]' : ''}`}>
-              {provider.trade_title}
+            <p className={`text-base font-bold text-[#059669] overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3]' : ''}`}>
+              <span>{categoryName}</span>
+              {provider.trade_title && provider.trade_title.toLowerCase() !== categoryName.toLowerCase() && (
+                <span className="text-gray-500 font-medium text-sm ms-2">
+                  • {provider.trade_title}
+                </span>
+              )}
             </p>
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 pt-1">

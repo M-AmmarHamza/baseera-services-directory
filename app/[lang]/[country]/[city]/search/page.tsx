@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
-import { CATEGORIES } from '@/lib/db';
+import { CATEGORIES, getCategoryBySlug, getCategoryName } from '@/lib/db';
 import { searchProviders } from '@/lib/search';
 import { formatVisitingPrice } from '@/lib/currencies';
 import SearchBar from '@/components/SearchBar';
@@ -156,7 +156,8 @@ export default async function SearchResultsPage({
                 .filter(Boolean)
                 .slice(0, 2)
                 .map((n) => n[0]?.toUpperCase())
-                .join('');
+              const catObj = getCategoryBySlug(pro.category_id);
+              const categoryName = catObj ? getCategoryName(catObj, lang) : pro.category_id;
 
               return (
                 <article
@@ -189,8 +190,8 @@ export default async function SearchResultsPage({
                             {pro.rating}
                           </span>
                         </div>
-                        <span className="text-sm text-emerald-800 font-semibold truncate mt-0.5">
-                          {pro.trade_title}
+                        <span className={`text-xs sm:text-sm text-emerald-800 font-bold truncate mt-0.5 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
+                          {categoryName}
                         </span>
                         <div className="flex items-center gap-1.5 text-sm text-gray-500 mt-1">
                           <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
