@@ -7,16 +7,18 @@ import {
   MapPin,
   MessageCircle,
   ChevronRight,
-  Phone,
   ArrowRight,
   Sparkles,
-  Zap,
-  ShieldCheck,
   PlusCircle,
 } from 'lucide-react';
-import { getProviders, getCategoryBySlug, CATEGORIES } from '@/lib/db';
+import {
+  getProviders,
+  getCategoryBySlug,
+  getCategoryName,
+  getCountryByCode,
+  toTitleCase,
+} from '@/lib/db';
 import { formatVisitingPrice } from '@/lib/currencies';
-import { getDictionary } from '@/lib/get-dictionary';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -33,17 +35,14 @@ const DOMAIN = 'https://baseera-services-directory.vercel.app';
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { lang, country, city, category } = await params;
   const catObj = getCategoryBySlug(category);
-  const categoryName = catObj ? catObj.name : category.charAt(0).toUpperCase() + category.slice(1);
-  const cityName = city.charAt(0).toUpperCase() + city.slice(1);
-  const countryCode = country.toUpperCase();
-  const countryName = countryCode === 'PK' ? 'Pakistan' : countryCode === 'AE' ? 'United Arab Emirates' : countryCode;
+  const categoryName = catObj ? catObj.name : toTitleCase(category);
+  const cityName = toTitleCase(city);
+  const countryObj = getCountryByCode(country);
+  const countryName = countryObj.name;
 
-  const providers = await getProviders(city, category);
-  const count = providers.length;
-
-  const title = `Top ${categoryName} in ${cityName} | Baseera`;
-  const description = `Find and connect directly with verified ${categoryName} in ${cityName}, ${countryName}. Zero agency commission, verified reviews, and instant WhatsApp chat.`;
-  const canonicalUrl = `${DOMAIN}/${lang}/${country}/${city}/${category}`;
+  const title = `Best ${categoryName} in ${cityName}, ${countryName} | Top Rated Profiles`;
+  const description = `Looking for a reliable ${categoryName} in ${cityName}? Browse verified profiles, check ratings, view portfolios, and chat directly on WhatsApp. No middlemen!`;
+  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
 
   return {
     title,
@@ -51,11 +50,9 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        'en-PK': `${DOMAIN}/en/pk/${city}/${category}`,
-        'ur-PK': `${DOMAIN}/ur/pk/${city}/${category}`,
-        'ar-AE': `${DOMAIN}/ar/ae/${city}/${category}`,
-        'en-AE': `${DOMAIN}/en/ae/${city}/${category}`,
-        'x-default': `${DOMAIN}/en/${country}/${city}/${category}`,
+        en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
+        ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
+        ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
       },
     },
     openGraph: {
@@ -73,22 +70,66 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
   const { lang, country, city, category } = await params;
   const providers = await getProviders(city, category);
   const catObj = getCategoryBySlug(category);
-  const categoryName = catObj ? catObj.name : category.charAt(0).toUpperCase() + category.slice(1);
-  const cityName = city.charAt(0).toUpperCase() + city.slice(1);
-  const countryCode = country.toUpperCase();
+  const categoryName = catObj ? catObj.name : toTitleCase(category);
+  const cityName = toTitleCase(city);
+  const countryObj = getCountryByCode(country);
+  const countryName = countryObj.name;
+  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
+
+  // Programmatic JSON-LD Schema (ItemList for Category Pages)
+  const jsonLdItemList = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `Best ${categoryName} in ${cityName}, ${countryName}`,
+    description: `Looking for a reliable ${categoryName} in ${cityName}? Browse verified profiles, check ratings, view portfolios, and chat directly on WhatsApp. No middlemen!`,
+    url: canonicalUrl,
+    numberOfItems: providers.length,
+    itemListElement: providers.map((p, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      item: {
+        '@type': 'LocalBusiness',
+        name: p.name,
+        url: `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${p.slug}`,
+        image: p.avatar_url,
+        telephone: p.whatsapp_number,
+        priceRange: formatVisitingPrice(p.starting_price, p.country_code || country),
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: cityName,
+          addressCountry: countryObj.code.toUpperCase(),
+        },
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: p.rating.toFixed(1),
+          reviewCount: p.review_count.toString(),
+        },
+      },
+    })),
+  };
 
   return (
     <div className={`min-h-screen bg-white text-neutral-900 pb-24 md:pb-16 ${lang === 'ur' ? 'font-urdu' : 'font-sans'}`}>
+      {/* Dynamic ItemList JSON-LD Injection */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdItemList) }}
+      />
+
       {/* Breadcrumbs Navigation */}
       <div className="border-b border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <nav className="flex items-center gap-1.5 text-xs text-gray-500 overflow-x-auto whitespace-nowrap">
             <Link href={`/${lang}`} className="hover:text-[#059669] transition-colors">
-              Home
+              {lang === 'ur' ? 'مرکزی صفحہ' : lang === 'ar' ? 'الرئيسية' : 'Home'}
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-            <Link href={`/${lang}/${country}/${city}`} className="hover:text-[#059669] transition-colors">
-              {cityName}, {countryCode}
+            <Link href={`/${lang}/${country.toLowerCase()}`} className="hover:text-[#059669] transition-colors">
+              {countryName}
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <Link href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`} className="hover:text-[#059669] transition-colors">
+              {cityName}
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
             <span className="text-neutral-900 font-semibold">{categoryName}</span>
@@ -106,7 +147,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                 <span>{providers.length} Verified Specialists Available</span>
               </div>
               <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-6 pt-2' : 'leading-tight'}`}>
-                Top {categoryName} in {cityName}
+                Top-Rated {categoryName} in {cityName}
               </h1>
               <p className={`text-base text-gray-600 max-w-2xl overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5]' : 'mt-1 leading-relaxed'}`}>
                 Compare verified specialist profiles, ratings, service areas, and connect directly on WhatsApp with zero middlemen commission.
@@ -135,7 +176,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
             </div>
 
             <h2 className={`text-xl sm:text-2xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-4 pt-1.5' : 'leading-snug mb-2'}`}>
-              We are launching in {cityName} soon! Register your business now.
+              We are launching {categoryName} services in {cityName} soon!
             </h2>
 
             <p className={`text-base text-gray-600 max-w-md mx-auto overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-8' : 'leading-relaxed mb-6'}`}>
@@ -167,7 +208,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                 `Hello ${provider.name}, I saw your verified profile on Baseera in ${cityName}. I would like to inquire about your ${categoryName} services.`
               );
               const directWhatsAppUrl = `https://wa.me/${cleanPhone}?text=${whatsappMessage}`;
-              const profileHref = `/${lang}/${country}/${city}/${category}/${provider.slug}`;
+              const profileHref = `/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${provider.slug}`;
 
               return (
                 <div
@@ -203,6 +244,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                           )}
                         </div>
 
+                        {/* Primary Category */}
                         <p className={`text-xs sm:text-sm font-bold text-[#059669] truncate mt-0.5 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
                           {categoryName}
                         </p>

@@ -459,7 +459,7 @@ export interface Country {
   name: string;
   defaultCity: string;
   flag: string;
-  region: 'Middle East' | 'Asia' | 'Americas' | 'Europe' | 'Africa' | 'Oceania';
+  region: 'Middle East' | 'Asia' | 'Americas' | 'Europe' | 'Africa' | 'Oceania' | 'Global';
 }
 
 export interface City {
@@ -552,7 +552,7 @@ export const CITIES: City[] = [
   { slug: 'sydney', name: 'Sydney', countryCode: 'au' },
   { slug: 'melbourne', name: 'Melbourne', countryCode: 'au' },
 
-  // Europe & Asia
+  // Europe & Asia & Africa
   { slug: 'berlin', name: 'Berlin', countryCode: 'de' },
   { slug: 'paris', name: 'Paris', countryCode: 'fr' },
   { slug: 'istanbul', name: 'Istanbul', countryCode: 'tr' },
@@ -563,27 +563,51 @@ export const CITIES: City[] = [
   { slug: 'dhaka', name: 'Dhaka', countryCode: 'bd' },
   { slug: 'cairo', name: 'Cairo', countryCode: 'eg' },
   { slug: 'johannesburg', name: 'Johannesburg', countryCode: 'za' },
+  { slug: 'lagos', name: 'Lagos', countryCode: 'ng' },
+  { slug: 'abuja', name: 'Abuja', countryCode: 'ng' },
+  { slug: 'nairobi', name: 'Nairobi', countryCode: 'ke' },
 ];
 
+export function toTitleCase(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/[-_]/g, ' ')
+    .split(' ')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export function getCountryByCode(code: string): Country {
-  const norm = code.toLowerCase();
+  const norm = (code || 'pk').toLowerCase();
   const found = COUNTRIES.find((c) => c.code.toLowerCase() === norm);
   if (found) return found;
-  // Dynamic universal fallback for ANY ISO country code in the world!
+
+  // Universal fallback for any ISO country code using Intl.DisplayNames
+  let resolvedName = norm.toUpperCase();
+  try {
+    const displayNames = new Intl.DisplayNames(['en'], { type: 'region' });
+    const name = displayNames.of(norm.toUpperCase());
+    if (name) resolvedName = name;
+  } catch {}
+
   return {
     code: norm,
-    name: norm.toUpperCase(),
+    name: resolvedName,
     defaultCity: 'capital',
     flag: '🌍',
-    region: 'Middle East',
+    region: 'Global',
   };
 }
 
 export function getCitiesByCountry(countryCode: string): City[] {
-  const norm = countryCode.toLowerCase();
+  const norm = (countryCode || 'pk').toLowerCase();
   const list = CITIES.filter((c) => c.countryCode.toLowerCase() === norm);
   if (list.length > 0) return list;
-  return [{ slug: 'main-city', name: 'Main City', countryCode: norm }];
+
+  const countryObj = getCountryByCode(norm);
+  const defCity = countryObj.defaultCity && countryObj.defaultCity !== 'capital' ? countryObj.defaultCity : 'main-city';
+  return [{ slug: defCity, name: toTitleCase(defCity), countryCode: norm }];
 }
 
 export interface CategoryDef {

@@ -78,10 +78,19 @@ const CATEGORY_ICON_MAP: Record<string, React.ComponentType<{ className?: string
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
-  const dict = await getDictionary(lang);
-  const brand = dict?.header?.brandName || 'Baseera';
-  const title = dict?.home?.heroTitle ? `${dict.home.heroTitle} | ${brand}` : 'Find Trusted Local Services | Baseera Directory';
-  const description = dict?.home?.heroSubtitle || 'Connect directly with verified electricians, plumbers, AC technicians, and local specialists. Zero platform commissions, 100% direct contact.';
+  const title =
+    lang === 'ur'
+      ? 'اپنے قریب قابل اعتماد کاریگر اور سروسز تلاش کریں | بصیرہ'
+      : lang === 'ar'
+      ? 'اعثر على خدمات وفنيين موثوقين حول العالم | بصيرة'
+      : 'Find Trusted Local Services & Technicians Worldwide | Baseera';
+
+  const description =
+    lang === 'ur'
+      ? 'اپنے شہر میں تصدیق شدہ الیکٹریشن، پلمبر، انٹیریئر ڈیزائنر اور 20+ دیگر ماہرین سے براہِ راست رابطہ کریں۔ زیرو کمیشن، فوری واٹس ایپ چیٹ۔'
+      : lang === 'ar'
+      ? 'تواصل مباشرة مع فنيي الكهرباء، السباكة، مصممي الديكور، وأكثر من 20 تخصصاً معتمداً في مدينتك. بدون عمولة، محادثة واتساب مباشرة.'
+      : 'Connect directly with verified electricians, plumbers, interior designers, and 20+ other specialists in your city. Zero commission, direct WhatsApp chat.';
 
   return {
     title,
@@ -94,6 +103,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         ar: `${DOMAIN}/ar`,
       },
     },
+    openGraph: {
+      title,
+      description,
+      url: `${DOMAIN}/${lang}`,
+      siteName: 'Baseera Local Services Directory',
+      locale: lang === 'ur' ? 'ur_PK' : lang === 'ar' ? 'ar_AE' : 'en_US',
+      type: 'website',
+    },
   };
 }
 
@@ -103,8 +120,61 @@ export default async function HomePage({ params }: PageProps) {
   const providers = await getAllProviders();
   const defaultLocation = lang === 'ur' ? 'کراچی، پاکستان' : lang === 'ar' ? 'دبي، الإمارات' : 'Karachi, PK';
 
+  // Dynamic JSON-LD WebSite & ItemList Schema
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Baseera',
+    url: `${DOMAIN}/${lang}`,
+    description:
+      'Connect directly with verified electricians, plumbers, interior designers, and 20+ other specialists in your city. Zero commission, direct WhatsApp chat.',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${DOMAIN}/${lang}/pk/karachi/search?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
+  const categoriesItemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Browse 24+ Verified Specialties',
+    url: `${DOMAIN}/${lang}`,
+    numberOfItems: CATEGORIES.length,
+    itemListElement: CATEGORIES.map((cat, idx) => ({
+      '@type': 'ListItem',
+      position: idx + 1,
+      name: cat.name,
+      url: `${DOMAIN}/${lang}/pk/karachi/${cat.slug}`,
+    })),
+  };
+
+  const h1Text =
+    lang === 'ur'
+      ? 'اپنے قریب قابل اعتماد لوکل سروسز تلاش کریں'
+      : lang === 'ar'
+      ? 'اعثر على خدمات وفنيين محليين موثوقين بالقرب منك'
+      : 'Find Trusted Local Services Near You';
+
+  const h2Text =
+    lang === 'ur'
+      ? '24+ تصدیق شدہ کیٹیگریز دیکھیں'
+      : lang === 'ar'
+      ? 'تصفح أكثر من 24 تخصصاً موثقاً'
+      : 'Browse 24+ Verified Specialties';
+
   return (
     <div className="min-h-screen bg-white text-neutral-900 pb-20 md:pb-12">
+      {/* Programmatic JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoriesItemListSchema) }}
+      />
+
       {/* 1. HERO SECTION */}
       <section className="border-b border-gray-200 bg-white pt-10 pb-12 sm:pt-16 sm:pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
@@ -114,7 +184,7 @@ export default async function HomePage({ params }: PageProps) {
           </div>
 
           <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-6 sm:mb-8 pt-2' : 'leading-tight mb-4'}`}>
-            {dict.home?.heroTitle || 'Find Trusted Local Services'}
+            {h1Text}
           </h1>
 
           <p className={`text-base text-gray-600 max-w-2xl mx-auto overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-10' : 'leading-relaxed mb-8'}`}>
@@ -132,7 +202,7 @@ export default async function HomePage({ params }: PageProps) {
         <div className="flex items-end justify-between gap-4 mb-5 sm:mb-6">
           <div className="overflow-visible">
             <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-3 pt-1.5' : 'leading-snug'}`}>
-              {dict.home?.browseBySpecialty || 'Browse by Specialty'}
+              {h2Text}
             </h2>
             <p className={`text-sm text-gray-500 mt-1 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
               {dict.home?.specialtySubtitle || 'Verified community technicians & specialists worldwide'}

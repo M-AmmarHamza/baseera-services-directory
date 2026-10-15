@@ -15,7 +15,13 @@ import {
 } from 'lucide-react';
 import { WhatsAppIcon } from '@/components/Icons';
 import { getDictionary } from '@/lib/get-dictionary';
-import { getProviderBySlug, getCategoryBySlug, getCategoryName } from '@/lib/db';
+import {
+  getProviderBySlug,
+  getCategoryBySlug,
+  getCategoryName,
+  getCountryByCode,
+  toTitleCase,
+} from '@/lib/db';
 import { getProviderCoverUrl, getProviderAvatarUrl } from '@/lib/category-banners';
 import { formatVisitingPrice } from '@/lib/currencies';
 import ProviderImageSlider from '@/components/ProviderImageSlider';
@@ -58,135 +64,137 @@ const CATEGORY_SPECIALIZATIONS: Record<string, Array<{ title: string; desc: stri
     { title: 'Engine Overhaul & Tappet Clearance', desc: 'Valve clearance adjustment, cylinder compression check, and spark plug calibration.' },
     { title: 'Digital AVR & Alternator Repair', desc: 'Automatic voltage regulator replacement, carbon brush alignment, and frequency tuning.' },
     { title: 'Carburetor & Dual-Fuel Gas Kits', desc: 'CNG/LPG zero-pressure regulator installation and ultrasonic carburetor clearing.' },
-    { title: 'ATS Relay Wiring & Starter Solenoids', desc: 'Auto-start relay integration, trickle battery charger setup, and starter motor servicing.' },
+    { title: 'Auto Start ATS Control Wiring', desc: 'Mains failure sensing relays, battery float chargers, and emergency cut-off solenoids.' },
   ],
 
-  // Water & Plumbing
+  // Plumbing & Water
   plumber: [
-    { title: 'Concealed Wall Seepage & Leak Detection', desc: 'Acoustic testing, non-destructive moisture tracing, and pipeline pressure inspection.' },
-    { title: 'Submersible Water Motor Installation', desc: 'Boring deep-well motor lowering, magnetic float switch, and overhead tank automation.' },
-    { title: 'PPRC & UPVC Sanitary Piping', desc: 'High-pressure heat-fusion hot/cold water pipeline fittings and bathroom sanitary remodeling.' },
-    { title: 'Gas & Electric Geyser Calibration', desc: 'Safe exhaust ventilation, non-return safety valve fitting, and pressure pump calibration.' },
-  ],
-  'water-pump-repair': [
-    { title: 'Impeller & Mechanical Seal Replacement', desc: 'Stainless steel impeller balancing, carbon-ceramic water seal leak stopping, and vibration dampening.' },
-    { title: 'Submersible Boring Motor Overhaul', desc: 'Deep-well copper stator rewinding, thrust bearing replacement, and waterproof splicing.' },
-    { title: 'Automatic Pressure Controller Calibration', desc: 'Digital pressure switch calibration, pressure tank diaphragm bladder replacement, and dry-run protection.' },
-    { title: 'Sweet Water Suction Line Priming', desc: 'Non-return check valve installation, foot valve clearing, and high-efficiency suction optimization.' },
-  ],
-  'water-boring': [
-    { title: 'Deep Rotary & Percussion Well Drilling', desc: 'High-yield water stratum targeting, geological layer inspection, and heavy casing pipe lowering.' },
-    { title: 'Slotted Screen & Gravel Pack Filtration', desc: 'High-grade PVC strainer slotting, silica gravel packing, and silt prevention.' },
-    { title: 'Submersible Column Pipe & Cable Drop', desc: 'Corrosion-proof uPVC column pipes, safety stainless wire rope tethering, and underwater cable connection.' },
-    { title: 'Well Jetting & Compressor Mud Flushing', desc: 'High-CFM air compressor flushing, sand removal, and crystal clear water output testing.' },
+    { title: 'PPR-C Heat Fusion Pipeline Installation', desc: 'Master pressure testing, thermal fusion welding, and leakproof concealed plumbing.' },
+    { title: 'Submersible Boring & Water Pump Overhaul', desc: 'Deep-well impeller replacement, foot valve sealing, and non-return check valves.' },
+    { title: 'Sanitary Ware & Concealed Commode Cisterns', desc: 'Wall-hung commode frames, pneumatic flush plates, and vanity mixer connections.' },
+    { title: 'Ultrasonic Hidden Leakage Detection', desc: 'Acoustic pipeline inspection without destructive wall chiseling or tile breakage.' },
   ],
   'water-tank-cleaning': [
-    { title: 'Sludge Dewatering & Slurry Extraction', desc: 'High-capacity submersible pump extraction of bottom mud, silt, and bacterial sediment.' },
-    { title: 'High-Pressure Rotary Jet Scrubbing', desc: 'Anti-microbial wall and floor cleaning without damaging underlying plaster or tile grout.' },
-    { title: 'Food-Grade Chemical & Chlorine Disinfection', desc: 'Safe non-toxic sanitization, bio-film removal, and algae neutralization.' },
-    { title: 'UV Sterilization & Water Quality Testing', desc: 'Ultraviolet immersion lamp sterilization, TDS and pH verification before refill.' },
+    { title: 'Sludge Suction & Rotary Deep Jet Wash', desc: 'High-bar pressure washing of reinforced underground and overhead concrete tanks.' },
+    { title: 'Anti-Bacterial Chlorine Fumigation', desc: 'Food-grade sanitization killing E. coli, waterborne microbes, and mosquito larvae.' },
+    { title: 'Epoxy Waterproof Leak Sealing', desc: 'Food-grade non-toxic epoxy crack coating resisting hydrostatic water pressure.' },
+    { title: 'Float Valve & Automatic Overflow Sensor', desc: 'Heavy brass float valves and digital dry-run motor shutoff float switches.' },
+  ],
+  'drain-unblocking': [
+    { title: 'Heavy Rotary Mechanical Spiral Rodding', desc: 'High-torque steel cable clearing roots, hard grease, and construction debris.' },
+    { title: 'High-Velocity Hydro-Jet Sewer Flushing', desc: '200+ bar pulsating water nozzles stripping interior grease build-up completely.' },
+    { title: 'Fiber-Optic CCTV Pipe Camera Inspection', desc: 'Real-time internal pipe video diagnosis locating cracks, collapses, and obstacles.' },
+    { title: 'Manhole Desilting & Non-Toxic Odor Trap', desc: 'Main inspection chamber cleaning and anti-backflow sanitary P-trap alignment.' },
   ],
 
-  // Cooling & Home Appliances
+  // Cooling & Heating
   'ac-technician': [
-    { title: 'Inverter AC Jet Chemical Wash', desc: 'High-pressure anti-bacterial indoor coil wash, blower wheel degreasing, and drainage tray clearing.' },
-    { title: 'Refrigerant Gas Leak & Refill', desc: 'Nitrogen leak testing, copper flare nut brazing, and genuine R410a / R32 refrigerant charging.' },
-    { title: 'Inverter PCB Motherboard Diagnostics', desc: 'Microcontroller troubleshooting, capacitor replacement, and indoor/outdoor communication error reset.' },
-    { title: 'Compressor & Fan Motor Overhaul', desc: 'Rotary/Scroll compressor replacement, run capacitor testing, and condenser fan motor servicing.' },
+    { title: 'Inverter PCB Diagnostic & Micro-Soldering', desc: 'Component level repair of indoor and outdoor communication motherboard circuits.' },
+    { title: 'R32 & R410A Refrigerant Vacuum Charging', desc: 'Deep micron vacuum dehydration and electronic weight-calibrated gas replenishment.' },
+    { title: 'Indoor Evaporator Coil Anti-Leak Brazing', desc: 'Silver brazing of copper hairline pinholes and pressurized nitrogen testing.' },
+    { title: 'Hydro-Jet Deep Foam Dismantling Service', desc: 'High-pressure chemical washing of blower wheel, condenser fins, and drain pan.' },
   ],
-  'fridge-repair': [
-    { title: 'Inverter Compressor Replacement & Brazing', desc: 'Variable-speed compressor testing, copper line brazing, and nitrogen leak sweep.' },
-    { title: 'Eco-Friendly R600a / R134a Gas Charging', desc: 'Precision digital micro-gram refrigerant charging and vacuum line dehydration.' },
-    { title: 'Defrost Timer & Bi-Metal Sensor Fix', desc: 'Frost build-up clearance, heater coil replacement, and thermistor calibration.' },
-    { title: 'Door Gasket Seal & Thermostat Repair', desc: 'Magnetic rubber gasket replacement, internal LED thermostat repair, and air flap calibration.' },
+  'refrigerator-technician': [
+    { title: 'Inverter Compressor Relaying & Sealed System', desc: 'Rotary/linear compressor brazing, suction line filter-drier replacement, and gas charge.' },
+    { title: 'No-Frost Heating Element & Bi-Metal Sensor', desc: 'Defrost timer troubleshooting, thermal fuse replacement, and evaporative coil testing.' },
+    { title: 'Magnetic Door Gasket Air-Tight Sealing', desc: 'Custom silicone/vinyl thermal gasket replacement preventing cool air leakage.' },
+    { title: 'Digital Thermostat & Micro-Controller Repair', desc: 'Electronic temperature sensor calibration and compressor cycle regulation.' },
   ],
-  'washing-machine-repair': [
-    { title: 'Front & Top Load Drum Bearing Replacement', desc: 'Spider arm assembly renewal, heavy-duty waterproof seal fitting, and spin balance restoration.' },
-    { title: 'Direct-Drive Motor & PCB Module Repair', desc: 'Hall sensor replacement, logic board microcontroller repair, and drain pump unblocking.' },
-    { title: 'Water Inlet Solenoid Valve & Pressure Sensor', desc: 'Electronic water level pressure switch recalibration and mesh filter descaling.' },
-    { title: 'Shock Absorber & Suspension Spring Renewal', desc: 'Heavy spin cycle vibration elimination and child-safety door latch mechanism fix.' },
+  'washing-machine-technician': [
+    { title: 'Front-Load Spider Arm & Drum Bearing Swapping', desc: 'Stainless steel drum disassembly, hydraulic bearing pressing, and oil seal installation.' },
+    { title: 'Drain Pump & Pulsator Gearbox Overhaul', desc: 'Impeller clearance, magnetic drain motor replacement, and spin cycle clutch repair.' },
+    { title: 'Digital Inverter Inrush Control Board Diagnostics', desc: 'Error code clearance (IE, OE, UE, dE) and hall sensor tachometer testing.' },
+    { title: 'Heavy Duty Suspension Damper Struts', desc: 'Vibration dampening spring replacement and unbalance detection tuning.' },
   ],
-  'geyser-repair': [
-    { title: 'Instant Gas Geyser Diaphragm & Microswitch', desc: 'Water-gas linkage valve service, pilot flame jet clearing, and automatic pulse igniter setup.' },
-    { title: 'Electric Water Heater Immersion Element', desc: 'Heavy copper heating rod replacement, magnesium anode rod renewal, and thermostat calibration.' },
-    { title: 'Safety Pressure Relief Valve (PRV) Fitting', desc: 'Over-pressure steam blow-off protection, non-return check valve, and explosion safeguard.' },
-    { title: 'Flue Venting & Carbon Monoxide Clearance', desc: 'Safe stainless steel exhaust chimney alignment and thermal cut-off sensor testing.' },
+  'geyser-technician': [
+    { title: 'Instant Gas Geyser Solenoid & Microswitch', desc: 'Water diaphragm replacement, pilot jet needle clearing, and ignition box repair.' },
+    { title: 'Electric Geyser Heavy Magnesium Anode & Element', desc: 'Titanium heating rod scaling removal and sacrificial corrosion anode swapping.' },
+    { title: 'Thermostat Safety Cut-Off Valve Calibration', desc: 'Overheat pressure relief valve installation preventing cylinder bulging.' },
+    { title: 'Descaling of Heavy Copper Heat Exchanger', desc: 'Eco-friendly acid flushing removing lime scale for maximum heat transfer.' },
   ],
 
-  // Maintenance & Construction
+  // Home & Construction
   carpenter: [
-    { title: 'Modular Woodwork & Kitchen Cabinets', desc: 'UV sheet, tactile laminate, and solid wood modular kitchen cabinet manufacturing.' },
-    { title: 'Door Lock & Hydraulic Hinge Fitting', desc: 'Concealed multi-point mortise lock installation, soft-close hinges, and door alignment.' },
-    { title: 'Wooden Flooring & Parquet Decking', desc: 'HDF water-resistant laminate wooden parquet laying with sound-absorbing underlay.' },
-    { title: 'Wardrobe & Closet Customization', desc: 'Sliding aluminum channel wardrobes with integrated LED profile lighting.' },
+    { title: 'Custom Solid Wood & Modular Kitchen Cabinetry', desc: 'Soft-close hydraulic hinges, UV sheet lamination, and moisture-resistant MDF carcass.' },
+    { title: 'Solid Sheesham Wood Door Framing & Fitting', desc: 'Mortise lock installation, threshold weather-stripping, and acoustic gap seal.' },
+    { title: 'Bespoke Wardrobe & Walk-in Closet Design', desc: 'Concealed sliding tracks, pull-out trouser racks, and LED sensor profiles.' },
+    { title: 'Antique Furniture Restoration & Lacquer Polish', desc: 'Hand-rubbed French spirit polish, PU high gloss finish, and joint reinforcement.' },
   ],
   painter: [
-    { title: 'Interior & Exterior Wall Emulsion', desc: 'Premium silk matte, weather sheet exterior coatings, and anti-fungal prep.' },
-    { title: 'Wall Putty & Damp Seepage Treatment', desc: 'Chemical moisture barrier primer, crack bridging, and smooth stucco finish.' },
-    { title: 'Wood Polish & Deco Paint Finish', desc: 'Polyurethane spray polish, matte clear coat, and antique lacquer furniture buffing.' },
-    { title: 'Waterproofing & Roof Heat Insulation', desc: 'Elastomeric roof membrane coating, tile grout sealant, and thermal reflection paint.' },
-  ],
-  'aluminium-glass-worker': [
-    { title: 'Thermal Break Aluminium Window Fabrication', desc: 'Double-glazed soundproof glass panels, heavy gauge channel extrusion, and sliding tracks.' },
-    { title: 'Tempered Glass Shower Enclosures', desc: '10mm-12mm toughened frameless safety glass, stainless steel patch fittings, and waterproof silicone seals.' },
-    { title: 'Commercial Glass Doors & Floor Closers', desc: 'Heavy-duty hydraulic floor hinge installation, glass lock fittings, and alignment.' },
-    { title: 'Office Partitioning & Spider Glass Facades', desc: 'Acoustic gypsum-aluminium combo partitions and exterior curtain wall maintenance.' },
-  ],
-  welder: [
-    { title: 'Custom Iron Gate & Grille Fabrication', desc: 'Wrought iron entrance gates, burglar-proof window grilles, and decorative handrails.' },
-    { title: 'Heavy Structural Steel Beam Arc Welding', desc: 'I-beam column splicing, truss welding, and high-strength load bearing joints.' },
-    { title: 'MIG / TIG Stainless Steel Pipe Welding', desc: 'Argon gas shielded welding for sanitary pipes, railing joints, and hairline polish.' },
-    { title: 'Emergency Mobile On-Site Welding', desc: 'Portable welding generator repairs for broken hinges, terrace sheds, and water tank stands.' },
+    { title: 'Exterior Weather-Proof Elastomeric Coating', desc: 'High-build acrylic barrier resisting harsh sunlight, rain, and fungal flaking.' },
+    { title: 'Interior Matt Velvet & Silk Enamel Finishes', desc: 'Three-coat wall putty sanding, primer stabilization, and roller velvet coats.' },
+    { title: 'Anti-Dampness & Saltpetre Chemical Treatment', desc: 'Crystalline deep masonry penetrant blocking rising damp and efflorescence salt.' },
+    { title: 'Italian Marble Stucco & Velvet Texture Art', desc: 'Trowel-applied Venetian stucco, metallic glaze, and industrial concrete effects.' },
   ],
   mason: [
-    { title: 'Tile & Marble Precision Flooring', desc: 'Laser-leveled porcelain tile laying, zero-joint epoxy grouting, and marble diamond polishing.' },
-    { title: 'Brickwork, Plastering & Wall Raising', desc: 'Straight plumb-line masonry, moisture-proof plaster screed, and structural lintel casting.' },
-    { title: 'Bathroom Waterproofing & Slope Screed', desc: 'Multi-layer chemical elastomeric slurry coating and leakage-proof drain sunken slab prep.' },
-    { title: 'Demolition, Remodeling & Concrete Core Cutting', desc: 'Non-destructive partition wall removal, debris clearing, and reinforcement repairs.' },
+    { title: 'Granite & Vitrified Floor Tile Laser Laying', desc: 'Zero-tolerance laser leveling, epoxy grout filling, and polymer tile adhesive bonding.' },
+    { title: 'RCC Concrete Boundary Wall & Brick Masonry', desc: 'Structural brick laying, column shuttering, and sand-cement render plastering.' },
+    { title: 'Rooftop Thermal Insulation & Bitumen Waterproofing', desc: 'APP membrane torching, lightweight thermal screed, and drainage slope setting.' },
+    { title: 'Staircase Marble Bullnosing & Riser Cladding', desc: 'Diamond machine edge rounding, anti-slip grooving, and mirror buffing.' },
+  ],
+  welder: [
+    { title: 'Heavy Wrought Iron Gate & Safety Grills', desc: 'Solid forged iron scrolls, anti-pry lock plates, and rust-inhibiting zinc primer.' },
+    { title: 'Stainless Steel (SS-304) Balcony Railing', desc: 'TIG argon welding, seamless tube bending, and optical satin/mirror polish.' },
+    { title: 'Industrial Steel Truss & Shed Fabrication', desc: 'I-beam rafters, corrugated sheet roofing, and wind-brace tension rod bolting.' },
+    { title: 'Motorized Rolling Shutter Spring Tensioning', desc: 'Galvanized slat replacement, torsion spring calibration, and central gear motors.' },
+  ],
+  'pest-control': [
+    { title: 'Pre/Post Construction Subterranean Termite Proofing', desc: 'High-pressure chemical soil barrier injection along foundation walls with long warranty.' },
+    { title: 'Odorless Gel Baiting for German Cockroaches', desc: 'Fipronil micro-dot placement inside kitchen hinges, appliances, and crevices.' },
+    { title: 'Bed Bug Heat & Residual Steam Eradication', desc: 'High-temperature mattress steaming and insect growth regulator (IGR) spraying.' },
+    { title: 'Rodent Bait Stations & Structural Harbor Sealing', desc: 'Tamper-resistant bait boxes and heavy wire mesh burrow exclusion barriers.' },
+  ],
+  'sofa-cleaner': [
+    { title: 'Deep Injection-Extraction Fabric Extraction', desc: 'Multi-stage hot water industrial extraction removing deep sweat, oil, and dust mites.' },
+    { title: 'Anti-Microbial Sanitization & Odor Neutralization', desc: 'Eco-friendly enzymatic treatment eliminating pet and food odor permanently.' },
+    { title: 'Genuine Leather Conditioning & Color Buffing', desc: 'pH-balanced balm nourishing dry leather, preventing cracking and restoring sheen.' },
+    { title: 'Stain-Shield Hydrophobic Nano Protection', desc: 'Invisible fluoropolymer coating repelling coffee, tea, and grease spillages.' },
   ],
 
-  // Cleaning & Security
-  'pest-control': [
-    { title: 'Drill-Fill-Seal Termite Chemical Barrier', desc: 'Subterranean termite perimeter trenching, high-pressure wood injection, and warranty certificate.' },
-    { title: 'Bed Bug Heat & Residual Steam Treatment', desc: 'Non-toxic organic misting, mattress crevice steaming, and egg eradication.' },
-    { title: 'Cockroach & Ant Gel Bait Application', desc: 'Odorless German cockroach baiting, kitchen cabinet micro-droplet application, and child-safe formulas.' },
-    { title: 'Rodent & Mosquito Fogging Extermination', desc: 'Ultrasonic rat repellent traps, ULV cold fogging for gardens, and drainage spray.' },
-  ],
-  'sofa-carpet-cleaning': [
-    { title: 'Hot Water Extraction Carpet Shampooing', desc: 'High-pressure injection-extraction machine with anti-mite hypoallergenic detergent.' },
-    { title: 'Upholstery Fabric & Leather Sofa Detailing', desc: 'Deep stain lift for tea, coffee, and oil spots, followed by moisture vacuum drying.' },
-    { title: 'Mattress Sanitization & Dust Mite Extraction', desc: 'High-frequency vibrating vacuuming and medical-grade anti-allergen UV sanitization.' },
-    { title: 'Color-Safe Drying & Deodorizing', desc: 'Fast 3-hour air-blower drying with natural long-lasting fresh scent neutralizer.' },
-  ],
-  'cctv-installer': [
-    { title: 'IP & HD Night-Vision Camera Installation', desc: '4K Ultra-HD bullet and dome camera mounting with color night-vision IR sensors.' },
-    { title: 'NVR/DVR Configuration & Hard Drive Setup', desc: 'Continuous motion-detection recording, surveillance storage calculation, and UPS backup.' },
-    { title: 'Remote Smartphone Live Stream Integration', desc: 'Port forwarding, cloud P2P mobile app sync, and real-time push intrusion alerts.' },
-    { title: 'Structured Cat6 & Coaxial Concealed Cabling', desc: 'Weatherproof conduit pipe routing, RJ45 crimping, and video balun noise filtering.' },
+  // Security & Hardware
+  'cctv-technician': [
+    { title: '5MP/4K ColorVu IP Network Camera Installation', desc: 'Cat-6 shielded structured cabling, PoE switch setup, and RJ-45 crimping.' },
+    { title: 'NVR/DVR Cloud Remote Viewing Calibration', desc: 'Static IP / P2P smartphone application streaming with push motion alert triggers.' },
+    { title: 'PTZ 360-Degree Optical Tracking Setup', desc: 'Auto-cruise patrol tour programming, human/vehicle AI classification filtering.' },
+    { title: 'Concealed Conduit & Weatherproof Junction Boxes', desc: 'UV-resistant external pipe routing and waterproof IP66 camera bases.' },
   ],
   locksmith: [
-    { title: 'Emergency Residential & Commercial Lockout', desc: 'Non-destructive pick unlocking for jammed entrance doors, deadbolts, and cabinets.' },
-    { title: 'High-Security Multi-Point Mortise Locks', desc: 'Computerized anti-tamper lock cylinders, brass deadbolts, and security strike plates.' },
-    { title: 'Smart Digital Biometric Lock Installation', desc: 'Fingerprint, RFID card, PIN code, and mobile Wi-Fi smart door lock setup.' },
-    { title: 'Master Key System & Precision Duplication', desc: 'Unified master keying for offices and residential complexes, with precision laser cut keys.' },
+    { title: 'High-Security Anti-Snap Cylinder Installation', desc: 'Key-coded dimple lock barrels resisting picking, bumping, and drilling attacks.' },
+    { title: 'Smart Fingerprint & RFID Digital Door Locks', desc: 'Biometric keypad installation with Bluetooth / Wi-Fi smartphone remote access.' },
+    { title: 'Emergency Non-Destructive Door Opening', desc: 'Specialized lishi picking and bypass tools opening locked doors without lock damage.' },
+    { title: 'Master Key System Hierarchical Charting', desc: 'Single master key configuring multiple doors with individual tenant restrictions.' },
   ],
 
-  // Lifestyle & Miscellaneous
+  // Automotive Care
+  'car-mechanic': [
+    { title: 'OBD-II Computerized Engine Diagnostics', desc: 'Live sensor datastream analysis, ECU fault code clearance, and sensor tracing.' },
+    { title: 'Complete Suspension & Shock Absorber Rebuild', desc: 'Bushing hydraulic pressing, ball joint replacement, and camber balance.' },
+    { title: 'Hydraulic Brake Rotor Skimming & Ceramic Pads', desc: 'Brake fluid bleeding, ABS modulator testing, and disc rotor resurfacing.' },
+    { title: 'Periodic Fluid Flushing & Synthetic Lubrication', desc: 'Engine oil, transmission fluid, radiator coolant, and differential oil replacement.' },
+  ],
+  'car-ac-technician': [
+    { title: 'Automotive Compressor Magnetic Clutch Repair', desc: 'Coil shimming, pulley bearing pressing, and expansion valve cleaning.' },
+    { title: 'Dashboard Evaporator Coil Leakage Testing', desc: 'Nitrogen pressure testing and careful dashboard removal without rattle damage.' },
+    { title: 'R134a Precision Gas Recharge & PAG Oil Injection', desc: 'Vacuum decay testing and synthetic compressor oil balancing.' },
+    { title: 'Cabin Pollen Filter & Air Duct Ozone Fumigation', desc: 'Ozone gas treatment destroying bacteria and musty odors in air vents.' },
+  ],
+
+  // Lifestyle & Design
   'home-chef': [
-    { title: 'Daily Office Lunch Delivery', desc: 'Hygienic fresh home-cooked meal boxes with premium basmati rice and canola oil preparation.' },
-    { title: 'Bulk Event & Daawat Catering', desc: 'Traditional mutton degi biryani, qorma, and custom desserts for family gatherings.' },
-    { title: 'Custom Diet & Diabetic Meal Plans', desc: 'Low-sodium, steamed vegetable, and portion-controlled wholesome meal prep.' },
-    { title: 'Homemade Sweets & Frozen Snacks', desc: 'Handcrafted samosas, shami kababs, and seasonal traditional mithai.' },
+    { title: 'Hygienic Home Tiffin & Daily Meal Delivery', desc: 'Fresh, balanced home-cooked meals prepared with premium oil and spices.' },
+    { title: 'Custom Party & Event Catering Menus', desc: 'Live barbecue, traditional biryani deghs, Continental platters, and custom desserts.' },
+    { title: 'Diet-Specific Nutrition & Keto Cooking', desc: 'Portion-controlled diabetic, low-sodium, and high-protein calorie-tracked meals.' },
+    { title: 'On-Demand Private Chef for Family Gatherings', desc: 'Full culinary preparation, on-site live cooking, and kitchen cleanup.' },
   ],
   'interior-designer': [
-    { title: 'Complete Residential & Commercial Interior Design', desc: 'Space planning, architectural layout design, mood boards, and 3D photorealistic visualization.' },
-    { title: 'False Ceiling & Architectural Lighting Concepts', desc: 'Gypsum false ceiling designs, cove lighting, architectural profile lights, and spotlighting.' },
-    { title: 'Bespoke Furniture Design & Material Sourcing', desc: 'Custom luxury sofas, media walls, walk-in closets, kitchen cabinetry, and premium wood veneers.' },
-    { title: 'Turnkey Project Execution & Site Supervision', desc: 'End-to-end renovation management, contractor oversight, material quality checks, and timely handover.' },
+    { title: '3D Architectural Visualization & Space Planning', desc: 'Photorealistic 3D renders, furniture space planning, and layout optimization.' },
+    { title: 'Bespoke False Ceiling & Concealed Lighting Design', desc: 'Gypsum board cove lighting, magnetic track lights, and acoustic baffles.' },
+    { title: 'Material & Color Palette Selection Consultation', desc: 'Curated wall textures, fluted wall panels, hardware, and fabrics harmonization.' },
+    { title: 'Full Turnkey Renovation & Site Execution', desc: 'End-to-end project management, carpenter/mason coordination, and quality delivery.' },
   ],
   'movers-packers': [
-    { title: 'Multi-Layer Furniture Protective Wrapping', desc: 'High-density bubble wrap, stretch film, corrugated sheets, and corner edge guards.' },
-    { title: 'Appliance & Heavy Safe Relocation', desc: 'Specialized hydraulic hand trucks for American fridges, washing machines, and heavy pianos.' },
+    { title: 'Multi-Layer Bubble & Corrugated Box Packing', desc: 'Shockproof wrapping for fragile glassware, chinaware, marble, and electronics.' },
+    { title: 'Heavy Furniture Dismantling & Strapped Loading', desc: 'Professional disassembly of hydraulic beds, conference tables, and wardrobes.' },
     { title: 'Covered Container Vans & GPS Tracked Fleet', desc: 'Weatherproof enclosed cargo trucks with soft interior padding for long and short distance.' },
     { title: 'Unpacking & Furniture Reassembly', desc: 'Bed frame bolting, wardrobe shelf realignment, curtain rod fixing, and carton box placement.' },
   ],
@@ -205,13 +213,16 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     };
   }
 
-  const cityName = city.charAt(0).toUpperCase() + city.slice(1);
-  const countryCode = country.toUpperCase();
-  const countryName = countryCode === 'PK' ? 'Pakistan' : countryCode === 'AE' ? 'United Arab Emirates' : countryCode;
+  const cityName = toTitleCase(city);
+  const categoryName = categoryInfo ? categoryInfo.name : toTitleCase(category);
+  const providerName = provider.name;
+  const countryObj = getCountryByCode(country);
+  const countryName = countryObj.name;
 
-  const title = `${provider.name} - Verified ${provider.trade_title} in ${cityName}, ${countryName} | Baseera`;
-  const description = `${provider.short_bio.slice(0, 160)}... Rated ${provider.rating}★ (${provider.review_count} reviews). Contact directly without platform fees.`;
-  const canonicalUrl = `${DOMAIN}/${lang}/${country}/${city}/${category}/${slug}`;
+  // Exact Programmatic SEO Formula
+  const title = `${providerName} - Expert ${categoryName} in ${cityName} | Baseera`;
+  const description = `Contact ${providerName} for professional ${categoryName} services in ${cityName}. View their work gallery, core specialties, and message directly on WhatsApp.`;
+  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`;
 
   return {
     title,
@@ -219,9 +230,9 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        'en-PK': `${DOMAIN}/en/pk/${city}/${category}/${slug}`,
-        'ur-PK': `${DOMAIN}/ur/pk/${city}/${category}/${slug}`,
-        'ar-AE': `${DOMAIN}/ar/ae/${city}/${category}/${slug}`,
+        en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
+        ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
+        ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
       },
     },
     openGraph: {
@@ -234,7 +245,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
           url: getProviderCoverUrl(provider),
           width: 1200,
           height: 630,
-          alt: `${provider.name} - ${categoryInfo?.name || category} in ${cityName}`,
+          alt: `${providerName} - ${categoryName} in ${cityName}`,
         },
       ],
       locale: lang === 'ur' ? 'ur_PK' : lang === 'ar' ? 'ar_AE' : 'en_US',
@@ -250,16 +261,18 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
   const provider = await getProviderBySlug(city, category, slug);
   const categoryInfo = getCategoryBySlug(category);
-  const categoryName = categoryInfo ? getCategoryName(categoryInfo, lang) : category;
+  const categoryName = categoryInfo ? categoryInfo.name : toTitleCase(category);
   const dict = await getDictionary(lang);
 
   if (!provider) {
     notFound();
   }
 
-  const cityName = city.charAt(0).toUpperCase() + city.slice(1);
-  const countryCode = country.toUpperCase();
-  const canonicalUrl = `${DOMAIN}/${lang}/${country}/${city}/${category}/${slug}`;
+  const cityName = toTitleCase(city);
+  const countryObj = getCountryByCode(country);
+  const countryCode = countryObj.code.toUpperCase();
+  const providerName = provider.name;
+  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`;
 
   const effectiveCover = getProviderCoverUrl(provider);
   const effectiveAvatar = getProviderAvatarUrl(provider);
@@ -269,7 +282,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     '@id': canonicalUrl,
-    name: provider.name,
+    name: providerName,
     image: [effectiveCover, effectiveAvatar],
     telephone: provider.whatsapp_number,
     url: canonicalUrl,
@@ -298,12 +311,13 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
   // Dynamic Specializations
   const normalizedCategoryKey = (categoryInfo?.id || category).toLowerCase();
-  const specializations = CATEGORY_SPECIALIZATIONS[normalizedCategoryKey] ||
+  const specializations =
+    CATEGORY_SPECIALIZATIONS[normalizedCategoryKey] ||
     CATEGORY_SPECIALIZATIONS[category] ||
     CATEGORY_SPECIALIZATIONS['electrician'];
 
   const whatsappMessage = encodeURIComponent(
-    `Assalam-o-Alaikum ${provider.name}, I found your verified profile on Baseera directory in ${cityName}. I need consultation for ${provider.trade_title}. Are you available today?`
+    `Assalam-o-Alaikum ${provider.name}, I found your verified profile on Baseera directory in ${cityName}. I need consultation for ${categoryName}. Are you available today?`
   );
 
   return (
@@ -322,20 +336,31 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               Home
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-            <Link href={`/${lang}/${country}/${city}`} className="hover:text-[#059669] transition-colors">
+            <Link href={`/${lang}/${country.toLowerCase()}`} className="hover:text-[#059669] transition-colors">
+              {countryObj.name}
+            </Link>
+            <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+            <Link href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`} className="hover:text-[#059669] transition-colors">
               {cityName}
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-            <Link href={`/${lang}/${country}/${city}/${category}`} className="hover:text-[#059669] transition-colors capitalize">
-              {categoryInfo?.name || category}
+            <Link href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`} className="hover:text-[#059669] transition-colors capitalize">
+              {categoryName}
             </Link>
             <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-            <span className="text-neutral-900 font-semibold truncate">{provider.name}</span>
+            <span className="text-neutral-900 font-semibold truncate">{providerName}</span>
           </nav>
         </div>
       </div>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* H2 for Portfolio: Work Showcase & Projects by ${providerName} */}
+        <div className="mb-3">
+          <h2 className={`text-base sm:text-lg font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3]' : 'leading-snug'}`}>
+            Work Showcase & Projects by {providerName}
+          </h2>
+        </div>
+
         {/* TOP IMAGE SLIDER (Next.js Image unoptimized={true}) */}
         <ProviderImageSlider images={portfolioPhotos} providerName={provider.name} />
 
@@ -364,7 +389,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
           <div className="space-y-1.5 overflow-visible">
             <div className="flex flex-wrap items-center gap-2 overflow-visible">
               <h1 className={`text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-4 pt-2' : 'leading-tight'}`}>
-                {provider.name}
+                {providerName}
               </h1>
               {provider.is_verified && (
                 <span title="Verified by Baseera" className="inline-flex items-center text-[#059669]">
@@ -373,6 +398,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               )}
             </div>
 
+            {/* Primary Category Title */}
             <p className={`text-base font-bold text-[#059669] overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3]' : ''}`}>
               <span>{categoryName}</span>
               {provider.trade_title && provider.trade_title.toLowerCase() !== categoryName.toLowerCase() && (
@@ -453,7 +479,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               </div>
             </div>
 
-            {/* Trust Badges - STRICTLY NO POLICE CLEARANCE */}
+            {/* Trust Badges */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-4 border border-gray-200 rounded-xl bg-white flex items-center gap-3">
                 <ShieldCheck className="w-6 h-6 text-[#059669] shrink-0" />
@@ -481,7 +507,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
             </div>
           </div>
 
-          {/* Pricing & Direct Booking Sidebar (STRICTLY NO E-COMMERCE PRICE TAGS) */}
+          {/* Pricing & Direct Booking Sidebar */}
           <div className="space-y-6">
             <div className="p-6 border border-gray-200 rounded-2xl bg-white sticky top-24">
               {/* Plain Text Visiting Charges */}
@@ -539,7 +565,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
         providerName={provider.name}
         contactMethod="whatsapp"
         contactValue={provider.whatsapp_number}
-        categoryTitle={categoryInfo?.name || category}
+        categoryTitle={categoryName}
         cityName={cityName}
       />
     </div>
