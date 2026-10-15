@@ -65,12 +65,19 @@ h3.font-urdu {
 }
 
 /* 2. Nastaliq Paragraphs Line-Height & Overflow Fixes */
-html[lang="ur"] p,
-.font-urdu p,
-p.font-urdu {
+html[lang="ur"] p:not([class*="line-clamp"]),
+.font-urdu p:not([class*="line-clamp"]),
+p.font-urdu:not([class*="line-clamp"]) {
   line-height: 2.5 !important; /* leading-[2.5] */
-  overflow: visible !important;
-  padding-top: 0.25rem !important;
+  overflow: visible;
+  padding-top: 0.25rem;
+}
+
+/* Ensure line-clamp works properly across all languages without spilling text */
+[class*="line-clamp"] {
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
 }
 
 /* 3. Containers holding Nastaliq text must not clip vertical strokes */

@@ -159,7 +159,7 @@ export default async function HomePage({ params }: PageProps) {
                 </div>
 
                 {/* Two-line clamped Title */}
-                <span className={`font-bold text-xs text-gray-900 group-hover:text-[#006948] transition-colors leading-tight line-clamp-2 ${lang === 'ur' ? 'font-urdu leading-[2.2] min-h-[3rem] py-1' : 'h-8 sm:h-9'} flex items-center justify-center overflow-visible`}>
+                <span className={`font-bold text-xs text-gray-900 group-hover:text-[#006948] transition-colors leading-tight line-clamp-2 ${lang === 'ur' ? 'font-urdu leading-[2.2] min-h-[3rem] py-1' : 'h-8 sm:h-9'} flex items-center justify-center`}>
                   {getCategoryName(cat, lang)}
                 </span>
 

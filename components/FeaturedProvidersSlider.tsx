@@ -175,20 +175,24 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
                   </span>
                 </div>
 
-                {/* Short Bio Snippet */}
-                <p className={`text-sm text-gray-600 mb-4 line-clamp-2 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5]' : 'leading-relaxed'}`}>
+                {/* Short Bio Snippet (Strictly clamped to 2 lines with ellipsis) */}
+                <p className={`text-xs sm:text-sm text-gray-600 mb-4 line-clamp-2 min-h-[38px] sm:min-h-[40px] ${lang === 'ur' ? 'font-urdu leading-[2.2] min-h-[46px]' : 'leading-relaxed'}`}>
                   {provider.short_bio}
                 </p>
               </div>
 
               {/* Action Footer: Visiting Charges & Direct WhatsApp CTA */}
-              <div className="pt-3.5 border-t border-gray-100 flex items-center justify-between gap-2.5">
-                <div>
-                  <span className="text-xs uppercase font-bold text-gray-400 block">
-                    Visiting
+              <div className="pt-3.5 mt-auto border-t border-gray-100 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-gray-400 block truncate">
+                    {lang === 'ur' ? 'وزٹ چارجز' : lang === 'ar' ? 'رسوم الزيارة' : 'Visiting Charges'}
                   </span>
-                  <span className="text-sm font-bold text-neutral-900">
-                    {provider.country_code === 'ae' ? `AED ${provider.starting_price}` : `Rs. ${provider.starting_price}`}
+                  <span className="text-sm sm:text-base font-bold text-neutral-900 block mt-0.5 whitespace-nowrap">
+                    {provider.country_code === 'ae'
+                      ? `AED ${provider.starting_price}`
+                      : provider.country_code === 'sa'
+                      ? `SAR ${provider.starting_price}`
+                      : `Rs. ${provider.starting_price}`}
                   </span>
                 </div>
 
@@ -199,10 +203,10 @@ export default function FeaturedProvidersSlider({ providers, lang }: Props) {
                     e.stopPropagation();
                     window.open(whatsappLink, '_blank', 'noopener,noreferrer');
                   }}
-                  className="bg-[#059669] hover:bg-[#047857] active:scale-[0.98] text-white text-sm font-semibold px-3.5 py-1.5 rounded-xl transition-all inline-flex items-center justify-center gap-1.5 shrink-0 shadow-2xs cursor-pointer"
+                  className="bg-[#059669] hover:bg-[#047857] active:scale-[0.98] text-white text-xs sm:text-sm font-semibold px-3 sm:px-3.5 py-2 rounded-xl transition-all inline-flex items-center justify-center gap-1.5 shrink-0 shadow-2xs cursor-pointer min-h-[38px]"
                   title={`Chat directly with ${provider.name} on WhatsApp`}
                 >
-                  <WhatsAppIcon className="w-4 h-4 fill-current" />
+                  <WhatsAppIcon className="w-4 h-4 fill-current shrink-0" />
                   <span>WhatsApp</span>
                 </button>
               </div>
