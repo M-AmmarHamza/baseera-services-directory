@@ -502,26 +502,29 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                             key={`${c.countryCode}-${c.slug}`}
                             type="button"
                             onClick={() => handleSelectCity(c)}
-                            className={`p-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition-all flex items-center justify-between text-start cursor-pointer group overflow-visible ${
+                            className={`flex items-center justify-between w-full px-3 py-2 rounded-xl border text-xs sm:text-sm font-semibold transition-all text-start cursor-pointer group min-w-0 ${
                               isSelected
                                 ? 'border-[#006948] bg-emerald-50/60 text-[#006948] ring-1 ring-[#006948]'
                                 : 'border-gray-200 bg-white hover:border-[#006948]/60 hover:bg-gray-50 text-gray-800'
                             } ${lang === 'ur' ? 'min-h-[52px]' : ''}`}
                           >
-                            <div className="min-w-0 pr-1 overflow-visible">
-                              <span className={`block font-bold text-gray-900 group-hover:text-[#006948] transition-colors overflow-visible ${
-                                lang === 'ur' ? 'font-urdu leading-[2.2] text-sm pt-0.5' : 'truncate'
-                              }`}>
+                            <div className="min-w-0 flex-1">
+                              <span
+                                title={displayTitle}
+                                className={`block font-bold text-gray-900 group-hover:text-[#006948] transition-colors truncate overflow-hidden text-ellipsis whitespace-nowrap ${
+                                  lang === 'ur' ? 'font-urdu leading-[2.2] text-sm pt-0.5' : ''
+                                }`}
+                              >
                                 {displayTitle}
                               </span>
-                              <span className="block text-[11px] text-gray-400 font-normal truncate mt-0.5">
+                              <span className="block text-[11px] text-gray-400 font-normal truncate overflow-hidden text-ellipsis whitespace-nowrap mt-0.5">
                                 {c.name !== displayTitle ? `${c.name} • ` : ''}
                                 {c.countryCode.toUpperCase()}
                               </span>
                             </div>
 
                             {isSelected && (
-                              <Check className="w-4 h-4 text-[#006948] shrink-0" />
+                              <Check className="w-4 h-4 text-[#006948] flex-shrink-0 ml-2" />
                             )}
                           </button>
                         );
