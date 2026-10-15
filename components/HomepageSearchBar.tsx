@@ -3,8 +3,24 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, MapPin, ArrowRight, ChevronDown, X, Check, Globe } from 'lucide-react';
-import { COUNTRIES, CITIES, Country, City, getLocalizedCountryName, getLocalizedCityName } from '@/lib/db';
+import { Search, MapPin, ArrowRight, ChevronDown, X, Check, Globe, Sparkles } from 'lucide-react';
+import {
+  COUNTRIES,
+  CITIES,
+  CATEGORIES,
+  Country,
+  City,
+  CategoryDef,
+  getLocalizedCountryName,
+  getLocalizedCityName,
+  getCategoryName,
+} from '@/lib/db';
+import {
+  filterLocationsSmart,
+  searchCategoriesSmart,
+  findBestCategoryMatch,
+} from '@/lib/smart-search';
+import CategoryIcon from '@/components/CategoryIcon';
 
 interface Props {
   lang: string;
@@ -91,6 +107,31 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
   const [citySearch, setCitySearch] = useState('');
   const [countryFilter, setCountryFilter] = useState<'all' | string>('all');
   const [isMounted, setIsMounted] = useState(false);
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  // Compute live smart category suggestions as user types
+  const suggestedCategories = useMemo(() => {
+    const trimmed = query.trim();
+    if (!trimmed) return [];
+    return searchCategoriesSmart(trimmed, CATEGORIES, lang, 5);
+  }, [query, lang]);
+
+  // Click outside to close category suggestions
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(e.target as Node) &&
+        searchInputRef.current &&
+        !searchInputRef.current.contains(e.target as Node)
+      ) {
+        setIsSuggestionsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const isRTL = lang === 'ur' || lang === 'ar';
 
@@ -205,33 +246,33 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
     return getLocalizedCityName(city.slug, lang);
   };
 
-  // Filtered and grouped cities for selection modal
+  // Filtered and grouped cities for selection modal using Smart Multi-field & Typo Search
   const groupedCities = useMemo(() => {
-    const q = citySearch.toLowerCase().trim();
-    const activeCountries = countryFilter === 'all'
-      ? COUNTRIES
-      : COUNTRIES.filter((c) => c.code.toLowerCase() === countryFilter.toLowerCase());
+    const activeCountries =
+      countryFilter === 'all'
+        ? COUNTRIES
+        : COUNTRIES.filter((c) => c.code.toLowerCase() === countryFilter.toLowerCase());
 
-    return activeCountries
-      .map((country) => {
-        const locCountry = getLocalizedCountryName(country.code, lang).toLowerCase();
-        const countryCities = CITIES.filter((city) => {
-          if (city.countryCode.toLowerCase() !== country.code.toLowerCase()) return false;
-          if (!q) return true;
-          const locCity = getLocalizedCityName(city.slug, lang).toLowerCase();
-          const matchesName = city.name.toLowerCase().includes(q);
-          const matchesSlug = city.slug.toLowerCase().includes(q);
-          const matchesCountry = country.name.toLowerCase().includes(q) || locCountry.includes(q);
-          const matchesLoc = locCity.includes(q);
-          return matchesName || matchesSlug || matchesCountry || matchesLoc;
-        });
+    const formatted = activeCountries.map((c) => ({
+      code: c.code,
+      name: c.name,
+      flag: c.flag,
+      region: c.region,
+      country: c,
+      cities: CITIES.filter((city) => city.countryCode.toLowerCase() === c.code.toLowerCase()),
+    }));
 
-        return {
-          country,
-          cities: countryCities,
-        };
-      })
-      .filter((group) => group.cities.length > 0);
+    const filtered = filterLocationsSmart(
+      formatted,
+      citySearch,
+      (code) => getLocalizedCountryName(code, lang),
+      (slug) => getLocalizedCityName(slug, lang)
+    );
+
+    return filtered.map((f) => ({
+      country: f.country,
+      cities: f.cities,
+    }));
   }, [citySearch, countryFilter, lang]);
 
   // Handle City Selection
@@ -252,23 +293,32 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
     }
   };
 
-  // Perform search directed to the selected city route
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  // Select category directly from live smart suggestions
+  const handleSelectCategory = (categorySlug: string) => {
+    setIsSuggestionsOpen(false);
+    const countryCode = selectedCity.countryCode.toLowerCase();
+    const citySlug = selectedCity.slug.toLowerCase();
+    router.push(`/${lang}/${countryCode}/${citySlug}/${categorySlug}`);
+  };
 
-    const clean = query.trim().toLowerCase();
-    const matchedCategory = t.popularSearches.find(
-      (item) => item.category.includes(clean) || item.title.toLowerCase().includes(clean)
-    );
+  // Perform search directed to the selected city route with smart category detection
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const trimmed = query.trim();
+    if (!trimmed) return;
+
+    setIsSuggestionsOpen(false);
+
+    // 1. Try finding best category match using alias mapping + fuzzy match
+    const matchedCategory = findBestCategoryMatch(trimmed, CATEGORIES, lang);
 
     const countryCode = selectedCity.countryCode.toLowerCase();
     const citySlug = selectedCity.slug.toLowerCase();
 
     if (matchedCategory) {
-      router.push(`/${lang}/${countryCode}/${citySlug}/${matchedCategory.category}`);
+      router.push(`/${lang}/${countryCode}/${citySlug}/${matchedCategory.slug}`);
     } else {
-      router.push(`/${lang}/${countryCode}/${citySlug}/search?q=${encodeURIComponent(query.trim())}`);
+      router.push(`/${lang}/${countryCode}/${citySlug}/search?q=${encodeURIComponent(trimmed)}`);
     }
   };
 
@@ -281,67 +331,161 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
 
   return (
     <div className="w-full max-w-3xl mx-auto">
-      {/* Main Search Bar Form */}
-      <form
-        onSubmit={handleSearch}
-        className="bg-white border border-gray-200 rounded-2xl p-2 sm:p-2.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shadow-2xs hover:border-gray-300 transition-colors"
-      >
-        {/* 1. INTERACTIVE LOCATION CHIP BUTTON */}
-        <button
-          type="button"
-          onClick={() => setIsCityModalOpen(true)}
-          className="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 min-h-[44px] bg-gray-50 hover:bg-gray-100 active:bg-gray-200/80 border border-gray-200 hover:border-emerald-600/70 rounded-xl text-xs sm:text-sm font-semibold text-gray-800 transition-all shrink-0 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#006948]/20 overflow-visible"
-          title={t.changeCityTooltip}
-          aria-haspopup="dialog"
-          aria-expanded={isCityModalOpen}
+      {/* Main Search Bar Form with Floating Category Suggestions */}
+      <div className="relative">
+        <form
+          onSubmit={handleSearch}
+          className="bg-white border border-gray-200 rounded-2xl p-2 sm:p-2.5 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shadow-2xs hover:border-gray-300 transition-colors"
         >
-          <div className="flex items-center gap-1.5 min-w-0 overflow-visible">
-            <MapPin className="w-4 h-4 text-[#059669] shrink-0 group-hover:scale-110 transition-transform" />
-            <span className={`font-semibold text-neutral-900 text-xs sm:text-sm overflow-visible whitespace-nowrap ${
-              lang === 'ur' ? 'font-urdu leading-[2.2] pt-1 pb-0.5' : 'truncate'
-            }`}>
-              {isMounted ? getCityDisplayName(selectedCity) : defaultLocation}
-            </span>
-          </div>
-          <ChevronDown className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-700 transition-colors shrink-0" />
-        </button>
+          {/* 1. INTERACTIVE LOCATION CHIP BUTTON */}
+          <button
+            type="button"
+            onClick={() => setIsCityModalOpen(true)}
+            className="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 min-h-[44px] bg-gray-50 hover:bg-gray-100 active:bg-gray-200/80 border border-gray-200 hover:border-emerald-600/70 rounded-xl text-xs sm:text-sm font-semibold text-gray-800 transition-all shrink-0 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#006948]/20 overflow-visible"
+            title={t.changeCityTooltip}
+            aria-haspopup="dialog"
+            aria-expanded={isCityModalOpen}
+          >
+            <div className="flex items-center gap-1.5 min-w-0 overflow-visible">
+              <MapPin className="w-4 h-4 text-[#059669] shrink-0 group-hover:scale-110 transition-transform" />
+              <span className={`font-semibold text-neutral-900 text-xs sm:text-sm overflow-visible whitespace-nowrap ${
+                lang === 'ur' ? 'font-urdu leading-[2.2] pt-1 pb-0.5' : 'truncate'
+              }`}>
+                {isMounted ? getCityDisplayName(selectedCity) : defaultLocation}
+              </span>
+            </div>
+            <ChevronDown className="w-3.5 h-3.5 text-gray-400 group-hover:text-gray-700 transition-colors shrink-0" />
+          </button>
 
-        {/* Search Input */}
-        <div className="relative flex-1 flex items-center min-w-0 bg-gray-50/50 sm:bg-transparent rounded-xl sm:rounded-none border sm:border-0 border-gray-100 overflow-visible">
-          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 absolute start-3 pointer-events-none" />
-          <input
-            ref={searchInputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t.placeholder}
-            className={`w-full ps-9 sm:ps-10 pe-4 py-2.5 sm:py-3 bg-transparent text-xs sm:text-sm text-neutral-900 placeholder:text-gray-400 focus:outline-none min-h-[44px] ${
+          {/* Search Input */}
+          <div className="relative flex-1 flex items-center min-w-0 bg-gray-50/50 sm:bg-transparent rounded-xl sm:rounded-none border sm:border-0 border-gray-100 overflow-visible">
+            <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 absolute start-3 pointer-events-none" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={query}
+              onFocus={() => {
+                if (query.trim()) setIsSuggestionsOpen(true);
+              }}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setIsSuggestionsOpen(true);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setIsSuggestionsOpen(false);
+                }
+              }}
+              placeholder={t.placeholder}
+              className={`w-full ps-9 sm:ps-10 pe-4 py-2.5 sm:py-3 bg-transparent text-xs sm:text-sm text-neutral-900 placeholder:text-gray-400 focus:outline-none min-h-[44px] ${
+                lang === 'ur' ? 'font-urdu leading-[2.2]' : ''
+              }`}
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQuery('');
+                  setIsSuggestionsOpen(false);
+                }}
+                className="absolute end-2 p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 cursor-pointer"
+                title="Clear"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Search Submit Action Button */}
+          <button
+            type="submit"
+            className={`bg-[#059669] hover:bg-[#047857] text-white text-xs sm:text-sm font-semibold px-5 sm:px-6 py-2.5 sm:py-3 min-h-[44px] rounded-xl transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-2xs active:scale-98 overflow-visible ${
               lang === 'ur' ? 'font-urdu leading-[2.2]' : ''
             }`}
-          />
-          {query && (
+          >
+            <span className={lang === 'ur' ? 'font-urdu leading-[2.2] pt-0.5' : ''}>{t.btnText}</span>
+            <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+          </button>
+        </form>
+
+        {/* Smart Category Suggestions Floating Dropdown */}
+        {isSuggestionsOpen && query.trim() && suggestedCategories.length > 0 && (
+          <div
+            ref={suggestionsRef}
+            className="absolute top-full start-0 end-0 mt-2 bg-white rounded-2xl border border-gray-200 shadow-xl z-30 overflow-hidden text-start animate-in fade-in zoom-in-95 duration-150 divide-y divide-gray-100"
+          >
+            <div className="px-4 py-2 bg-gray-50/70 flex items-center justify-between text-[11px] text-gray-500 font-semibold">
+              <span className="flex items-center gap-1.5 text-emerald-800">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                {lang === 'ur' ? 'تجویز کردہ سروسز' : lang === 'ar' ? 'الخدمات المقترحة' : 'Suggested Services'}
+              </span>
+              <span className="text-[10px] text-gray-400">
+                {lang === 'ur' ? 'فوری انتخاب' : lang === 'ar' ? 'تطابق فوري' : 'Direct Match'}
+              </span>
+            </div>
+
+            <div className="max-h-72 overflow-y-auto divide-y divide-gray-50">
+              {suggestedCategories.map((cat) => (
+                <button
+                  key={cat.slug}
+                  type="button"
+                  onClick={() => handleSelectCategory(cat.slug)}
+                  className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-emerald-50/60 transition-colors cursor-pointer group text-start"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 text-[#006948] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <CategoryIcon slug={cat.slug} icon={cat.icon} className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`font-bold text-gray-900 text-xs sm:text-sm group-hover:text-[#006948] transition-colors truncate ${
+                          lang === 'ur' ? 'font-urdu text-sm' : ''
+                        }`}>
+                          {getCategoryName(cat, lang)}
+                        </span>
+                        <span className="text-[9px] uppercase font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded-sm shrink-0">
+                          {cat.slug}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-gray-400 block truncate">
+                        {cat.group} • {getCityNameOnly(selectedCity)}
+                      </span>
+                    </div>
+                  </div>
+                  <ArrowRight className={`w-4 h-4 text-gray-300 group-hover:text-[#006948] group-hover:translate-x-0.5 transition-all shrink-0 ${
+                    isRTL ? 'rotate-180 group-hover:-translate-x-0.5' : ''
+                  }`} />
+                </button>
+              ))}
+            </div>
+
+            {/* Direct Query Search Link */}
             <button
               type="button"
-              onClick={() => setQuery('')}
-              className="absolute end-2 p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 cursor-pointer"
-              title="Clear"
+              onClick={() => handleSearch()}
+              className="w-full px-4 py-2.5 bg-gray-50/80 hover:bg-gray-100 flex items-center justify-between text-xs text-gray-600 transition-colors cursor-pointer"
             >
-              <X className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-2 truncate">
+                <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                <span className="truncate">
+                  {lang === 'ur' ? (
+                    <>تمام ماہرین برائے &quot;<strong className="text-gray-900">{query.trim()}</strong>&quot; ({getCityNameOnly(selectedCity)})</>
+                  ) : lang === 'ar' ? (
+                    <>بحث شامل عن &quot;<strong className="text-gray-900">{query.trim()}</strong>&quot; في {getCityNameOnly(selectedCity)}</>
+                  ) : (
+                    <>Search all providers for &quot;<strong className="text-gray-900">{query.trim()}</strong>&quot; in <strong className="text-gray-900">{getCityNameOnly(selectedCity)}</strong></>
+                  )}
+                </span>
+              </div>
+              <span className={`text-[11px] font-semibold text-[#006948] shrink-0 ms-2 ${
+                lang === 'ur' ? 'font-urdu' : ''
+              }`}>
+                {lang === 'ur' ? 'تلاش کے نتائج ←' : lang === 'ar' ? 'نتائج البحث ←' : 'Search Results →'}
+              </span>
             </button>
-          )}
-        </div>
-
-        {/* Search Submit Action Button */}
-        <button
-          type="submit"
-          className={`bg-[#059669] hover:bg-[#047857] text-white text-xs sm:text-sm font-semibold px-5 sm:px-6 py-2.5 sm:py-3 min-h-[44px] rounded-xl transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-2xs active:scale-98 overflow-visible ${
-            lang === 'ur' ? 'font-urdu leading-[2.2]' : ''
-          }`}
-        >
-          <span className={lang === 'ur' ? 'font-urdu leading-[2.2] pt-0.5' : ''}>{t.btnText}</span>
-          <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
-        </button>
-      </form>
+          </div>
+        )}
+      </div>
 
       {/* Quick Category Search Chips (Auto-directed to the selected city) */}
       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3.5 justify-center text-xs text-gray-500 overflow-visible">

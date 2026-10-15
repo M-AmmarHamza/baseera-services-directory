@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, Check, Globe, Search, X, MapPin } from 'lucide-react';
 import { COUNTRIES, CITIES, Country, City, getLocalizedCountryName, getLocalizedCityName } from '@/lib/db';
+import { filterLocationsSmart } from '@/lib/smart-search';
 
 export interface LocationCity {
   id?: string | number;
@@ -139,47 +140,14 @@ export default function CitySelector({ lang }: CitySelectorProps) {
     activeLabel = getLocalizedCountryName(currentCountry.code, lang);
   }
 
-  // Filter countries and cities based on search across the ENTIRE dataset (No arbitrary limits)
+  // Multi-field, alias-expanded, and typo-tolerant smart location search
   const filteredData = useMemo(() => {
-    const q = search.toLowerCase().trim();
-    if (!q) {
-      // 100% Unlimited: Render all countries and all cities sorted alphabetically
-      return locations;
-    }
-
-    return locations
-      .map((country) => {
-        const locCountry = getLocalizedCountryName(country.code, lang).toLowerCase();
-        const countryMatches =
-          country.name.toLowerCase().includes(q) ||
-          country.code.toLowerCase().includes(q) ||
-          locCountry.includes(q);
-
-        const matchingCities = country.cities.filter((city) => {
-          const locCity = getLocalizedCityName(city.slug, lang).toLowerCase();
-          return (
-            city.name.toLowerCase().includes(q) ||
-            city.slug.toLowerCase().includes(q) ||
-            locCity.includes(q)
-          );
-        });
-
-        // If the country itself matches, show all its cities unless specific cities match
-        const citiesToDisplay =
-          matchingCities.length > 0
-            ? matchingCities
-            : countryMatches
-            ? country.cities
-            : [];
-
-        if (citiesToDisplay.length === 0) return null;
-
-        return {
-          ...country,
-          cities: citiesToDisplay,
-        };
-      })
-      .filter((country): country is LocationCountry => country !== null && country.cities.length > 0);
+    return filterLocationsSmart(
+      locations,
+      search,
+      (code) => getLocalizedCountryName(code, lang),
+      (slug) => getLocalizedCityName(slug, lang)
+    );
   }, [locations, search, lang]);
 
   const totalFilteredCities = useMemo(() => {

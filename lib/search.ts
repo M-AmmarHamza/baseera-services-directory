@@ -1,4 +1,5 @@
 import { Provider, getProviders, CATEGORIES, getCategoryBySlug } from './db';
+import { findBestCategoryMatch } from './smart-search';
 
 export interface SearchAnalysis {
   originalQuery: string;
@@ -137,12 +138,17 @@ export function parseSearchQuery(query: string) {
   let detectedCategoryId: string | null = null;
   let detectedArea: string | null = null;
 
-  // 1. Detect Category Keyword
-  for (const [kw, catId] of Object.entries(CATEGORY_KEYWORDS)) {
-    const regex = new RegExp(`\\b${kw}\\b`, 'i');
-    if (regex.test(normalized)) {
-      detectedCategoryId = catId;
-      break;
+  // 1. Detect Category Keyword (Smart Search engine with alias mapping & fuzzy matching)
+  const smartCat = findBestCategoryMatch(clean, CATEGORIES);
+  if (smartCat) {
+    detectedCategoryId = smartCat.slug;
+  } else {
+    for (const [kw, catId] of Object.entries(CATEGORY_KEYWORDS)) {
+      const regex = new RegExp(`\\b${kw}\\b`, 'i');
+      if (regex.test(normalized)) {
+        detectedCategoryId = catId;
+        break;
+      }
     }
   }
 
