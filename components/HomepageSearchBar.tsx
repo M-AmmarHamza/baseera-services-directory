@@ -270,14 +270,16 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
         <button
           type="button"
           onClick={() => setIsCityModalOpen(true)}
-          className="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 active:bg-gray-200/80 border border-gray-200 hover:border-emerald-600/70 rounded-xl text-xs font-semibold text-gray-800 transition-all shrink-0 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#006948]/20"
+          className="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 min-h-[44px] bg-gray-50 hover:bg-gray-100 active:bg-gray-200/80 border border-gray-200 hover:border-emerald-600/70 rounded-xl text-xs sm:text-sm font-semibold text-gray-800 transition-all shrink-0 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[#006948]/20 overflow-visible"
           title={t.changeCityTooltip}
           aria-haspopup="dialog"
           aria-expanded={isCityModalOpen}
         >
-          <div className="flex items-center gap-1.5 min-w-0">
+          <div className="flex items-center gap-1.5 min-w-0 overflow-visible">
             <MapPin className="w-4 h-4 text-[#059669] shrink-0 group-hover:scale-110 transition-transform" />
-            <span className="truncate font-semibold text-neutral-900 text-xs sm:text-sm">
+            <span className={`font-semibold text-neutral-900 text-xs sm:text-sm overflow-visible whitespace-nowrap ${
+              lang === 'ur' ? 'font-urdu leading-[2.2] pt-1 pb-0.5' : 'truncate'
+            }`}>
               {isMounted ? getCityDisplayName(selectedCity) : defaultLocation}
             </span>
           </div>
@@ -285,7 +287,7 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
         </button>
 
         {/* Search Input */}
-        <div className="relative flex-1 flex items-center min-w-0 bg-gray-50/50 sm:bg-transparent rounded-xl sm:rounded-none border sm:border-0 border-gray-100">
+        <div className="relative flex-1 flex items-center min-w-0 bg-gray-50/50 sm:bg-transparent rounded-xl sm:rounded-none border sm:border-0 border-gray-100 overflow-visible">
           <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 absolute start-3 pointer-events-none" />
           <input
             ref={searchInputRef}
@@ -293,7 +295,9 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t.placeholder}
-            className="w-full ps-9 sm:ps-10 pe-4 py-2.5 bg-transparent text-xs sm:text-sm text-neutral-900 placeholder:text-gray-400 focus:outline-none"
+            className={`w-full ps-9 sm:ps-10 pe-4 py-2.5 sm:py-3 bg-transparent text-xs sm:text-sm text-neutral-900 placeholder:text-gray-400 focus:outline-none min-h-[44px] ${
+              lang === 'ur' ? 'font-urdu leading-[2.2]' : ''
+            }`}
           />
           {query && (
             <button
@@ -310,24 +314,32 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
         {/* Search Submit Action Button */}
         <button
           type="submit"
-          className="bg-[#059669] hover:bg-[#047857] text-white text-xs sm:text-sm font-semibold px-5 sm:px-6 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-2xs active:scale-98"
+          className={`bg-[#059669] hover:bg-[#047857] text-white text-xs sm:text-sm font-semibold px-5 sm:px-6 py-2.5 sm:py-3 min-h-[44px] rounded-xl transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-2xs active:scale-98 overflow-visible ${
+            lang === 'ur' ? 'font-urdu leading-[2.2]' : ''
+          }`}
         >
-          <span>{t.btnText}</span>
+          <span className={lang === 'ur' ? 'font-urdu leading-[2.2] pt-0.5' : ''}>{t.btnText}</span>
           <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
         </button>
       </form>
 
       {/* Quick Category Search Chips (Auto-directed to the selected city) */}
-      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3 justify-center text-xs text-gray-500">
-        <span className="font-medium text-gray-400">{t.popular}</span>
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-3.5 justify-center text-xs text-gray-500 overflow-visible">
+        <span className={`font-medium text-gray-400 ${lang === 'ur' ? 'font-urdu text-sm' : ''}`}>{t.popular}</span>
         {t.popularSearches.map((item) => (
           <button
             key={item.category}
             type="button"
             onClick={() => handleChipClick(item.category)}
-            className="px-2.5 py-1 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs transition-colors cursor-pointer"
+            className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center overflow-visible ${
+              lang === 'ur'
+                ? 'font-urdu leading-[2.3] min-h-[40px] pt-1.5 pb-1'
+                : 'min-h-[32px]'
+            }`}
           >
-            {item.title}
+            <span className={lang === 'ur' ? 'font-urdu leading-[2.3] overflow-visible inline-block' : ''}>
+              {item.title}
+            </span>
           </button>
         ))}
       </div>
@@ -352,10 +364,14 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 id="city-modal-title" className="text-base sm:text-lg font-bold text-gray-900 leading-tight">
+                  <h3 id="city-modal-title" className={`text-base sm:text-lg font-bold text-gray-900 ${
+                    lang === 'ur' ? 'font-urdu leading-[2.2] pt-0.5' : 'leading-tight'
+                  }`}>
                     {t.modalTitle}
                   </h3>
-                  <p className="text-xs text-gray-500 mt-0.5 hidden xs:block">
+                  <p className={`text-xs text-gray-500 mt-0.5 hidden xs:block ${
+                    lang === 'ur' ? 'font-urdu leading-[2.2]' : ''
+                  }`}>
                     {t.modalSubtitle}
                   </p>
                 </div>
@@ -381,7 +397,9 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                   value={citySearch}
                   onChange={(e) => setCitySearch(e.target.value)}
                   placeholder={t.searchCityPlaceholder}
-                  className="w-full ps-9 pe-8 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 focus:border-[#006948] rounded-xl text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none transition-all"
+                  className={`w-full ps-9 pe-8 py-2.5 bg-gray-50 focus:bg-white border border-gray-200 focus:border-[#006948] rounded-xl text-xs sm:text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none transition-all ${
+                    lang === 'ur' ? 'font-urdu leading-[2.2]' : ''
+                  }`}
                 />
                 {citySearch && (
                   <button
@@ -396,15 +414,15 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
             </div>
 
             {/* Quick Country Filter Tabs */}
-            <div className="px-5 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-gray-100">
+            <div className="px-5 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-gray-100 overflow-visible">
               <button
                 type="button"
                 onClick={() => setCountryFilter('all')}
-                className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer overflow-visible ${
                   countryFilter === 'all'
                     ? 'bg-[#006948] text-white shadow-2xs'
                     : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                }`}
+                } ${lang === 'ur' ? 'font-urdu leading-[2.2] min-h-[36px]' : ''}`}
               >
                 {t.allCountries}
               </button>
@@ -413,11 +431,11 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                   key={c.code}
                   type="button"
                   onClick={() => setCountryFilter(c.code)}
-                  className={`px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-2.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 overflow-visible ${
                     countryFilter === c.code
                       ? 'bg-[#006948] text-white shadow-2xs'
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                  }`}
+                  } ${lang === 'ur' ? 'font-urdu leading-[2.2] min-h-[36px]' : ''}`}
                 >
                   <span>{c.flag}</span>
                   <span>{c.name}</span>
@@ -464,14 +482,16 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
                             key={`${c.countryCode}-${c.slug}`}
                             type="button"
                             onClick={() => handleSelectCity(c)}
-                            className={`p-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition-all flex items-center justify-between text-start cursor-pointer group ${
+                            className={`p-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition-all flex items-center justify-between text-start cursor-pointer group overflow-visible ${
                               isSelected
                                 ? 'border-[#006948] bg-emerald-50/60 text-[#006948] ring-1 ring-[#006948]'
                                 : 'border-gray-200 bg-white hover:border-[#006948]/60 hover:bg-gray-50 text-gray-800'
-                            }`}
+                            } ${lang === 'ur' ? 'min-h-[52px]' : ''}`}
                           >
-                            <div className="min-w-0 pr-1">
-                              <span className="block truncate font-bold text-gray-900 group-hover:text-[#006948] transition-colors">
+                            <div className="min-w-0 pr-1 overflow-visible">
+                              <span className={`block font-bold text-gray-900 group-hover:text-[#006948] transition-colors overflow-visible ${
+                                lang === 'ur' ? 'font-urdu leading-[2.2] text-sm pt-0.5' : 'truncate'
+                              }`}>
                                 {displayTitle}
                               </span>
                               <span className="block text-[11px] text-gray-400 font-normal truncate mt-0.5">
@@ -493,14 +513,18 @@ export default function HomepageSearchBar({ lang, defaultLocation = 'Karachi, PK
             </div>
 
             {/* Modal Footer with Direct Link Option */}
-            <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/70 flex items-center justify-between text-xs">
-              <span className="text-gray-500 truncate">
+            <div className={`px-5 py-3 border-t border-gray-100 bg-gray-50/70 flex items-center justify-between text-xs overflow-visible ${
+              lang === 'ur' ? 'font-urdu leading-[2.2]' : ''
+            }`}>
+              <span className={`text-gray-500 overflow-visible ${lang === 'ur' ? '' : 'truncate'}`}>
                 {t.browseCityDirectly} <strong className="text-gray-900">{getCityNameOnly(selectedCity)}</strong>:
               </span>
               <Link
                 href={`/${lang}/${selectedCity.countryCode.toLowerCase()}/${selectedCity.slug.toLowerCase()}`}
                 onClick={() => setIsCityModalOpen(false)}
-                className="font-bold text-[#006948] hover:underline flex items-center gap-1 shrink-0"
+                className={`font-bold text-[#006948] hover:underline flex items-center gap-1 shrink-0 ${
+                  lang === 'ur' ? 'font-urdu pt-0.5' : ''
+                }`}
               >
                 <span>{getCityNameOnly(selectedCity)} Hub</span>
                 <ArrowRight className={`w-3.5 h-3.5 ${isRTL ? 'rotate-180' : ''}`} />

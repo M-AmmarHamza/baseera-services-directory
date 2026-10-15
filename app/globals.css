@@ -80,6 +80,26 @@ html[lang="ur"] section {
   overflow: visible !important;
 }
 
+/* 4. Nastaliq Buttons, Chips, Badges and Input Fields Vertical Breathing Room */
+html[lang="ur"] button,
+.font-urdu button {
+  line-height: 2.2;
+  overflow: visible !important;
+}
+
+html[lang="ur"] input,
+html[lang="ur"] textarea,
+.font-urdu input {
+  line-height: 2.2 !important;
+}
+
+/* Prevent clipping on pill badges, tags, and chips in Nastaliq */
+html[lang="ur"] span[class*="rounded-"],
+html[lang="ur"] button[class*="rounded-"],
+html[lang="ur"] a[class*="rounded-"] {
+  overflow: visible !important;
+}
+
 /* ==========================================================================
    ARABIC TYPOGRAPHY: Tajawal (Self-hosted via next/font/google)
    ========================================================================== */
