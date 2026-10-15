@@ -14,6 +14,11 @@ import {
 } from '@/lib/db';
 import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
 import {
+  providerRegistrationSchema,
+  MAX_SERVICE_AREAS,
+  MAX_BIO_LENGTH,
+} from '@/lib/validations/provider';
+import {
   ShieldCheck,
   ArrowRight,
   CheckCircle2,
@@ -103,10 +108,39 @@ function ListServiceContent({ lang }: { lang: string }) {
   const [tradeTitle, setTradeTitle] = useState('');
   const [shortBio, setShortBio] = useState('');
   const [serviceArea, setServiceArea] = useState('');
+  const [serviceAreaError, setServiceAreaError] = useState('');
   const [startingPrice, setStartingPrice] = useState(() => String(getCountryCurrency(defaultCountry).defaultFee));
   const [profileType, setProfileType] = useState<'individual' | 'shop'>('individual');
 
   const selectedCurrency = getCountryCurrency(countryCode);
+
+  // Parse entered service areas (comma separated, max 3)
+  const parsedAreas = serviceArea
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const handleServiceAreaChange = (val: string) => {
+    const parts = val.split(',').map((s) => s.trim()).filter(Boolean);
+    if (parts.length > MAX_SERVICE_AREAS) {
+      setServiceAreaError(
+        lang === 'ur'
+          ? `زیادہ سے زیادہ ${MAX_SERVICE_AREAS} علاقوں کی اجازت ہے۔`
+          : lang === 'ar'
+          ? `الحد الأقصى ${MAX_SERVICE_AREAS} مناطق مسموح بها فقط.`
+          : `Maximum ${MAX_SERVICE_AREAS} areas allowed (comma separated).`
+      );
+    } else {
+      setServiceAreaError('');
+    }
+    setServiceArea(val);
+  };
+
+  const removeAreaByIndex = (indexToRemove: number) => {
+    const updated = parsedAreas.filter((_, idx) => idx !== indexToRemove);
+    setServiceArea(updated.join(', '));
+    setServiceAreaError('');
+  };
 
   // 2. CASCADING LOGIC: Filter cities immediately and reset city selection on country change
   const handleCountryChange = (newCountryCode: string) => {
@@ -245,6 +279,57 @@ function ListServiceContent({ lang }: { lang: string }) {
       return;
     }
 
+    const areasArray = serviceArea
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    if (areasArray.length > MAX_SERVICE_AREAS) {
+      setErrorMsg(
+        lang === 'ur'
+          ? `سروس کوریج کے زیادہ سے زیادہ ${MAX_SERVICE_AREAS} علاقوں کی اجازت ہے۔ براہِ کرم اضافی علاقے ہٹا دیں۔`
+          : lang === 'ar'
+          ? `الحد الأقصى ${MAX_SERVICE_AREAS} مناطق مسموح بها فقط. يرجى إزالة المناطق الزائدة.`
+          : `Maximum ${MAX_SERVICE_AREAS} service areas allowed. Please remove extra areas.`
+      );
+      return;
+    }
+
+    if (shortBio.trim().length > MAX_BIO_LENGTH) {
+      setErrorMsg(
+        lang === 'ur'
+          ? `مختصر تعارف ${MAX_BIO_LENGTH} حروف سے زیادہ نہیں ہو سکتا۔`
+          : lang === 'ar'
+          ? `الحد الأقصى للنبذة هو ${MAX_BIO_LENGTH} حرفاً.`
+          : `Short bio must not exceed ${MAX_BIO_LENGTH} characters.`
+      );
+      return;
+    }
+
+    const payload = {
+      name: name.trim(),
+      whatsapp_number: contactNumber.trim(),
+      phone_number: secondaryPhone.trim() || contactNumber.trim(),
+      preferred_contact: contactChannel,
+      country_code: countryCode.toLowerCase(),
+      city_name: cityName.trim(),
+      category_id: categoryId,
+      trade_title: tradeTitle.trim(),
+      short_bio: shortBio.trim(),
+      service_area: areasArray,
+      starting_price: cleanNumericPrice(startingPrice, getCountryCurrency(countryCode).defaultFee),
+      profile_type: profileType,
+      avatar_url: avatarBase64,
+      cover_url: coverBase64,
+      lang,
+    };
+
+    const clientValidation = providerRegistrationSchema.safeParse(payload);
+    if (!clientValidation.success) {
+      setErrorMsg(clientValidation.error.issues[0]?.message || 'Please check form inputs.');
+      return;
+    }
+
     setIsSubmitting(true);
     setErrorMsg('');
 
@@ -252,23 +337,7 @@ function ListServiceContent({ lang }: { lang: string }) {
       const res = await fetch('/api/providers/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(),
-          whatsapp_number: contactNumber.trim(),
-          phone_number: secondaryPhone.trim() || contactNumber.trim(),
-          preferred_contact: contactChannel,
-          country_code: countryCode.toLowerCase(),
-          city_name: cityName.trim(),
-          category_id: categoryId,
-          trade_title: tradeTitle.trim(),
-          short_bio: shortBio.trim(),
-          service_area: serviceArea.split(',').map((s) => s.trim()).filter(Boolean),
-          starting_price: cleanNumericPrice(startingPrice, getCountryCurrency(countryCode).defaultFee),
-          profile_type: profileType,
-          avatar_url: avatarBase64,
-          cover_url: coverBase64,
-          lang,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -856,22 +925,88 @@ function ListServiceContent({ lang }: { lang: string }) {
                 </div>
               </div>
 
-              {/* Service Areas */}
+              {/* Service Areas (Strict limit: Max 3 areas) */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-900">
-                  {lang === 'ur' ? 'سروس کوریج کے علاقے / محلے' : 'Service Coverage Areas / Neighborhoods'}
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-gray-900">
+                    {lang === 'ur'
+                      ? 'سروس کوریج کے علاقے / محلے'
+                      : lang === 'ar'
+                      ? 'مناطق تغطية الخدمة / الأحياء'
+                      : 'Service Coverage Areas / Neighborhoods'}
+                  </label>
+                  <span
+                    className={`text-xs font-semibold tabular-nums ${
+                      parsedAreas.length > MAX_SERVICE_AREAS
+                        ? 'text-red-600 font-bold'
+                        : parsedAreas.length === MAX_SERVICE_AREAS
+                        ? 'text-emerald-700'
+                        : 'text-gray-400'
+                    }`}
+                  >
+                    {parsedAreas.length}/{MAX_SERVICE_AREAS} {lang === 'ur' ? 'علاقے' : lang === 'ar' ? 'مناطق' : 'areas'}
+                  </span>
+                </div>
                 <input
                   type="text"
                   value={serviceArea}
-                  onChange={(e) => setServiceArea(e.target.value)}
+                  onChange={(e) => handleServiceAreaChange(e.target.value)}
                   placeholder={
                     lang === 'ur'
-                      ? 'مثلاً: کلفٹن، ڈی ایچ اے، پی ای سی ایچ ایس، گلشن (کوما سے الگ کریں)'
-                      : 'e.g. Clifton, DHA Phases 1-8, PECHS, Gulshan (comma separated)'
+                      ? 'مثلاً: کلفٹن، ڈی ایچ اے، پی ای سی ایچ ایس'
+                      : 'e.g. Clifton, DHA, PECHS'
                   }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all"
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-sm transition-all ${
+                    parsedAreas.length > MAX_SERVICE_AREAS || serviceAreaError
+                      ? 'bg-red-50/50 border border-red-400 text-gray-900 focus:outline-none focus:border-red-500'
+                      : 'bg-gray-50 border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white'
+                  }`}
                 />
+
+                {/* Helper text: "Maximum 3 areas allowed (comma separated)." */}
+                <div className="flex items-center justify-between flex-wrap gap-1">
+                  <span className="text-xs text-gray-500">
+                    {lang === 'ur'
+                      ? 'زیادہ سے زیادہ 3 علاقوں کی اجازت ہے (کوما سے الگ کریں)۔'
+                      : lang === 'ar'
+                      ? 'الحد الأقصى 3 مناطق مسموح بها (مفصولة بفواصل).'
+                      : 'Maximum 3 areas allowed (comma separated).'}
+                  </span>
+                  {(serviceAreaError || parsedAreas.length > MAX_SERVICE_AREAS) && (
+                    <span className="text-xs font-semibold text-red-600">
+                      {serviceAreaError ||
+                        (lang === 'ur'
+                          ? 'براہِ کرم اضافی علاقے ہٹا دیں۔'
+                          : 'Please remove extra areas.')}
+                    </span>
+                  )}
+                </div>
+
+                {/* Interactive Area Tag Chips */}
+                {parsedAreas.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {parsedAreas.map((area, idx) => (
+                      <span
+                        key={idx}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+                          idx < MAX_SERVICE_AREAS
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                            : 'bg-red-50 text-red-700 border border-red-300'
+                        }`}
+                      >
+                        <span>{area}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeAreaByIndex(idx)}
+                          className="hover:text-red-600 text-gray-400 hover:bg-white rounded-full p-0.5 transition-colors cursor-pointer"
+                          title="Remove area"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Visiting Charges (Country-localized input with dynamic currency badge) */}
@@ -905,22 +1040,56 @@ function ListServiceContent({ lang }: { lang: string }) {
                 </span>
               </div>
 
-              {/* Short Bio */}
+              {/* Short Bio (Strict limit: Max 150 characters) */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-900">
-                  {lang === 'ur' ? 'مختصر تعارف / خصوصیات' : 'Short Bio / Specializations'}
-                </label>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-gray-900">
+                    {lang === 'ur'
+                      ? 'مختصر تعارف / خصوصیات'
+                      : lang === 'ar'
+                      ? 'نبذة موجزة / التخصصات'
+                      : 'Short Bio / Specializations'}
+                  </label>
+                  <span
+                    className={`text-xs font-semibold tabular-nums ${
+                      shortBio.length >= MAX_BIO_LENGTH
+                        ? 'text-amber-600 font-bold'
+                        : shortBio.length >= 130
+                        ? 'text-gray-700'
+                        : 'text-gray-400'
+                    }`}
+                  >
+                    {shortBio.length}/{MAX_BIO_LENGTH} {lang === 'ur' ? 'حروف' : lang === 'ar' ? 'حرف' : 'characters'}
+                  </span>
+                </div>
                 <textarea
                   rows={3}
+                  maxLength={MAX_BIO_LENGTH}
                   value={shortBio}
-                  onChange={(e) => setShortBio(e.target.value)}
+                  onChange={(e) => setShortBio(e.target.value.slice(0, MAX_BIO_LENGTH))}
                   placeholder={
                     lang === 'ur'
-                      ? 'اپنے تجربے، مہارت، اوزار اور سروس کی وارنٹی کے بارے میں بتائیں...'
+                      ? 'اپنے تجربے، مہارت، اوزار اور سروس کی وارنٹی کے بارے میں مختصر بتائیں...'
                       : 'Describe your years of experience, tools, guarantees, and key specialties...'
                   }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all resize-none"
+                  className={`w-full px-3.5 py-2.5 rounded-xl border text-sm placeholder:text-gray-400 focus:outline-none transition-all resize-none ${
+                    shortBio.length >= MAX_BIO_LENGTH
+                      ? 'bg-white border-amber-400 focus:border-amber-500 text-gray-900'
+                      : 'bg-gray-50 border-gray-200 text-gray-900 focus:border-[#006948] focus:bg-white'
+                  }`}
                 />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">
+                    {lang === 'ur'
+                      ? 'پروفائل پر دکھانے کے لیے مختصر اور جامع رکھیں'
+                      : lang === 'ar'
+                      ? 'حافظ على نبذة موجزة وواضحة للملف الشخصي'
+                      : 'Keep it clean and concise for profile visitors'}
+                  </span>
+                  <span className="text-[11px] text-gray-400">
+                    {MAX_BIO_LENGTH - shortBio.length} {lang === 'ur' ? 'باقی' : lang === 'ar' ? 'متبقي' : 'remaining'}
+                  </span>
+                </div>
               </div>
 
               {/* Submit Button */}

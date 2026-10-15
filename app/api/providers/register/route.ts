@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateEnglishSlug } from '@/lib/transliterate';
 import { getCategoryBySlug, getCountryByCode, getCategoryName, SEED_PROVIDERS } from '@/lib/db';
 import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
+import { providerRegistrationSchema } from '@/lib/validations/provider';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -45,7 +46,17 @@ function phonesMatch(p1: string, p2: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const rawBody = await request.json();
+    const parseResult = providerRegistrationSchema.safeParse(rawBody);
+
+    if (!parseResult.success) {
+      const firstError = parseResult.error.issues[0]?.message || 'Invalid input data.';
+      return NextResponse.json(
+        { error: firstError, details: parseResult.error.issues },
+        { status: 400 }
+      );
+    }
+
     const {
       name,
       whatsapp_number,
@@ -63,7 +74,7 @@ export async function POST(request: NextRequest) {
       avatar_url,
       cover_url,
       lang = 'en',
-    } = body;
+    } = parseResult.data;
 
     const contactMethod = (whatsapp_number || phone_number || telegram_handle || '').trim();
 
