@@ -212,7 +212,7 @@ export default function FeaturedProvidersSlider({ providers, lang, title, badge,
                     <div className="flex items-center gap-1.5 overflow-visible">
                       <h3
                         dir="auto"
-                        className={`text-base sm:text-lg font-semibold text-neutral-900 group-hover:text-[#006948] transition-colors truncate mb-0 ${lang === 'ur' ? 'font-urdu leading-[2.0]' : 'leading-snug'}`}
+                        className={`text-base sm:text-lg font-semibold text-neutral-900 group-hover:text-[#006948] transition-colors mb-0 ${lang === 'ur' ? 'font-urdu leading-[2.0] overflow-visible' : 'truncate leading-snug'}`}
                       >
                         {provider.name}
                       </h3>
@@ -223,7 +223,7 @@ export default function FeaturedProvidersSlider({ providers, lang, title, badge,
                       )}
                     </div>
                     {/* Primary Category (Full, clearly visible, never truncated description) */}
-                    <p className={`text-xs sm:text-sm font-bold text-[#006948] truncate mt-0.5 mb-0 ${lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}`}>
+                    <p className={`text-xs sm:text-sm font-bold text-[#006948] mt-0.5 mb-0 ${lang === 'ur' ? 'font-urdu leading-[2.0] overflow-visible' : 'truncate'}`}>
                       {categoryName}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1 text-sm text-amber-600 font-semibold" dir="ltr">
@@ -237,7 +237,7 @@ export default function FeaturedProvidersSlider({ providers, lang, title, badge,
                 {/* Location */}
                 <div className="flex items-center gap-1.5 text-sm text-gray-500 mb-3 overflow-visible">
                   <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                  <span className="truncate">
+                  <span className={lang === 'ur' ? 'font-urdu leading-[1.8] overflow-visible' : 'truncate'}>
                     {provider.district}, {cityDisplay}
                   </span>
                 </div>

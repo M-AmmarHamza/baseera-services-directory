@@ -199,42 +199,57 @@ export default async function HomePage({ params }: PageProps) {
       {/* 2. BROWSE BY SPECIALTY (PREMIUM HORIZONTAL SCROLLABLE SECTION) */}
       <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 overflow-visible scroll-mt-20">
         {/* Section Header */}
-        <div className="flex items-end justify-between gap-4 mb-5 sm:mb-6">
+        <div className="flex items-end justify-between gap-4 mb-5 sm:mb-6 overflow-visible">
           <div className="overflow-visible">
-            <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-3 pt-1.5' : 'leading-snug'}`}>
+            <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-2 pt-2' : 'leading-snug'}`}>
               {h2Text}
             </h2>
             <p className={`text-sm text-gray-500 mt-1 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
               {dict.home?.specialtySubtitle || 'Verified community technicians & specialists worldwide'}
             </p>
           </div>
-          <div className="text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0">
+          <div className={`text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}`}>
             {CATEGORIES.length} {dict.home?.categoriesCount || 'Categories'}
           </div>
         </div>
 
         {/* Full Specialty Categories Grid (All 24 Categories in 3 Rows on Desktop) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-3.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-3.5 overflow-visible">
           {CATEGORIES.map((cat) => {
             const IconComponent = CATEGORY_ICON_MAP[cat.icon] || Wrench;
             return (
               <Link
                 key={cat.id}
                 href={`/${lang}/pk/karachi/${cat.slug}`}
-                className="flex flex-col items-center justify-center p-3 sm:p-3.5 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group cursor-pointer overflow-visible"
+                className={`flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group cursor-pointer overflow-visible ${
+                  lang === 'ur' ? 'min-h-[165px] sm:min-h-[175px]' : 'min-h-[135px] sm:min-h-[145px]'
+                }`}
               >
                 {/* Soft circular background behind icon */}
-                <div className="w-12 h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-2 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
+                <div className="w-12 h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-1 shrink-0 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
                   <IconComponent className="w-5 h-5" />
                 </div>
 
-                {/* Two-line clamped Title */}
-                <span className={`font-bold text-xs text-gray-900 group-hover:text-[#006948] transition-colors leading-tight line-clamp-2 ${lang === 'ur' ? 'font-urdu leading-[2.2] min-h-[3rem] py-1' : 'h-8 sm:h-9'} flex items-center justify-center`}>
-                  {getCategoryName(cat, lang)}
-                </span>
+                {/* Title Container - Zero clipping, natural Nastaliq line height & full overflow visibility */}
+                <div className="flex-1 flex items-center justify-center w-full my-auto py-1 overflow-visible">
+                  <span
+                    className={`font-bold text-gray-900 group-hover:text-[#006948] transition-colors text-center overflow-visible ${
+                      lang === 'ur'
+                        ? 'font-urdu text-[13px] sm:text-sm leading-[2.4] py-0.5 tracking-normal'
+                        : 'text-xs line-clamp-2 leading-tight h-8 sm:h-9 flex items-center justify-center'
+                    }`}
+                  >
+                    {getCategoryName(cat, lang)}
+                  </span>
+                </div>
 
                 {/* Active provider count Subtext */}
-                <span className="text-xs text-gray-500 font-medium mt-0.5">
+                <span
+                  dir="auto"
+                  className={`text-[11px] sm:text-xs text-gray-500 font-medium shrink-0 mt-1.5 overflow-visible ${
+                    lang === 'ur' ? 'font-urdu leading-[1.8] pt-0.5' : ''
+                  }`}
+                >
                   {cat.count}+ {dict.home?.activeCount || 'Active'}
                 </span>
               </Link>

@@ -116,6 +116,19 @@ html[lang="ur"] a[class*="rounded-"] {
   overflow: visible !important;
 }
 
+/* Category grid cards in Urdu: Guarantee zero clipping for Noto Nastaliq Urdu letters, dots and descenders */
+html[lang="ur"] #categories a,
+html[lang="ur"] #categories span,
+html[lang="ur"] #categories div,
+html[lang="ur"] #categories h2,
+html[lang="ur"] #categories p {
+  overflow: visible !important;
+}
+
+html[lang="ur"] #categories a {
+  min-height: 165px;
+}
+
 /* ==========================================================================
    ARABIC TYPOGRAPHY: Tajawal (Self-hosted via next/font/google)
    ========================================================================== */
