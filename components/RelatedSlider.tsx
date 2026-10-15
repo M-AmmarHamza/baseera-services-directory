@@ -211,7 +211,7 @@ export default function RelatedSlider({
               >
                 <div className="flex flex-col items-center w-full">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-[#006948] flex items-center justify-center mb-3 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
-                    <CategoryIcon id={catItem.id || catSlug} className="w-6 h-6" />
+                    <CategoryIcon slug={catItem.slug || catSlug} id={catItem.id} name={catItem.name} icon={catItem.icon} className="w-6 h-6" />
                   </div>
                   <h3
                     className={`font-bold text-sm text-gray-900 group-hover:text-[#006948] transition-colors text-center line-clamp-2 ${

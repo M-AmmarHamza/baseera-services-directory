@@ -1738,7 +1738,7 @@ export const CATEGORIES: CategoryDef[] = [
     nameUr: 'واٹر بورنگ اسپیشلسٹ',
     nameAr: 'حفر وتمديد الآبار',
     group: 'Water & Plumbing',
-    icon: 'Layers',
+    icon: 'ArrowDownToLine',
     count: 18,
   },
   {
@@ -1749,7 +1749,7 @@ export const CATEGORIES: CategoryDef[] = [
     nameUr: 'پانی کی ٹینکی کی صفائی',
     nameAr: 'تنظيف خزانات المياه',
     group: 'Water & Plumbing',
-    icon: 'Waves',
+    icon: 'Droplets',
     count: 31,
   },
 
@@ -1830,7 +1830,7 @@ export const CATEGORIES: CategoryDef[] = [
     nameUr: 'ایلومینیم اور گلاس ورکر',
     nameAr: 'فني ألمنيوم وزجاج',
     group: 'Maintenance & Construction',
-    icon: 'Frame',
+    icon: 'PanelRight',
     count: 20,
   },
   {
@@ -1841,7 +1841,7 @@ export const CATEGORIES: CategoryDef[] = [
     nameUr: 'ویلڈر اور گرل ورکر',
     nameAr: 'حداد ولحام',
     group: 'Maintenance & Construction',
-    icon: 'Zap',
+    icon: 'Sparkles',
     count: 17,
   },
   {
@@ -1852,7 +1852,7 @@ export const CATEGORIES: CategoryDef[] = [
     nameUr: 'مستری اور ٹائل فکسر',
     nameAr: 'بناء وسيراميك',
     group: 'Maintenance & Construction',
-    icon: 'Boxes',
+    icon: 'BrickWall',
     count: 23,
   },
 
@@ -1876,7 +1876,7 @@ export const CATEGORIES: CategoryDef[] = [
     nameUr: 'صوفہ اور قالین کی صفائی',
     nameAr: 'غسيل كنب وسجاد',
     group: 'Cleaning & Security',
-    icon: 'Armchair',
+    icon: 'Brush',
     count: 29,
   },
   {
@@ -1887,7 +1887,7 @@ export const CATEGORIES: CategoryDef[] = [
     nameUr: 'سی سی ٹی وی کیمرہ انسٹالر',
     nameAr: 'تركيب كاميرات مراقبة',
     group: 'Cleaning & Security',
-    icon: 'Camera',
+    icon: 'Cctv',
     count: 31,
   },
   {
@@ -1911,7 +1911,7 @@ export const CATEGORIES: CategoryDef[] = [
     nameUr: 'ہوم شیف اور کچن',
     nameAr: 'طاهي منزلي',
     group: 'Lifestyle & Miscellaneous',
-    icon: 'Utensils',
+    icon: 'ChefHat',
     count: 45,
   },
   {
@@ -1922,7 +1922,7 @@ export const CATEGORIES: CategoryDef[] = [
     nameUr: 'انٹیریئر ڈیزائنر',
     nameAr: 'مصمم ديكور داخلي',
     group: 'Home & Construction',
-    icon: 'PaintRoller',
+    icon: 'PenTool',
     count: 24,
   },
   {

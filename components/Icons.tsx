@@ -76,35 +76,7 @@ export function WhatsAppIcon({ className = 'w-5 h-5' }: { className?: string }) 
   );
 }
 
-// Maps category id or icon name to clean native SVG icon
-export function CategoryIcon({ id, className = 'w-6 h-6' }: { id: string; className?: string }) {
-  const norm = id.toLowerCase();
-  if (norm.includes('electric') || norm === 'bolt') {
-    return <Zap className={className} />;
-  }
-  if (norm.includes('ac') || norm.includes('cool') || norm === 'mode_fan') {
-    return <Fan className={className} />;
-  }
-  if (norm.includes('plumb') || norm.includes('pipe') || norm === 'plumbing') {
-    return <Wrench className={className} />;
-  }
-  if (norm.includes('gen') || norm === 'power') {
-    return <Flame className={className} />;
-  }
-  if (norm.includes('solar') || norm === 'solar_power') {
-    return <Sun className={className} />;
-  }
-  if (norm.includes('cctv') || norm.includes('camera') || norm === 'videocam') {
-    return <Camera className={className} />;
-  }
-  if (norm.includes('water') || norm.includes('ro') || norm === 'water_drop') {
-    return <Droplets className={className} />;
-  }
-  if (norm.includes('food') || norm.includes('chef') || norm === 'restaurant') {
-    return <UtensilsCrossed className={className} />;
-  }
-  if (norm.includes('interior') || norm.includes('design') || norm.includes('decor')) {
-    return <PaintRoller className={className} />;
-  }
-  return <Briefcase className={className} />;
-}
+import CategoryIconComponent, { getCategoryIcon } from './CategoryIcon';
+
+export { getCategoryIcon };
+export const CategoryIcon = CategoryIconComponent;

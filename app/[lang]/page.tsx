@@ -2,39 +2,11 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import {
-  Zap,
-  BatteryCharging,
-  Sun,
-  Power,
-  Wrench,
-  Gauge,
-  Layers,
-  Waves,
-  Wind,
-  Snowflake,
-  RotateCw,
-  Flame,
-  Hammer,
-  Paintbrush,
-  Frame,
-  Boxes,
-  Bug,
-  Armchair,
-  Camera,
-  Key,
-  Utensils,
-  PaintRoller,
-  Sofa,
-  Truck,
-  Star,
-  BadgeCheck,
-  MapPin,
-  ChevronRight,
-  MessageCircle,
   ShieldCheck,
   CheckCircle2,
   Clock,
 } from 'lucide-react';
+import CategoryIcon from '@/components/CategoryIcon';
 import HomepageSearchBar from '@/components/HomepageSearchBar';
 import FeaturedProvidersSlider from '@/components/FeaturedProvidersSlider';
 import { getAllProviders, CATEGORIES, getCategoryName } from '@/lib/db';
@@ -47,34 +19,6 @@ interface PageProps {
 }
 
 const DOMAIN = 'https://baseera-services-directory.vercel.app';
-
-// Dynamic Icon Mapping for Lucide Icons
-const CATEGORY_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  Zap,
-  BatteryCharging,
-  Sun,
-  Power,
-  Wrench,
-  Gauge,
-  Layers,
-  Waves,
-  Wind,
-  Snowflake,
-  RotateCw,
-  Flame,
-  Hammer,
-  Paintbrush,
-  Frame,
-  Boxes,
-  Bug,
-  Armchair,
-  Camera,
-  Key,
-  Utensils,
-  PaintRoller,
-  Sofa,
-  Truck,
-};
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
@@ -215,20 +159,18 @@ export default async function HomePage({ params }: PageProps) {
 
         {/* Full Specialty Categories Grid (All 24 Categories in 3 Rows on Desktop) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-3.5 overflow-visible">
-          {CATEGORIES.map((cat) => {
-            const IconComponent = CATEGORY_ICON_MAP[cat.icon] || Wrench;
-            return (
-              <Link
-                key={cat.id}
-                href={`/${lang}/pk/karachi/${cat.slug}`}
-                className={`flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group cursor-pointer overflow-visible ${
-                  lang === 'ur' ? 'min-h-[165px] sm:min-h-[175px]' : 'min-h-[135px] sm:min-h-[145px]'
-                }`}
-              >
-                {/* Soft circular background behind icon */}
-                <div className="w-12 h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-1 shrink-0 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
-                  <IconComponent className="w-5 h-5" />
-                </div>
+          {CATEGORIES.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/${lang}/pk/karachi/${cat.slug}`}
+              className={`flex flex-col items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group cursor-pointer overflow-visible ${
+                lang === 'ur' ? 'min-h-[165px] sm:min-h-[175px]' : 'min-h-[135px] sm:min-h-[145px]'
+              }`}
+            >
+              {/* Soft circular background behind icon */}
+              <div className="w-12 h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-1 shrink-0 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
+                <CategoryIcon slug={cat.slug} id={cat.id} name={cat.name} icon={cat.icon} className="w-5 h-5" />
+              </div>
 
                 {/* Title Container - Zero clipping, natural Nastaliq line height & full overflow visibility */}
                 <div className="flex-1 flex items-center justify-center w-full my-auto py-1 overflow-visible">
@@ -253,8 +195,7 @@ export default async function HomePage({ params }: PageProps) {
                   {cat.count}+ {dict.home?.activeCount || 'Active'}
                 </span>
               </Link>
-            );
-          })}
+          ))}
         </div>
       </section>
 

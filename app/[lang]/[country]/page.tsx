@@ -7,31 +7,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   ArrowRight,
-  Wrench,
-  Zap,
-  BatteryCharging,
-  Sun,
-  Power,
-  Gauge,
-  Layers,
-  Waves,
-  Wind,
-  Snowflake,
-  RotateCw,
-  Flame,
-  Hammer,
-  Paintbrush,
-  Frame,
-  Boxes,
-  Bug,
-  Armchair,
-  Camera,
-  Key,
-  Utensils,
-  PaintRoller,
-  Sofa,
-  Truck,
 } from 'lucide-react';
+import CategoryIcon from '@/components/CategoryIcon';
 import {
   getCountryByCode,
   getCitiesByCountry,
@@ -51,33 +28,6 @@ interface CountryPageProps {
 }
 
 const DOMAIN = 'https://baseera-services-directory.vercel.app';
-
-const CATEGORY_ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  Zap,
-  BatteryCharging,
-  Sun,
-  Power,
-  Wrench,
-  Gauge,
-  Layers,
-  Waves,
-  Wind,
-  Snowflake,
-  RotateCw,
-  Flame,
-  Hammer,
-  Paintbrush,
-  Frame,
-  Boxes,
-  Bug,
-  Armchair,
-  Camera,
-  Key,
-  Utensils,
-  PaintRoller,
-  Sofa,
-  Truck,
-};
 
 export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
   const { lang, country } = await params;
@@ -243,23 +193,20 @@ export default async function CountryPage({ params }: CountryPageProps) {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-            {CATEGORIES.map((cat) => {
-              const IconComp = CATEGORY_ICON_MAP[cat.icon] || Wrench;
-              return (
-                <Link
-                  key={cat.id}
-                  href={`/${lang}/${country.toLowerCase()}/${defaultCitySlug}/${cat.slug}`}
-                  className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-gray-200 hover:border-[#006948] hover:shadow-xs transition-all text-center group"
-                >
-                  <div className="w-11 h-11 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-2 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
-                    <IconComp className="w-5 h-5" />
-                  </div>
-                  <span className={`text-xs font-bold text-gray-900 group-hover:text-[#006948] line-clamp-2 leading-tight ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-                    {getCategoryName(cat, lang)}
-                  </span>
-                </Link>
-              );
-            })}
+            {CATEGORIES.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/${lang}/${country.toLowerCase()}/${defaultCitySlug}/${cat.slug}`}
+                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-gray-200 hover:border-[#006948] hover:shadow-xs transition-all text-center group"
+              >
+                <div className="w-11 h-11 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-2 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
+                  <CategoryIcon slug={cat.slug} id={cat.id} name={cat.name} icon={cat.icon} className="w-5 h-5" />
+                </div>
+                <span className={`text-xs font-bold text-gray-900 group-hover:text-[#006948] line-clamp-2 leading-tight ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
+                  {getCategoryName(cat, lang)}
+                </span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
