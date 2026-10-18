@@ -5,8 +5,12 @@
 
 -- 1. Add status and is_featured to providers table
 alter table if exists public.providers 
-  add column if not exists status text default 'approved' 
+  add column if not exists status text default 'pending' 
   check (status in ('pending', 'approved', 'rejected', 'suspended'));
+
+-- Ensure default for all future registrations is strictly 'pending'
+alter table if exists public.providers 
+  alter column status set default 'pending';
 
 alter table if exists public.providers 
   add column if not exists is_featured boolean default false;

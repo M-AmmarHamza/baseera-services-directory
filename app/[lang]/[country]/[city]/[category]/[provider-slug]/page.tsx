@@ -35,6 +35,7 @@ import FeaturedProfilesSlider from '@/components/FeaturedProfilesSlider';
 import LeadTrackButton from '@/components/LeadTrackButton';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
+import ProfileUnderReview from '@/components/ProfileUnderReview';
 
 interface ProviderPageProps {
   params: Promise<{
@@ -222,6 +223,34 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     };
   }
 
+  // CRITICAL SEO GUARD: If profile status is NOT 'approved', forcefully inject noindex, nofollow
+  if (provider.status !== 'approved') {
+    const isUrdu = lang === 'ur';
+    const isArabic = lang === 'ar';
+    return {
+      title: isUrdu
+        ? 'پروفائل زیرِ جائزہ ہے | بصیرہ'
+        : isArabic
+        ? 'الملف قيد المراجعة والتدقيق | بصيرة'
+        : 'Profile Under Review | Baseera',
+      description:
+        'This specialist profile is currently undergoing verification by Baseera moderators and is not publicly listed.',
+      robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'none',
+          'max-snippet': -1,
+        },
+      },
+    };
+  }
+
   const cityName = getLocalizedCityName(city, lang);
   const categoryName = getCategoryName(categoryInfo, lang);
   const providerName = provider.name;
@@ -288,6 +317,19 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
   if (!provider) {
     notFound();
+  }
+
+  // MODERATION WORKFLOW GUARD: If status is not approved, render customized "Profile Under Review" UI
+  if (provider.status !== 'approved') {
+    return (
+      <ProfileUnderReview
+        provider={provider}
+        lang={lang}
+        country={country}
+        city={city}
+        category={category}
+      />
+    );
   }
 
   const similarProviders = await getProviders(city, category);

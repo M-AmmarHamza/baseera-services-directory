@@ -2146,8 +2146,8 @@ export async function getProviders(citySlug: string, categorySlug?: string): Pro
 
   let dbProviders: Provider[] = [];
   try {
-    // Only approved/verified providers are visible on the public frontend
-    let queryPath = `providers?select=*,cities!inner(slug),countries!inner(code)&cities.slug=eq.${encodeURIComponent(normCity)}&is_verified=eq.true`;
+    // Only approved providers are visible on the public frontend
+    let queryPath = `providers?select=*,cities!inner(slug),countries!inner(code)&cities.slug=eq.${encodeURIComponent(normCity)}&status=eq.approved`;
     if (category) {
       queryPath += `&category_id=in.(${targetCategoryIds.map(encodeURIComponent).join(',')})`;
     }
@@ -2162,8 +2162,9 @@ export async function getProviders(citySlug: string, categorySlug?: string): Pro
   // Matching approved seed providers for this city and category
   const matchingSeeds = SEED_PROVIDERS.filter((p) => {
     // Only approved providers should be visible on public frontend
-    const isApproved = p.is_verified && (p.status || 'approved') === 'approved';
-    if (!isApproved) return false;
+    const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug);
+    const status = override?.status !== undefined ? override.status : p.status || (p.is_verified ? 'approved' : 'pending');
+    if (status !== 'approved') return false;
 
     const cityMatch = p.city_slug.toLowerCase() === normCity;
     if (!categorySlug) return cityMatch;
@@ -2209,7 +2210,7 @@ export async function getFeaturedProviders(
   let dbProviders: Provider[] = [];
   try {
     const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(normCity);
-    let queryPath = `providers?select=*,cities!inner(slug,name),countries!inner(code,name)&is_featured=eq.true&is_verified=eq.true`;
+    let queryPath = `providers?select=*,cities!inner(slug,name),countries!inner(code,name)&is_featured=eq.true&status=eq.approved`;
 
     if (isUuid) {
       queryPath += `&city_id=eq.${encodeURIComponent(normCity)}`;
@@ -2238,13 +2239,12 @@ export async function getFeaturedProviders(
   // Matching approved and featured seed providers
   const matchingSeeds = SEED_PROVIDERS.filter((p) => {
     // Check local in-memory override or static seed flag
-    const override = localProvidersOverrides.get(p.id);
+    const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug);
     const isFeatured = override?.is_featured !== undefined ? override.is_featured : p.is_featured;
     if (!isFeatured) return false;
 
-    const status = override?.status || p.status || (p.is_verified ? 'approved' : 'pending');
-    const isVerified = override?.is_verified !== undefined ? override.is_verified : p.is_verified;
-    if (!isVerified || status !== 'approved') return false;
+    const status = override?.status !== undefined ? override.status : p.status || (p.is_verified ? 'approved' : 'pending');
+    if (status !== 'approved') return false;
 
     // Filter by city
     const cityMatch =
@@ -2295,7 +2295,12 @@ export async function getProviderBySlug(citySlug: string, categorySlug: string, 
       `providers?select=*,cities!inner(slug),countries!inner(code)&slug=eq.${encodeURIComponent(normSlug)}`
     );
     if (dbRows && dbRows.length > 0) {
-      return mapDbProvider(dbRows[0], normCity);
+      const p = mapDbProvider(dbRows[0], normCity);
+      const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug);
+      if (override) {
+        Object.assign(p, override);
+      }
+      return p;
     }
   } catch (err) {
     console.warn('getProviderBySlug direct fetch note:', err);
@@ -2306,18 +2311,51 @@ export async function getProviderBySlug(citySlug: string, categorySlug: string, 
     (p) => p.slug.toLowerCase() === normSlug || p.slug.toLowerCase().replace(/-/g, '') === normSlug.replace(/-/g, '')
   );
   if (seed) {
-    return seed;
+    const pro = { ...seed };
+    const override = localProvidersOverrides.get(pro.id) || localProvidersOverrides.get(pro.slug);
+    if (override) {
+      Object.assign(pro, override);
+    } else if (!pro.status) {
+      pro.status = pro.is_verified ? 'approved' : 'pending';
+    }
+    return pro;
   }
 
-  // 3. Fallback: search across all providers in this city & category
-  const providers = await getProviders(citySlug, categorySlug);
-  return providers.find((p) => p.slug.toLowerCase() === normSlug) || null;
+  // 3. Fallback: check local memory overrides directly by slug
+  const directOverride = localProvidersOverrides.get(normSlug);
+  if (directOverride) {
+    return {
+      id: directOverride.id || normSlug,
+      name: directOverride.name || normSlug,
+      slug: directOverride.slug || normSlug,
+      profile_type: directOverride.profile_type || 'individual',
+      category_id: directOverride.category_id || categorySlug,
+      trade_title: directOverride.trade_title || directOverride.name || 'Specialist',
+      city_slug: directOverride.city_slug || normCity,
+      country_code: directOverride.country_code || 'pk',
+      district: directOverride.district || normCity,
+      service_area: directOverride.service_area || [],
+      whatsapp_number: directOverride.whatsapp_number || '',
+      avatar_url: directOverride.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(normSlug)}`,
+      short_bio: directOverride.short_bio || '',
+      starting_price: directOverride.starting_price || 500,
+      rating: directOverride.rating || 5.0,
+      review_count: directOverride.review_count || 1,
+      total_leads: directOverride.total_leads || 0,
+      is_verified: Boolean(directOverride.is_verified),
+      is_available: Boolean(directOverride.is_available),
+      status: directOverride.status || 'pending',
+      is_featured: Boolean(directOverride.is_featured),
+    };
+  }
+
+  return null;
 }
 
 export async function getAllProviders(): Promise<Provider[]> {
   let dbProviders: Provider[] = [];
   try {
-    const dbRows = await fetchSupabase<any[]>('providers?select=*,cities!inner(slug),countries!inner(code)');
+    const dbRows = await fetchSupabase<any[]>('providers?select=*,cities!inner(slug),countries!inner(code)&status=eq.approved');
     if (dbRows && dbRows.length > 0) {
       dbProviders = dbRows.map((r) => mapDbProvider(r, 'karachi'));
     }
@@ -2325,11 +2363,17 @@ export async function getAllProviders(): Promise<Provider[]> {
     console.warn('getAllProviders fetch note:', err);
   }
 
-  // Combine DB providers + Seed providers so all featured profiles remain accessible
+  // Combine DB providers + Seed providers strictly filtering for status === 'approved'
   const seenSlugs = new Set<string>();
   const combined: Provider[] = [];
 
-  for (const pro of [...dbProviders, ...SEED_PROVIDERS]) {
+  const approvedSeeds = SEED_PROVIDERS.filter((p) => {
+    const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug);
+    const status = override?.status !== undefined ? override.status : p.status || (p.is_verified ? 'approved' : 'pending');
+    return status === 'approved';
+  });
+
+  for (const pro of [...dbProviders, ...approvedSeeds]) {
     const s = pro.slug.toLowerCase();
     if (!seenSlugs.has(s)) {
       seenSlugs.add(s);

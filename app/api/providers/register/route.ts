@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateEnglishSlug } from '@/lib/transliterate';
-import { getCategoryBySlug, getCountryByCode, getCategoryName, SEED_PROVIDERS } from '@/lib/db';
+import { getCategoryBySlug, getCountryByCode, getCategoryName, SEED_PROVIDERS, localProvidersOverrides } from '@/lib/db';
 import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
 import { providerRegistrationSchema } from '@/lib/validations/provider';
 import { validateAndFormatE164 } from '@/lib/phone';
@@ -284,8 +284,10 @@ export async function POST(request: NextRequest) {
         avatar_url: avatar_url?.trim() || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,
         service_area: serviceAreaArray,
         short_bio: short_bio?.trim() || `${resolvedTradeTitle} serving ${cleanCityName}. Direct communication with zero commission.`,
-        is_verified: true, // auto-verified for seamless dynamic creation
-        is_available: true,
+        status: 'pending', // Strictly defaults to pending for admin moderation
+        is_verified: false,
+        is_available: false,
+        is_featured: false,
         starting_price: cleanNumericPrice(starting_price, getCountryCurrency(country_code).defaultFee),
         rating: 5.0,
         review_count: 1,
@@ -301,12 +303,26 @@ export async function POST(request: NextRequest) {
       const insertResult = await insertRes.json();
       console.log('Provider registration Supabase response:', insertResult);
 
+      localProvidersOverrides.set(uniqueSlug, {
+        name: name.trim(),
+        slug: uniqueSlug,
+        status: 'pending',
+        is_verified: false,
+        is_available: false,
+        is_featured: false,
+        category_id: resolvedCatId,
+        city_slug: citySlug,
+        country_code: cleanCountryCode,
+        whatsapp_number: resolvedWhatsApp,
+      });
+
       if (insertRes.ok || (Array.isArray(insertResult) && insertResult.length > 0)) {
         return NextResponse.json({
           success: true,
           slug: uniqueSlug,
           publicUrl,
-          message: 'Provider registered successfully in database',
+          status: 'pending',
+          message: 'Provider registered successfully and submitted for moderation review',
         });
       }
 
@@ -314,11 +330,25 @@ export async function POST(request: NextRequest) {
       console.warn('Supabase RLS note:', insertResult);
     }
 
+    localProvidersOverrides.set(uniqueSlug, {
+      name: name.trim(),
+      slug: uniqueSlug,
+      status: 'pending',
+      is_verified: false,
+      is_available: false,
+      is_featured: false,
+      category_id: resolvedCatId,
+      city_slug: citySlug,
+      country_code: cleanCountryCode,
+      whatsapp_number: resolvedWhatsApp,
+    });
+
     return NextResponse.json({
       success: true,
       slug: uniqueSlug,
       publicUrl,
-      message: 'Provider profile registered and ready',
+      status: 'pending',
+      message: 'Provider profile registered and submitted for moderation review',
     });
   } catch (error: any) {
     console.error('Registration error:', error);
