@@ -190,6 +190,11 @@ export default async function RootLayout({
                     </Link>
                   </li>
                   <li>
+                    <Link href={`/${lang}/faq`} className="hover:text-emerald-700 transition-colors">
+                      {dict.footer?.faq || 'Frequently Asked Questions'}
+                    </Link>
+                  </li>
+                  <li>
                     <Link href={`/${lang}/privacy`} className="hover:text-emerald-700 transition-colors">
                       {dict.footer?.privacyPolicy || 'Privacy Policy'}
                     </Link>

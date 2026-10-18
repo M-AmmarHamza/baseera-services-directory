@@ -77,7 +77,7 @@ export default async function sitemap(props: SitemapProps): Promise<MetadataRout
   // CHUNK 0: Core Platform Silos (Home, Static Pages, Countries, Cities, Category Silos)
   if (numericId === 0) {
     // 1. Root and Core Static Landing Pages
-    const staticPaths = ['', '/about', '/list-service', '/blog', '/privacy', '/terms'];
+    const staticPaths = ['', '/about', '/list-service', '/faq', '/blog', '/privacy', '/terms'];
 
     for (const path of staticPaths) {
       for (const lang of SUPPORTED_LOCALES) {
