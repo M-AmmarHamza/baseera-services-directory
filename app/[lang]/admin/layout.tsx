@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Globe,
   Sparkles,
+  UploadCloud,
 } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -45,6 +46,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: 'Providers',
       href: `/${lang}/admin/providers`,
       icon: Users,
+      exact: false,
+    },
+    {
+      title: 'Import CSV',
+      href: `/${lang}/admin/import`,
+      icon: UploadCloud,
       exact: false,
     },
     {

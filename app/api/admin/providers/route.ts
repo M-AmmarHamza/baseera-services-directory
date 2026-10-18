@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { verifyAdminToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth';
-import { SEED_PROVIDERS, Provider, localProvidersOverrides } from '@/lib/db';
+import { SEED_PROVIDERS, Provider, localProvidersOverrides, localImportedProviders } from '@/lib/db';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -63,28 +63,40 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // If Supabase has no providers or is offline, use SEED_PROVIDERS
+  // If Supabase has no providers or is offline, use SEED_PROVIDERS + localImportedProviders
   if (allProviders.length === 0) {
-    allProviders = SEED_PROVIDERS.map((p, idx) => {
-      const override = localProvidersOverrides.get(p.id) || {};
-      // Distribute a few mock statuses for demonstration
-      const defaultStatus = idx === 1 ? 'pending' : idx === 3 ? 'suspended' : 'approved';
+    allProviders = [...SEED_PROVIDERS, ...localImportedProviders].map((p, idx) => {
+      const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug) || {};
+      const defaultStatus = (p as any).status || (idx === 1 ? 'pending' : idx === 3 ? 'suspended' : 'approved');
       return {
         ...p,
-        cityName: p.city_slug.charAt(0).toUpperCase() + p.city_slug.slice(1),
+        cityName: p.city_slug ? p.city_slug.charAt(0).toUpperCase() + p.city_slug.slice(1) : 'Karachi',
         status: (override as any).status || defaultStatus,
         is_featured: (override as any).is_featured ?? (idx === 0 || idx === 2),
         is_verified: (override as any).is_verified ?? p.is_verified,
-        created_at: new Date(Date.now() - idx * 3600 * 24 * 1000).toISOString(),
+        created_at: (p as any).created_at || new Date(Date.now() - idx * 3600 * 24 * 1000).toISOString(),
         ...override,
       };
     });
   } else {
     // Apply any in-memory local overrides
     allProviders = allProviders.map((p) => {
-      const override = localProvidersOverrides.get(p.id);
+      const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug);
       return override ? { ...p, ...override } : p;
     });
+
+    // Also prepend local imported providers if not already present in Supabase
+    const existingIds = new Set(allProviders.map((p) => p.id || p.slug));
+    for (const imp of localImportedProviders) {
+      if (!existingIds.has(imp.id) && !existingIds.has(imp.slug)) {
+        allProviders.unshift({
+          ...imp,
+          cityName: imp.city_slug ? imp.city_slug.charAt(0).toUpperCase() + imp.city_slug.slice(1) : 'Karachi',
+          created_at: (imp as any).created_at || new Date().toISOString(),
+        });
+        existingIds.add(imp.id);
+      }
+    }
   }
 
   // Filter by status

@@ -22,6 +22,7 @@ import {
   ChevronRight,
   ShieldCheck,
   BadgeCheck,
+  UploadCloud,
 } from 'lucide-react';
 import { WhatsAppIcon, CategoryIcon } from '@/components/Icons';
 import { CATEGORIES, CITIES } from '@/lib/db';
@@ -270,14 +271,23 @@ function AdminProvidersContent() {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#006948] hover:bg-[#00855d] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add Provider</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <Link
+            href={`/${lang}/admin/import`}
+            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white border border-gray-200/90 hover:border-gray-300 text-gray-700 hover:text-gray-900 font-semibold text-xs transition-all shadow-2xs cursor-pointer"
+          >
+            <UploadCloud className="w-4 h-4 text-[#006948]" />
+            <span>Import CSV</span>
+          </Link>
+          <button
+            type="button"
+            onClick={() => setShowAddModal(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#006948] hover:bg-[#00855d] text-white font-semibold text-xs transition-all shadow-xs cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Provider</span>
+          </button>
+        </div>
       </div>
 
       {/* Search & Filter Toolbar */}

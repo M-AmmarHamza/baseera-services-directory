@@ -35,6 +35,7 @@ export interface Provider {
 
 // In-memory runtime override store shared across admin and frontend
 export const localProvidersOverrides: Map<string, Partial<Provider>> = new Map();
+export const localImportedProviders: Provider[] = [];
 
 export const SEED_PROVIDERS: Provider[] = [
   {
@@ -2373,7 +2374,13 @@ export async function getAllProviders(): Promise<Provider[]> {
     return status === 'approved';
   });
 
-  for (const pro of [...dbProviders, ...approvedSeeds]) {
+  const approvedImported = localImportedProviders.filter((p) => {
+    const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug);
+    const status = override?.status !== undefined ? override.status : p.status || (p.is_verified ? 'approved' : 'pending');
+    return status === 'approved';
+  });
+
+  for (const pro of [...dbProviders, ...approvedSeeds, ...approvedImported]) {
     const s = pro.slug.toLowerCase();
     if (!seenSlugs.has(s)) {
       seenSlugs.add(s);
