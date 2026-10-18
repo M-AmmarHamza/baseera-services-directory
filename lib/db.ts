@@ -33,6 +33,9 @@ export interface Provider {
   is_featured?: boolean;
 }
 
+// In-memory runtime override store shared across admin and frontend
+export const localProvidersOverrides: Map<string, Partial<Provider>> = new Map();
+
 export const SEED_PROVIDERS: Provider[] = [
   {
     id: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
@@ -54,6 +57,7 @@ export const SEED_PROVIDERS: Provider[] = [
     total_leads: 342,
     is_verified: true,
     is_available: true,
+    is_featured: true,
   },
   {
     id: 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e',
@@ -75,6 +79,7 @@ export const SEED_PROVIDERS: Provider[] = [
     total_leads: 189,
     is_verified: true,
     is_available: true,
+    is_featured: true,
   },
   {
     id: 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f',
@@ -96,6 +101,7 @@ export const SEED_PROVIDERS: Provider[] = [
     total_leads: 520,
     is_verified: true,
     is_available: true,
+    is_featured: true,
   },
   {
     id: 'd4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a',
@@ -117,6 +123,7 @@ export const SEED_PROVIDERS: Provider[] = [
     total_leads: 290,
     is_verified: true,
     is_available: true,
+    is_featured: true,
   },
   {
     id: 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b',
@@ -138,6 +145,7 @@ export const SEED_PROVIDERS: Provider[] = [
     total_leads: 215,
     is_verified: true,
     is_available: true,
+    is_featured: true,
   },
   {
     id: 'f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c',
@@ -180,6 +188,7 @@ export const SEED_PROVIDERS: Provider[] = [
     total_leads: 140,
     is_verified: true,
     is_available: true,
+    is_featured: true,
   },
   {
     id: 'b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e',
@@ -369,6 +378,7 @@ export const SEED_PROVIDERS: Provider[] = [
     total_leads: 380,
     is_verified: true,
     is_available: true,
+    is_featured: true,
   },
   {
     id: 'e7f8a9b0-c1d2-3e4f-5a6b-7c8d9e0f1a2b',
@@ -2171,6 +2181,101 @@ export async function getProviders(citySlug: string, categorySlug?: string): Pro
 
   for (const pro of [...dbProviders, ...matchingSeeds]) {
     const s = pro.slug.toLowerCase();
+    if (!seenSlugs.has(s)) {
+      seenSlugs.add(s);
+      combined.push(pro);
+    }
+  }
+
+  return combined;
+}
+
+export async function getFeaturedProviders(
+  cityIdOrSlug: string,
+  categoryIdOrSlug: string,
+  currentProviderSlug?: string
+): Promise<Provider[]> {
+  const normCity = (cityIdOrSlug || 'karachi').toLowerCase().trim();
+  const normCat = (categoryIdOrSlug || '').toLowerCase().trim();
+  const normCurrentSlug = (currentProviderSlug || '').toLowerCase().trim();
+
+  const category = normCat ? getCategoryBySlug(normCat) : null;
+  const targetCategoryIds = category
+    ? [category.id, category.slug, ...(category.aliases || [])]
+    : normCat
+    ? [normCat]
+    : [];
+
+  let dbProviders: Provider[] = [];
+  try {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(normCity);
+    let queryPath = `providers?select=*,cities!inner(slug,name),countries!inner(code,name)&is_featured=eq.true&is_verified=eq.true`;
+
+    if (isUuid) {
+      queryPath += `&city_id=eq.${encodeURIComponent(normCity)}`;
+    } else {
+      queryPath += `&cities.slug=eq.${encodeURIComponent(normCity)}`;
+    }
+
+    if (targetCategoryIds.length > 0) {
+      queryPath += `&category_id=in.(${targetCategoryIds.map(encodeURIComponent).join(',')})`;
+    }
+
+    if (normCurrentSlug) {
+      queryPath += `&slug=neq.${encodeURIComponent(normCurrentSlug)}`;
+    }
+
+    queryPath += `&order=rating.desc,review_count.desc`;
+
+    const dbRows = await fetchSupabase<any[]>(queryPath);
+    if (dbRows && dbRows.length > 0) {
+      dbProviders = dbRows.map((r) => mapDbProvider(r, normCity));
+    }
+  } catch (err) {
+    console.warn('getFeaturedProviders fetch note:', err);
+  }
+
+  // Matching approved and featured seed providers
+  const matchingSeeds = SEED_PROVIDERS.filter((p) => {
+    // Check local in-memory override or static seed flag
+    const override = localProvidersOverrides.get(p.id);
+    const isFeatured = override?.is_featured !== undefined ? override.is_featured : p.is_featured;
+    if (!isFeatured) return false;
+
+    const status = override?.status || p.status || (p.is_verified ? 'approved' : 'pending');
+    const isVerified = override?.is_verified !== undefined ? override.is_verified : p.is_verified;
+    if (!isVerified || status !== 'approved') return false;
+
+    // Filter by city
+    const cityMatch =
+      p.city_slug.toLowerCase() === normCity ||
+      (p as any).city_id?.toLowerCase() === normCity;
+    if (!cityMatch) return false;
+
+    // Filter by category
+    const catMatch =
+      !normCat ||
+      p.category_id.toLowerCase() === normCat ||
+      targetCategoryIds.some((tc) => tc.toLowerCase() === p.category_id.toLowerCase()) ||
+      (category && category.aliases?.some((a) => a.toLowerCase() === p.category_id.toLowerCase())) ||
+      p.slug.toLowerCase().includes(normCat);
+    if (!catMatch) return false;
+
+    // Exclude current provider
+    if (normCurrentSlug && p.slug.toLowerCase() === normCurrentSlug) {
+      return false;
+    }
+
+    return true;
+  });
+
+  // Combine DB providers + Seed providers without duplicate slugs
+  const seenSlugs = new Set<string>();
+  const combined: Provider[] = [];
+
+  for (const pro of [...dbProviders, ...matchingSeeds]) {
+    const s = pro.slug.toLowerCase();
+    if (normCurrentSlug && s === normCurrentSlug) continue;
     if (!seenSlugs.has(s)) {
       seenSlugs.add(s);
       combined.push(pro);

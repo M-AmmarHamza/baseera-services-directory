@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { verifyAdminToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth';
-import { SEED_PROVIDERS, Provider } from '@/lib/db';
+import { SEED_PROVIDERS, Provider, localProvidersOverrides } from '@/lib/db';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-// In-memory runtime override store so local mutations (approval, status, featured) persist across requests
-let localProvidersOverrides: Map<string, Partial<Provider>> = new Map();
 
 export async function GET(req: NextRequest) {
   // Check admin session

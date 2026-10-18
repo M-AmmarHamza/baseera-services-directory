@@ -31,6 +31,7 @@ import { getCleanWhatsAppUrl, getCleanTelUrl } from '@/lib/phone';
 import ProviderImageSlider from '@/components/ProviderImageSlider';
 import ProviderContactFAB from '@/components/ProviderContactFAB';
 import RelatedSlider from '@/components/RelatedSlider';
+import FeaturedProfilesSlider from '@/components/FeaturedProfilesSlider';
 import LeadTrackButton from '@/components/LeadTrackButton';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
@@ -779,6 +780,22 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
             viewAllHref={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`}
           />
         </div>
+
+        {/* More Featured Specialists in City Slider (Excludes Current Provider) */}
+        <FeaturedProfilesSlider
+          categoryId={category}
+          cityId={city}
+          currentProviderSlug={slug}
+          lang={lang}
+          country={country}
+          title={
+            lang === 'ur'
+              ? `${cityName} میں مزید نمایاں ${categoryName} ماہرین`
+              : lang === 'ar'
+              ? `المزيد من ${categoryName} المميزين في ${cityName}`
+              : `More Featured ${categoryName}s in ${cityName}`
+          }
+        />
       </main>
 
       {/* CRITICAL UI: STICKY FLOATING ACTION BUTTON (FAB) ANCHORED BOTTOM-RIGHT WITH LEAD TRACKING */}

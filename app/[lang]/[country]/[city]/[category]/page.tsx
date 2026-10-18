@@ -24,6 +24,7 @@ import { formatVisitingPrice } from '@/lib/currencies';
 import RelatedSlider from '@/components/RelatedSlider';
 import QuickFacts from '@/components/QuickFacts';
 import CategoryFaqSection from '@/components/CategoryFaqSection';
+import FeaturedProfilesSlider from '@/components/FeaturedProfilesSlider';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -330,6 +331,21 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
           </div>
         ) : (
           <div className="space-y-10">
+            {/* FEATURED SPECIALISTS SLIDER (HIGHLIGHTS SPONSORED/PREMIUM PROVIDERS AT TOP) */}
+            <FeaturedProfilesSlider
+              categoryId={category}
+              cityId={city}
+              lang={lang}
+              country={country}
+              title={
+                lang === 'ur'
+                  ? `${cityName} میں نمایاں ${categoryName}`
+                  : lang === 'ar'
+                  ? `${categoryName} مميزون في ${cityName}`
+                  : `Featured ${categoryName} in ${cityName}`
+              }
+            />
+
             {/* 1. TOP-RATED SPECIALISTS HORIZONTAL SLIDER */}
             <RelatedSlider
               type="providers"
