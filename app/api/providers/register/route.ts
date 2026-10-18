@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateEnglishSlug } from '@/lib/transliterate';
 import { getCategoryBySlug, getCountryByCode, getCategoryName, SEED_PROVIDERS, localProvidersOverrides } from '@/lib/db';
 import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
-import { providerRegistrationSchema } from '@/lib/validations/provider';
+import { providerRegistrationSchema, createProviderRegistrationSchema } from '@/lib/validations/provider';
 import { validateAndFormatE164 } from '@/lib/phone';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -48,7 +48,9 @@ function phonesMatch(p1: string, p2: string): boolean {
 export async function POST(request: NextRequest) {
   try {
     const rawBody = await request.json();
-    const parseResult = providerRegistrationSchema.safeParse(rawBody);
+    const requestLang = (rawBody && typeof rawBody === 'object' && rawBody.lang) || 'en';
+    const schema = createProviderRegistrationSchema(requestLang);
+    const parseResult = schema.safeParse(rawBody);
 
     if (!parseResult.success) {
       const firstError = parseResult.error.issues[0]?.message || 'Invalid input data.';

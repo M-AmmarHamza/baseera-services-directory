@@ -19,7 +19,9 @@ import {
   getCountryCallingCodeSafe,
 } from '@/lib/phone';
 import {
-  providerRegistrationSchema,
+  createProviderRegistrationSchema,
+  validateScript,
+  getScriptErrorMessage,
   MAX_SERVICE_AREAS,
   MAX_BIO_LENGTH,
 } from '@/lib/validations/provider';
@@ -172,6 +174,66 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
   const [startingPrice, setStartingPrice] = useState(() => String(getCountryCurrency(defaultCountry).defaultFee));
   const [profileType, setProfileType] = useState<'individual' | 'shop'>('individual');
 
+  // Script & Field-Specific Error States
+  const [nameError, setNameError] = useState('');
+  const [tradeTitleError, setTradeTitleError] = useState('');
+  const [bioError, setBioError] = useState('');
+
+  const handleNameChange = (val: string) => {
+    setName(val);
+    if (nameError && validateScript(val, lang, true)) {
+      setNameError('');
+    }
+  };
+
+  const handleNameBlur = () => {
+    if (!name.trim()) return;
+    if (!validateScript(name, lang, true)) {
+      setNameError(t('err_name_script', getScriptErrorMessage(lang, 'name')));
+    } else {
+      setNameError('');
+    }
+  };
+
+  const handleTradeTitleChange = (val: string) => {
+    setTradeTitle(val);
+    if (tradeTitleError && validateScript(val, lang, false)) {
+      setTradeTitleError('');
+    }
+  };
+
+  const handleTradeTitleBlur = () => {
+    if (!tradeTitle.trim()) {
+      setTradeTitleError('');
+      return;
+    }
+    if (!validateScript(tradeTitle, lang, false)) {
+      setTradeTitleError(t('err_trade_title_script', getScriptErrorMessage(lang, 'trade_title')));
+    } else {
+      setTradeTitleError('');
+    }
+  };
+
+  const handleBioChange = (val: string) => {
+    const truncated = val.slice(0, MAX_BIO_LENGTH);
+    setShortBio(truncated);
+    if (bioError && validateScript(truncated, lang, false)) {
+      setBioError('');
+    }
+  };
+
+  const handleBioBlur = () => {
+    if (!shortBio.trim()) {
+      setBioError('');
+      return;
+    }
+    if (!validateScript(shortBio, lang, false)) {
+      setBioError(t('err_bio_script', getScriptErrorMessage(lang, 'short_bio')));
+    } else {
+      setBioError('');
+    }
+  };
+
   const selectedCurrency = getCountryCurrency(countryCode);
   const countryCallingCode = getCountryCallingCodeSafe(countryCode);
 
@@ -311,8 +373,35 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setNameError('');
+    setTradeTitleError('');
+    setBioError('');
+
     if (!name.trim() || !contactNumber.trim() || !selectedCountryId.trim() || !cityName.trim()) {
       setErrorMsg(t('err_required_fields'));
+      if (!name.trim()) {
+        setNameError(t('err_name_script', getScriptErrorMessage(lang, 'name')));
+      }
+      return;
+    }
+
+    // Dynamic Script Validation checks for text-heavy fields
+    let hasScriptError = false;
+    if (!validateScript(name, lang, true)) {
+      setNameError(t('err_name_script', getScriptErrorMessage(lang, 'name')));
+      hasScriptError = true;
+    }
+    if (tradeTitle.trim() && !validateScript(tradeTitle, lang, false)) {
+      setTradeTitleError(t('err_trade_title_script', getScriptErrorMessage(lang, 'trade_title')));
+      hasScriptError = true;
+    }
+    if (shortBio.trim() && !validateScript(shortBio, lang, false)) {
+      setBioError(t('err_bio_script', getScriptErrorMessage(lang, 'short_bio')));
+      hasScriptError = true;
+    }
+
+    if (hasScriptError) {
+      setErrorMsg(t('err_language_script', getScriptErrorMessage(lang)));
       return;
     }
 
@@ -378,8 +467,15 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
       lang,
     };
 
-    const clientValidation = providerRegistrationSchema.safeParse(payload);
+    const schema = createProviderRegistrationSchema(lang);
+    const clientValidation = schema.safeParse(payload);
     if (!clientValidation.success) {
+      for (const issue of clientValidation.error.issues) {
+        const field = issue.path[0];
+        if (field === 'name') setNameError(issue.message);
+        if (field === 'trade_title') setTradeTitleError(issue.message);
+        if (field === 'short_bio') setBioError(issue.message);
+      }
       setErrorMsg(clientValidation.error.issues[0]?.message || 'Please check form inputs.');
       return;
     }
@@ -568,10 +664,21 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
                   type="text"
                   required
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => handleNameChange(e.target.value)}
+                  onBlur={handleNameBlur}
                   placeholder={t('name_placeholder')}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all text-start"
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none transition-all text-start ${
+                    nameError
+                      ? 'bg-red-50/40 border border-red-400 focus:border-red-500 text-gray-900'
+                      : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#006948] focus:bg-white'
+                  }`}
                 />
+                {nameError && (
+                  <div className="flex items-center gap-1.5 text-xs text-red-600 font-semibold px-1 mt-0.5 text-start">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{nameError}</span>
+                  </div>
+                )}
               </div>
 
               {/* Contact Channel Selector & Number */}
@@ -849,10 +956,22 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
                 <input
                   type="text"
                   value={tradeTitle}
-                  onChange={(e) => setTradeTitle(e.target.value)}
+                  onChange={(e) => handleTradeTitleChange(e.target.value)}
+                  onBlur={handleTradeTitleBlur}
                   placeholder={t('trade_title_placeholder')}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948] focus:bg-white transition-all font-medium text-start"
+                  className={`w-full px-3.5 py-2.5 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none transition-all font-medium text-start ${
+                    tradeTitleError
+                      ? 'bg-red-50/40 border border-red-400 focus:border-red-500 text-gray-900'
+                      : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#006948] focus:bg-white'
+                  }`}
                 />
+
+                {tradeTitleError && (
+                  <div className="flex items-center gap-1.5 text-xs text-red-600 font-semibold px-1 mt-0.5 text-start">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{tradeTitleError}</span>
+                  </div>
+                )}
 
                 {/* Explainer Box for Trade Title */}
                 {showTradeTitleHelp && (
@@ -1123,14 +1242,21 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
                   rows={3}
                   maxLength={MAX_BIO_LENGTH}
                   value={shortBio}
-                  onChange={(e) => setShortBio(e.target.value.slice(0, MAX_BIO_LENGTH))}
+                  onChange={(e) => handleBioChange(e.target.value)}
+                  onBlur={handleBioBlur}
                   placeholder={t('bio_placeholder')}
                   className={`w-full px-3.5 py-2.5 rounded-xl border text-sm placeholder:text-gray-400 focus:outline-none transition-all resize-none text-start ${
-                    shortBio.length >= MAX_BIO_LENGTH
-                      ? 'bg-white border-amber-400 focus:border-amber-500 text-gray-900'
+                    bioError || shortBio.length >= MAX_BIO_LENGTH
+                      ? 'bg-red-50/40 border border-red-400 focus:border-red-500 text-gray-900'
                       : 'bg-gray-50 border border-gray-200 text-gray-900 focus:border-[#006948] focus:bg-white'
                   }`}
                 />
+                {bioError && (
+                  <div className="flex items-center gap-1.5 text-xs text-red-600 font-semibold px-1 mt-0.5 text-start">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{bioError}</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">
                     {t('bio_helper')}
