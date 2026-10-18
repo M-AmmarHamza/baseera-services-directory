@@ -22,6 +22,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         en: `${DOMAIN}/en/about`,
         ur: `${DOMAIN}/ur/about`,
         ar: `${DOMAIN}/ar/about`,
+        'x-default': `${DOMAIN}/en/about`,
       },
     },
   };

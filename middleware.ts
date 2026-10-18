@@ -9,9 +9,9 @@ export const config = {
      * - api routes (/api/...)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico, images, documents, sitemap, robots
+     * - favicon.ico, images, documents, sitemap, robots, llms.txt
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|sitemap|robots.txt|llms.txt|llms-full.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js|txt|xml)$).*)',
   ],
 };
 
@@ -95,8 +95,14 @@ const SHORT_CATEGORY_REDIRECTS: Record<string, string> = {
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
-  // Bypass sitemap and robots.txt
-  if (pathname === '/sitemap.xml' || pathname === '/robots.txt') {
+  // Bypass sitemap, robots.txt, and llms.txt
+  if (
+    pathname === '/sitemap.xml' ||
+    pathname.startsWith('/sitemap') ||
+    pathname === '/robots.txt' ||
+    pathname === '/llms.txt' ||
+    pathname === '/llms-full.txt'
+  ) {
     return NextResponse.next();
   }
 

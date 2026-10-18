@@ -59,6 +59,7 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
         en: `${DOMAIN}/en/${country.toLowerCase()}`,
         ur: `${DOMAIN}/ur/${country.toLowerCase()}`,
         ar: `${DOMAIN}/ar/${country.toLowerCase()}`,
+        'x-default': `${DOMAIN}/en/${country.toLowerCase()}`,
       },
     },
     openGraph: {
@@ -80,6 +81,25 @@ export default async function CountryPage({ params }: CountryPageProps) {
   const defaultCitySlug = countryObj.defaultCity || cities[0]?.slug || 'capital';
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}`;
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: lang === 'ur' ? 'مرکزی صفحہ' : lang === 'ar' ? 'الرئيسية' : 'Home',
+        item: `${DOMAIN}/${lang}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: countryName,
+        item: canonicalUrl,
+      },
+    ],
+  };
+
   const jsonLdItemList = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -97,7 +117,11 @@ export default async function CountryPage({ params }: CountryPageProps) {
 
   return (
     <div className={`min-h-screen bg-white text-neutral-900 pb-20 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
-      {/* Programmatic JSON-LD Schema */}
+      {/* Programmatic BreadcrumbList & ItemList JSON-LD Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdItemList) }}

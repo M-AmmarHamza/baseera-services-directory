@@ -32,6 +32,8 @@ import ProviderImageSlider from '@/components/ProviderImageSlider';
 import ProviderContactFAB from '@/components/ProviderContactFAB';
 import RelatedSlider from '@/components/RelatedSlider';
 import LeadTrackButton from '@/components/LeadTrackButton';
+import QuickFacts from '@/components/QuickFacts';
+import JsonLd from '@/components/JsonLd';
 
 interface ProviderPageProps {
   params: Promise<{
@@ -251,6 +253,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
         en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
         ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
         ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
+        'x-default': `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
       },
     },
     openGraph: {
@@ -297,7 +300,45 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
   const effectiveCover = getProviderCoverUrl(provider);
   const effectiveAvatar = getProviderAvatarUrl(provider);
 
-  // 1. DYNAMIC JSON-LD LOCALBUSINESS & SERVICE SCHEMA MARKUP (LOCAL SEO)
+  // 1. DYNAMIC JSON-LD BREADCRUMBLIST SCHEMA
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: lang === 'ur' ? 'مرکزی صفحہ' : lang === 'ar' ? 'الرئيسية' : 'Home',
+        item: `${DOMAIN}/${lang}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: countryName,
+        item: `${DOMAIN}/${lang}/${country.toLowerCase()}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: cityName,
+        item: `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: categoryName,
+        item: `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 5,
+        name: providerName,
+        item: canonicalUrl,
+      },
+    ],
+  };
+
+  // 2. DYNAMIC JSON-LD LOCALBUSINESS & SERVICE SCHEMA MARKUP (LOCAL SEO)
   const areaServedList =
     Array.isArray(provider.service_area) && provider.service_area.length > 0
       ? provider.service_area.map((area: string) => ({
@@ -344,6 +385,43 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     };
   }
 
+  // GEO Quick Facts Items
+  const providerFacts = [
+    {
+      label: lang === 'ur' ? 'تصدیق کا درجہ' : lang === 'ar' ? 'حالة التوثيق' : 'Verification Status',
+      value: provider.is_verified ? (lang === 'ur' ? '100% تصدیق شدہ کاریگر' : lang === 'ar' ? 'معتمد وموثق 100%' : '100% Verified Specialist') : 'Active Provider',
+      highlight: true,
+      badge: 'Verified',
+      icon: 'verified' as const,
+    },
+    {
+      label: lang === 'ur' ? 'پلیٹ فارم فیس' : lang === 'ar' ? 'رسوم المنصة' : 'Platform Fee',
+      value: lang === 'ur' ? '0% بغیر کسی کمیشن کے' : lang === 'ar' ? '0% بدون أي عمولة' : '0% Zero Commission',
+      highlight: true,
+      icon: 'fee' as const,
+    },
+    {
+      label: lang === 'ur' ? 'رابطہ کا ذریعہ' : lang === 'ar' ? 'قناة التواصل' : 'Direct Contact',
+      value: lang === 'ur' ? 'فوری واٹس ایپ چیٹ' : lang === 'ar' ? 'واتساب مباشر فوري' : 'Instant WhatsApp Chat',
+      icon: 'contact' as const,
+    },
+    {
+      label: lang === 'ur' ? 'وزٹ چارجز' : lang === 'ar' ? 'رسوم الزيارة' : 'Visiting Charges',
+      value: formatVisitingPrice(provider.starting_price, provider.country_code || country),
+      icon: 'price' as const,
+    },
+    {
+      label: lang === 'ur' ? 'ریٹنگ اور جائزے' : lang === 'ar' ? 'تقييمات العملاء' : 'Customer Rating',
+      value: `${Number(provider.rating || 5).toFixed(1)} ★ (${provider.review_count || 1} Reviews)`,
+      icon: 'rating' as const,
+    },
+    {
+      label: lang === 'ur' ? 'بنیادی علاقہ' : lang === 'ar' ? 'منطقة التغطية' : 'Service Area',
+      value: provider.district ? `${provider.district}, ${cityName}` : cityName,
+      icon: 'location' as const,
+    },
+  ];
+
   // Portfolio photos with category cover banner as slide #1
   const portfolioPhotos = [
     effectiveCover,
@@ -370,11 +448,8 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
   return (
     <div className={`min-h-screen bg-white text-neutral-900 pb-28 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
-      {/* Dynamic JSON-LD Injection */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-      />
+      {/* Programmatic BreadcrumbList & LocalBusiness JSON-LD Injection */}
+      <JsonLd data={[breadcrumbSchema, localBusinessSchema]} />
 
       {/* Breadcrumbs Navigation */}
       <div className="border-b border-gray-200 bg-white">
@@ -491,6 +566,11 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               </div>
             </div>
           </div>
+        </div>
+
+        {/* GEO Quick Facts Component */}
+        <div className="px-2 sm:px-6 mb-6">
+          <QuickFacts facts={providerFacts} lang={lang} />
         </div>
 
         {/* PROFILE BODY & SERVICE AREAS */}

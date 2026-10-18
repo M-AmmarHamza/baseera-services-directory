@@ -14,6 +14,7 @@ import {
 } from '@/lib/db';
 import SearchBar from '@/components/SearchBar';
 import RelatedSlider from '@/components/RelatedSlider';
+import QuickFacts from '@/components/QuickFacts';
 import {
   CategoryIcon,
   MapPin,
@@ -72,11 +73,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        'en-PK': `${DOMAIN}/en/pk/${city}`,
-        'ur-PK': `${DOMAIN}/ur/pk/${city}`,
-        'ar-AE': `${DOMAIN}/ar/ae/${city}`,
-        'en-AE': `${DOMAIN}/en/ae/${city}`,
-        'x-default': `${DOMAIN}/en/pk/karachi`,
+        en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}`,
+        ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}`,
+        ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}`,
+        'x-default': `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}`,
       },
     },
     openGraph: {
@@ -99,6 +99,7 @@ export default async function CityHomePage({ params }: PageProps) {
   const cityName = getLocalizedCityName(city, lang);
   const countryCode = country.toUpperCase();
   const commaSeparator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
+  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`;
 
   // Structured Data: BreadcrumbList Schema
   const breadcrumbJsonLd = {
@@ -121,16 +122,79 @@ export default async function CityHomePage({ params }: PageProps) {
         '@type': 'ListItem',
         position: 3,
         name: cityName,
-        item: `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`,
+        item: canonicalUrl,
       },
     ],
   };
+
+  // Structured Data: CollectionPage & ItemList Schema
+  const cityCollectionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `Local Services Directory in ${cityName}, ${countryName}`,
+    description: `Connect directly with verified local specialists across ${cityName}, ${countryName} with zero commission and instant WhatsApp chat.`,
+    url: canonicalUrl,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: Math.min(providers.length, 10),
+      itemListElement: providers.slice(0, 10).map((p, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        item: {
+          '@type': 'LocalBusiness',
+          name: p.name,
+          url: `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${p.category_id}/${p.slug}`,
+          image: p.avatar_url,
+          telephone: p.whatsapp_number,
+        },
+      })),
+    },
+  };
+
+  const cityFacts = [
+    {
+      label: lang === 'ur' ? 'تصدیق کا معیار' : lang === 'ar' ? 'حالة التوثيق' : 'Verification Status',
+      value: lang === 'ur' ? '100% تصدیق شدہ' : lang === 'ar' ? 'موثق 100%' : '100% Verified',
+      highlight: true,
+      icon: 'verified' as const,
+    },
+    {
+      label: lang === 'ur' ? 'پلیٹ فارم فیس' : lang === 'ar' ? 'رسوم المنصة' : 'Booking Fee',
+      value: lang === 'ur' ? '0% زیرو کمیشن' : lang === 'ar' ? '0% بدون عمولة' : '0% Zero Commission',
+      highlight: true,
+      icon: 'fee' as const,
+    },
+    {
+      label: lang === 'ur' ? 'رابطہ کا ذریعہ' : lang === 'ar' ? 'قناة التواصل' : 'Contact Channel',
+      value: lang === 'ur' ? 'براہِ راست واٹس ایپ' : lang === 'ar' ? 'واتساب مباشر' : 'Direct WhatsApp',
+      icon: 'contact' as const,
+    },
+    {
+      label: lang === 'ur' ? 'شہری کوریج' : lang === 'ar' ? 'التغطية الميدانية' : 'Coverage',
+      value: `${cityName} (${districts.length > 0 ? `${districts.length}+ Districts` : countryCode})`,
+      icon: 'location' as const,
+    },
+    {
+      label: lang === 'ur' ? 'دستیاب کیٹیگریز' : lang === 'ar' ? 'التخصصات المتاحة' : 'Specialties',
+      value: `${CATEGORIES.length}+ Verified Trades`,
+      icon: 'experience' as const,
+    },
+    {
+      label: lang === 'ur' ? 'اوسط جوابی وقت' : lang === 'ar' ? 'متوسط وقت الرد' : 'Avg Response Time',
+      value: '< 15 Minutes',
+      icon: 'time' as const,
+    },
+  ];
 
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(cityCollectionJsonLd) }}
       />
 
       <div className={`bg-[#f9f9ff] min-h-screen text-[#141b2b] ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
@@ -195,6 +259,13 @@ export default async function CityHomePage({ params }: PageProps) {
                 ))}
               </div>
             )}
+
+            {/* GEO Quick Facts Section */}
+            <QuickFacts
+              facts={cityFacts}
+              lang={lang}
+              className="mt-6 w-full text-start"
+            />
           </section>
 
           {/* Popular Services Slider */}

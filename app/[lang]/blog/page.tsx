@@ -18,6 +18,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: 'Practical home maintenance guides, electrician hiring safety, plumbing DIY checklists, and verified local stories across Pakistan and the Middle East.',
     alternates: {
       canonical: `${DOMAIN}/${lang}/blog`,
+      languages: {
+        en: `${DOMAIN}/en/blog`,
+        ur: `${DOMAIN}/ur/blog`,
+        ar: `${DOMAIN}/ar/blog`,
+        'x-default': `${DOMAIN}/en/blog`,
+      },
     },
   };
 }

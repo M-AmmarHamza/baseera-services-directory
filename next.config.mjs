@@ -31,6 +31,15 @@ const nextConfig = {
       },
     ];
   },
+  // Rewrites for Sitemap Chunking and LLM Optimization
+  async rewrites() {
+    return [
+      {
+        source: '/sitemap-providers-:id.xml',
+        destination: '/sitemap/:id.xml',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

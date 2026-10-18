@@ -22,6 +22,8 @@ import {
 } from '@/lib/db';
 import { formatVisitingPrice } from '@/lib/currencies';
 import RelatedSlider from '@/components/RelatedSlider';
+import QuickFacts from '@/components/QuickFacts';
+import CategoryFaqSection from '@/components/CategoryFaqSection';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -68,6 +70,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
         en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
         ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
         ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
+        'x-default': `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
       },
     },
     openGraph: {
@@ -91,6 +94,38 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
   const countryName = getLocalizedCountryName(countryObj, lang);
   const commaSeparator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
+
+  // Programmatic BreadcrumbList Schema
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: lang === 'ur' ? 'مرکزی صفحہ' : lang === 'ar' ? 'الرئيسية' : 'Home',
+        item: `${DOMAIN}/${lang}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: countryName,
+        item: `${DOMAIN}/${lang}/${country.toLowerCase()}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: cityName,
+        item: `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: categoryName,
+        item: canonicalUrl,
+      },
+    ],
+  };
 
   // Programmatic JSON-LD Schema (ItemList for Category Pages)
   const jsonLdItemList = {
@@ -124,9 +159,50 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
     })),
   };
 
+  const categoryFacts = [
+    {
+      label: lang === 'ur' ? 'دستیاب ماہرین' : lang === 'ar' ? 'الفنيون المتاحون' : 'Verified Specialists',
+      value: `${providers.length} ${lang === 'ur' ? 'کاریگر دستیاب' : lang === 'ar' ? 'فني معتمد' : 'Verified in ' + cityName}`,
+      highlight: true,
+      icon: 'verified' as const,
+    },
+    {
+      label: lang === 'ur' ? 'پلیٹ فارم فیس' : lang === 'ar' ? 'رسوم المنصة' : 'Platform Fee',
+      value: lang === 'ur' ? '0% بغیر کسی کمیشن کے' : lang === 'ar' ? '0% بدون أي عمولة' : '0% Zero Commission',
+      highlight: true,
+      icon: 'fee' as const,
+    },
+    {
+      label: lang === 'ur' ? 'رابطہ کا ذریعہ' : lang === 'ar' ? 'طريقة الحجز' : 'Booking Mode',
+      value: lang === 'ur' ? 'براہِ راست واٹس ایپ' : lang === 'ar' ? 'واتساب مباشر فوري' : 'Direct WhatsApp Chat',
+      icon: 'contact' as const,
+    },
+    {
+      label: lang === 'ur' ? 'ابتدائی وزٹ فیس' : lang === 'ar' ? 'رسوم الزيارة' : 'Visiting Charges',
+      value: providers[0]?.starting_price
+        ? `From ${formatVisitingPrice(providers[0].starting_price, providers[0].country_code || country)}`
+        : 'Transparent Quotes',
+      icon: 'price' as const,
+    },
+    {
+      label: lang === 'ur' ? 'شہری کوریج' : lang === 'ar' ? 'نطاق التغطية' : 'Coverage',
+      value: `${cityName}, ${countryName}`,
+      icon: 'location' as const,
+    },
+    {
+      label: lang === 'ur' ? 'اوسط جوابی وقت' : lang === 'ar' ? 'متوسط وقت الرد' : 'Avg Response Time',
+      value: '< 15 Minutes',
+      icon: 'time' as const,
+    },
+  ];
+
   return (
     <div className={`min-h-screen bg-white text-neutral-900 pb-24 md:pb-16 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
-      {/* Dynamic ItemList JSON-LD Injection */}
+      {/* Programmatic BreadcrumbList & ItemList JSON-LD Injection */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdItemList) }}
@@ -199,6 +275,13 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
               </span>
             </Link>
           </div>
+
+          {/* GEO Quick Facts */}
+          <QuickFacts
+            facts={categoryFacts}
+            lang={lang}
+            className="mt-6 w-full text-start"
+          />
         </div>
       </section>
 
@@ -406,6 +489,15 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
             </div>
           </div>
         )}
+
+        {/* Dynamic Category FAQ & FAQPage Schema */}
+        <CategoryFaqSection
+          categoryName={categoryName}
+          cityName={cityName}
+          countryName={countryName}
+          startingPrice={providers[0]?.starting_price ? formatVisitingPrice(providers[0].starting_price, providers[0].country_code || country) : undefined}
+          lang={lang}
+        />
       </main>
     </div>
   );
