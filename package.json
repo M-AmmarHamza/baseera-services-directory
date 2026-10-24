@@ -26,7 +26,7 @@
     "autoprefixer": "^10.6.1",
     "libphonenumber-js": "^1.13.15",
     "lucide-react": "^1.56.0",
-    "next": "^16.4.0",
+    "next": "^16.4.3",
     "papaparse": "^5.7.0",
     "postcss": "^8.5.30",
     "react": "^19.3.0",
