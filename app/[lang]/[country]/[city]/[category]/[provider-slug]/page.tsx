@@ -226,8 +226,11 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     };
   }
 
-  // CRITICAL SEO GUARD: If profile status is NOT 'approved', forcefully inject noindex, nofollow
-  if (provider.status !== 'approved') {
+  // CRITICAL SEO GUARD: If profile status is NOT 'published' / 'approved', forcefully inject noindex, nofollow
+  const isPublished = provider.status === 'published' || provider.status === 'approved';
+  const isSeoIndexed = provider.seo_index !== undefined ? Boolean(provider.seo_index) : true;
+
+  if (!isPublished) {
     const isUrdu = lang === 'ur';
     const isArabic = lang === 'ar';
     return {
@@ -247,12 +250,29 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
           follow: false,
           noimageindex: true,
           'max-video-preview': -1,
-          'max-image-preview': 'none',
+          'max-image-preview': 'none' as const,
           'max-snippet': -1,
         },
       },
     };
   }
+
+  // SEO INDEXING LOGIC: If seo_index is false, forcefully inject noindex, nofollow
+  const robotsConfig = !isSeoIndexed
+    ? {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'none' as const,
+          'max-snippet': -1,
+        },
+      }
+    : undefined;
 
   const cityName = getLocalizedCityName(city, lang);
   const categoryName = getCategoryName(categoryInfo, lang);
@@ -280,6 +300,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   return {
     title,
     description,
+    ...(robotsConfig ? { robots: robotsConfig } : {}),
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -322,8 +343,8 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     notFound();
   }
 
-  // MODERATION WORKFLOW GUARD: If status is not approved, render customized "Profile Under Review" UI
-  if (provider.status !== 'approved') {
+  // MODERATION WORKFLOW GUARD: If status is not published/approved, render customized "Profile Under Review" UI
+  if (provider.status !== 'published' && provider.status !== 'approved') {
     return (
       <ProfileUnderReview
         provider={provider}

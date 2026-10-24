@@ -25,7 +25,8 @@ export async function generateSitemaps() {
     const { count } = await supabase
       .from('providers')
       .select('*', { count: 'exact', head: true })
-      .or('is_verified.eq.true,status.eq.approved');
+      .or('status.eq.published,status.eq.approved')
+      .eq('seo_index', true);
 
     const totalProviders = count && count > 0 ? count : 30;
     const providerChunks = Math.max(1, Math.ceil(totalProviders / PROVIDER_CHUNK_SIZE));
@@ -160,13 +161,14 @@ export default async function sitemap(props: SitemapProps): Promise<MetadataRout
     return sitemapEntries;
   }
 
-  // CHUNK 1..N: Approved Provider Dossiers (Paginated - STRICTLY status = 'approved')
+  // CHUNK 1..N: Published Provider Dossiers (Paginated - STRICTLY status = 'published' AND seo_index = true)
   let approvedProviders: Provider[] = [];
   try {
     const { data: dbApproved } = await supabase
       .from('providers')
       .select('*, cities(slug), countries(code)')
-      .eq('status', 'approved')
+      .or('status.eq.published,status.eq.approved')
+      .eq('seo_index', true)
       .order('rating', { ascending: false });
 
     if (Array.isArray(dbApproved) && dbApproved.length > 0) {
@@ -177,8 +179,10 @@ export default async function sitemap(props: SitemapProps): Promise<MetadataRout
         category_id: r.category_id,
         city_slug: r.cities?.slug || 'karachi',
         country_code: r.countries?.code || 'pk',
-        status: 'approved' as const,
-        is_verified: true,
+        status: 'published' as const,
+        seo_index: true,
+        is_verified: Boolean(r.is_verified),
+        is_featured: Boolean(r.is_featured),
         trade_title: r.trade_title || r.name,
         profile_type: r.profile_type || 'individual',
         district: r.district || 'Karachi',
@@ -197,11 +201,15 @@ export default async function sitemap(props: SitemapProps): Promise<MetadataRout
     console.warn('Sitemap live provider query note:', err);
   }
 
-  // Fallback to local data store strictly filtered by status === 'approved'
+  // Fallback to local data store strictly filtered by status === 'published' AND seo_index === true
   if (approvedProviders.length === 0) {
     try {
       const all = await getAllProviders();
-      approvedProviders = all.filter((p) => p.status === 'approved');
+      approvedProviders = all.filter(
+        (p) =>
+          (p.status === 'published' || p.status === 'approved') &&
+          p.seo_index === true
+      );
     } catch {
       approvedProviders = [];
     }

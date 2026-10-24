@@ -82,8 +82,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const allowedStatuses = ['approved', 'pending', 'suspended', 'rejected'];
-    const chosenStatus = allowedStatuses.includes(defaultStatus) ? defaultStatus : 'approved';
+    const allowedStatuses = ['published', 'approved', 'pending', 'suspended', 'rejected'];
+    const chosenStatus = allowedStatuses.includes(defaultStatus)
+      ? (defaultStatus === 'approved' ? 'published' : defaultStatus)
+      : 'published';
 
     const validProvidersToInsert: Provider[] = [];
     const failedRows: FailedRowReport[] = [];
@@ -290,8 +292,9 @@ export async function POST(req: NextRequest) {
         review_count: 1,
         total_leads: 0,
         status: chosenStatus as any,
-        is_verified: chosenStatus === 'approved',
-        is_available: chosenStatus === 'approved',
+        seo_index: chosenStatus === 'published' || chosenStatus === 'approved',
+        is_verified: chosenStatus === 'published' || chosenStatus === 'approved',
+        is_available: chosenStatus === 'published' || chosenStatus === 'approved',
         is_featured: false,
       };
 

@@ -85,9 +85,10 @@ create table if not exists public.providers (
   whatsapp_number text not null,
   service_area text[] default '{}', -- e.g. ['Clifton', 'DHA', 'PECHS']
   short_bio text,
-  status text not null default 'pending' check (status in ('pending', 'approved', 'rejected', 'suspended')),
-  is_verified boolean default false, -- Admin approval required
-  is_featured boolean default false, -- Sponsored / Premium provider flag
+  status text not null default 'pending' check (status in ('pending', 'published', 'suspended', 'approved', 'rejected')),
+  seo_index boolean default false, -- Controls search engine indexing (noindex when false)
+  is_verified boolean default false, -- Admin verification & trust badge
+  is_featured boolean default false, -- Sponsored / Premium provider flag in top sliders
   is_available boolean default true, -- Provider studio toggle: "Available Now"
   avatar_url text,
   portfolio_photos text[] default '{}', -- Max 4 photos stored in 'provider-portfolios' bucket

@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const page = parseInt(searchParams.get('page') || '1', 10);
   const limit = parseInt(searchParams.get('limit') || '10', 10);
-  const statusFilter = searchParams.get('status') || 'all'; // all | pending | approved | rejected | suspended
+  const statusFilter = searchParams.get('status') || 'all'; // all | pending | published | suspended
+  const seoFilter = searchParams.get('seo') || 'all'; // all | indexed | noindex
+  const featuredFilter = searchParams.get('featured') || 'all'; // all | featured | standard
+  const verifiedFilter = searchParams.get('verified') || 'all'; // all | verified | unverified
   const searchQuery = (searchParams.get('search') || '').toLowerCase().trim();
   const categoryFilter = (searchParams.get('category') || 'all').toLowerCase().trim();
   const cityFilter = (searchParams.get('city') || 'all').toLowerCase().trim();
@@ -33,30 +36,37 @@ export async function GET(req: NextRequest) {
         .order('created_at', { ascending: false });
 
       if (!error && Array.isArray(data) && data.length > 0) {
-        allProviders = data.map((p) => ({
-          id: p.id,
-          name: p.name,
-          slug: p.slug,
-          profile_type: p.profile_type || 'individual',
-          category_id: p.category_id,
-          trade_title: p.trade_title || p.name,
-          city_slug: p.cities?.slug || p.city_id || 'karachi',
-          cityName: p.cities?.name || p.city_id || 'Karachi',
-          country_code: p.countries?.code || p.country_id || 'pk',
-          district: p.district || '',
-          whatsapp_number: p.whatsapp_number,
-          phone_number: p.phone_number || p.whatsapp_number,
-          status: p.status || (p.is_verified ? 'approved' : 'pending'),
-          is_verified: Boolean(p.is_verified),
-          is_featured: Boolean(p.is_featured),
-          is_available: Boolean(p.is_available),
-          avatar_url: p.avatar_url,
-          starting_price: p.starting_price || 0,
-          rating: p.rating || 5.0,
-          review_count: p.review_count || 1,
-          total_leads: p.total_leads || 0,
-          created_at: p.created_at || new Date().toISOString(),
-        }));
+        allProviders = data.map((p) => {
+          const rawStatus = p.status || (p.is_verified ? 'published' : 'pending');
+          const normalizedStatus =
+            rawStatus === 'approved' ? 'published' : rawStatus === 'rejected' ? 'suspended' : rawStatus;
+
+          return {
+            id: p.id,
+            name: p.name,
+            slug: p.slug,
+            profile_type: p.profile_type || 'individual',
+            category_id: p.category_id,
+            trade_title: p.trade_title || p.name,
+            city_slug: p.cities?.slug || p.city_id || 'karachi',
+            cityName: p.cities?.name || p.city_id || 'Karachi',
+            country_code: p.countries?.code || p.country_id || 'pk',
+            district: p.district || '',
+            whatsapp_number: p.whatsapp_number,
+            phone_number: p.phone_number || p.whatsapp_number,
+            status: normalizedStatus,
+            seo_index: Boolean(p.seo_index),
+            is_verified: Boolean(p.is_verified),
+            is_featured: Boolean(p.is_featured),
+            is_available: Boolean(p.is_available),
+            avatar_url: p.avatar_url,
+            starting_price: p.starting_price || 0,
+            rating: p.rating || 5.0,
+            review_count: p.review_count || 1,
+            total_leads: p.total_leads || 0,
+            created_at: p.created_at || new Date().toISOString(),
+          };
+        });
       }
     } catch (err) {
       console.warn('Supabase fetch failed in admin providers, using seed fallback:', err);
@@ -67,13 +77,22 @@ export async function GET(req: NextRequest) {
   if (allProviders.length === 0) {
     allProviders = [...SEED_PROVIDERS, ...localImportedProviders].map((p, idx) => {
       const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug) || {};
-      const defaultStatus = (p as any).status || (idx === 1 ? 'pending' : idx === 3 ? 'suspended' : 'approved');
+      const rawStatus = (p as any).status || (idx === 1 ? 'pending' : idx === 3 ? 'suspended' : 'published');
+      const normalizedStatus =
+        rawStatus === 'approved' ? 'published' : rawStatus === 'rejected' ? 'suspended' : rawStatus;
+
+      const baseStatus = (override as any).status || normalizedStatus;
+      const baseSeo = (override as any).seo_index !== undefined ? Boolean((override as any).seo_index) : (baseStatus === 'published');
+      const baseFeatured = (override as any).is_featured !== undefined ? Boolean((override as any).is_featured) : (idx === 0 || idx === 2);
+      const baseVerified = (override as any).is_verified !== undefined ? Boolean((override as any).is_verified) : p.is_verified;
+
       return {
         ...p,
         cityName: p.city_slug ? p.city_slug.charAt(0).toUpperCase() + p.city_slug.slice(1) : 'Karachi',
-        status: (override as any).status || defaultStatus,
-        is_featured: (override as any).is_featured ?? (idx === 0 || idx === 2),
-        is_verified: (override as any).is_verified ?? p.is_verified,
+        status: baseStatus,
+        seo_index: baseSeo,
+        is_featured: baseFeatured,
+        is_verified: baseVerified,
         created_at: (p as any).created_at || new Date(Date.now() - idx * 3600 * 24 * 1000).toISOString(),
         ...override,
       };
@@ -92,6 +111,7 @@ export async function GET(req: NextRequest) {
         allProviders.unshift({
           ...imp,
           cityName: imp.city_slug ? imp.city_slug.charAt(0).toUpperCase() + imp.city_slug.slice(1) : 'Karachi',
+          seo_index: imp.seo_index ?? (imp.status === 'published'),
           created_at: (imp as any).created_at || new Date().toISOString(),
         });
         existingIds.add(imp.id);
@@ -99,12 +119,56 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // Summary statistics across entire roster
+  const stats = {
+    total: allProviders.length,
+    published: allProviders.filter((p) => p.status === 'published' || p.status === 'approved').length,
+    pending: allProviders.filter((p) => p.status === 'pending').length,
+    suspended: allProviders.filter((p) => p.status === 'suspended' || p.status === 'rejected').length,
+    seoIndexed: allProviders.filter((p) => Boolean(p.seo_index)).length,
+    featured: allProviders.filter((p) => Boolean(p.is_featured)).length,
+    verified: allProviders.filter((p) => Boolean(p.is_verified)).length,
+  };
+
   // Filter by status
   let filtered = allProviders;
   if (statusFilter !== 'all') {
     filtered = filtered.filter((p) => {
-      const pStatus = (p.status || (p.is_verified ? 'approved' : 'pending')).toLowerCase();
+      const pStatus = (p.status || (p.is_verified ? 'published' : 'pending')).toLowerCase();
+      if (statusFilter === 'published') {
+        return pStatus === 'published' || pStatus === 'approved';
+      }
+      if (statusFilter === 'suspended') {
+        return pStatus === 'suspended' || pStatus === 'rejected';
+      }
       return pStatus === statusFilter.toLowerCase();
+    });
+  }
+
+  // Filter by SEO Index
+  if (seoFilter !== 'all') {
+    filtered = filtered.filter((p) => {
+      if (seoFilter === 'indexed') return Boolean(p.seo_index);
+      if (seoFilter === 'noindex') return !p.seo_index;
+      return true;
+    });
+  }
+
+  // Filter by Featured
+  if (featuredFilter !== 'all') {
+    filtered = filtered.filter((p) => {
+      if (featuredFilter === 'featured') return Boolean(p.is_featured);
+      if (featuredFilter === 'standard') return !p.is_featured;
+      return true;
+    });
+  }
+
+  // Filter by Verified
+  if (verifiedFilter !== 'all') {
+    filtered = filtered.filter((p) => {
+      if (verifiedFilter === 'verified') return Boolean(p.is_verified);
+      if (verifiedFilter === 'unverified') return !p.is_verified;
+      return true;
     });
   }
 
@@ -144,6 +208,7 @@ export async function GET(req: NextRequest) {
     page,
     limit,
     totalPages,
+    stats,
   });
 }
 
@@ -156,7 +221,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    const { id, status, is_verified, is_featured, is_available } = await req.json();
+    const { id, status, seo_index, is_featured, is_verified, is_available } = await req.json();
 
     if (!id) {
       return NextResponse.json({ error: 'Provider ID is required' }, { status: 400 });
@@ -165,24 +230,21 @@ export async function PATCH(req: NextRequest) {
     const updates: Record<string, any> = {};
 
     if (status !== undefined) {
-      updates.status = status;
-      // Keep is_verified in sync with status
-      if (status === 'approved') {
-        updates.is_verified = true;
+      const normStatus = status === 'approved' ? 'published' : status === 'rejected' ? 'suspended' : status;
+      updates.status = normStatus;
+      if (normStatus === 'published') {
         updates.is_available = true;
-      } else if (status === 'rejected' || status === 'suspended') {
-        updates.is_verified = false;
+      } else if (normStatus === 'suspended') {
         updates.is_available = false;
-      } else if (status === 'pending') {
-        updates.is_verified = false;
       }
+    }
+
+    if (seo_index !== undefined) {
+      updates.seo_index = Boolean(seo_index);
     }
 
     if (is_verified !== undefined) {
       updates.is_verified = Boolean(is_verified);
-      if (updates.status === undefined) {
-        updates.status = is_verified ? 'approved' : 'pending';
-      }
     }
 
     if (is_featured !== undefined) {

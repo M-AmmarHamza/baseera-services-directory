@@ -287,6 +287,7 @@ export async function POST(request: NextRequest) {
         service_area: serviceAreaArray,
         short_bio: short_bio?.trim() || `${resolvedTradeTitle} serving ${cleanCityName}. Direct communication with zero commission.`,
         status: 'pending', // Strictly defaults to pending for admin moderation
+        seo_index: false,
         is_verified: false,
         is_available: false,
         is_featured: false,
@@ -309,6 +310,7 @@ export async function POST(request: NextRequest) {
         name: name.trim(),
         slug: uniqueSlug,
         status: 'pending',
+        seo_index: false,
         is_verified: false,
         is_available: false,
         is_featured: false,
@@ -336,6 +338,7 @@ export async function POST(request: NextRequest) {
       name: name.trim(),
       slug: uniqueSlug,
       status: 'pending',
+      seo_index: false,
       is_verified: false,
       is_available: false,
       is_featured: false,
