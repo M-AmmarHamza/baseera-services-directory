@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { ArrowRight, Clock, User, Calendar, BookOpen } from 'lucide-react';
+import { getSiteUrl } from '@/lib/site-url';
 
 interface Props {
   params: Promise<{
@@ -9,7 +10,7 @@ interface Props {
   }>;
 }
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;

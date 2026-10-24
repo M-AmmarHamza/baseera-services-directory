@@ -21,6 +21,7 @@ import {
 import RelatedSlider from '@/components/RelatedSlider';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
+import { getSiteUrl } from '@/lib/site-url';
 
 interface CountryPageProps {
   params: Promise<{
@@ -29,7 +30,7 @@ interface CountryPageProps {
   }>;
 }
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
   const { lang, country } = await params;

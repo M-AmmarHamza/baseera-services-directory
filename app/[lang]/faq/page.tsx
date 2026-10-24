@@ -14,6 +14,7 @@ import {
 import JsonLd from '@/components/JsonLd';
 import { createFaqSchema, createBreadcrumbSchema } from '@/lib/schema';
 import FaqAccordion, { FaqAccordionItem, FaqCategory } from '@/components/FaqAccordion';
+import { getSiteUrl } from '@/lib/site-url';
 
 interface PageProps {
   params: Promise<{
@@ -21,7 +22,7 @@ interface PageProps {
   }>;
 }
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 
 export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'ur' }, { lang: 'ar' }];

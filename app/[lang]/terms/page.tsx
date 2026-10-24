@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { FileText, ShieldAlert, CheckCircle2, ChevronRight, Scale, Handshake } from 'lucide-react';
+import { getSiteUrl } from '@/lib/site-url';
 
 interface PageProps {
   params: Promise<{
@@ -9,7 +10,7 @@ interface PageProps {
   }>;
 }
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;

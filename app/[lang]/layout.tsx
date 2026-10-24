@@ -1,16 +1,47 @@
 import '../globals.css';
 import React from 'react';
 import Link from 'next/link';
+import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Plus } from 'lucide-react';
 import CitySelector from '@/components/CitySelector';
 import BottomNav from '@/components/BottomNav';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { tajawal, inter, notoNastaliqUrdu } from '@/app/fonts';
+import { getSiteUrl, isIndexingAllowed } from '@/lib/site-url';
 
 export async function generateStaticParams() {
   return [{ lang: 'en' }, { lang: 'ur' }, { lang: 'ar' }];
 }
+
+export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
+  robots: isIndexingAllowed()
+    ? {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
+      }
+    : {
+        index: false,
+        follow: false,
+        nocache: true,
+        googleBot: {
+          index: false,
+          follow: false,
+          noimageindex: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'none',
+          'max-snippet': -1,
+        },
+      },
+};
 
 export default async function RootLayout({
   children,

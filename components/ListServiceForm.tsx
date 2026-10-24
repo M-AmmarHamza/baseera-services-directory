@@ -25,6 +25,7 @@ import {
   MAX_SERVICE_AREAS,
   MAX_BIO_LENGTH,
 } from '@/lib/validations/provider';
+import { getSiteUrl } from '@/lib/site-url';
 import {
   ShieldCheck,
   ArrowRight,
@@ -606,7 +607,7 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
                 <ArrowRight className={`w-4 h-4 shrink-0 ${isRTL ? 'rotate-180' : ''}`} />
               </Link>
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(`${t('whatsapp_share_text')}https://baseera-services-directory.vercel.app${createdProfile.publicUrl}`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`${t('whatsapp_share_text')}${typeof window !== 'undefined' ? window.location.origin : getSiteUrl()}${createdProfile.publicUrl}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto py-3 px-5 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-semibold text-sm shadow-xs transition-all flex items-center justify-center gap-2"

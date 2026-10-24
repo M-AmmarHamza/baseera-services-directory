@@ -16,6 +16,7 @@ import SearchBar from '@/components/SearchBar';
 import RelatedSlider from '@/components/RelatedSlider';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
+import { getSiteUrl } from '@/lib/site-url';
 import {
   CategoryIcon,
   MapPin,
@@ -44,7 +45,7 @@ interface PageProps {
   }>;
 }
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, country, city } = await params;

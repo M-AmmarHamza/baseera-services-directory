@@ -26,6 +26,7 @@ import QuickFacts from '@/components/QuickFacts';
 import CategoryFaqSection from '@/components/CategoryFaqSection';
 import FeaturedProfilesSlider from '@/components/FeaturedProfilesSlider';
 import JsonLd from '@/components/JsonLd';
+import { getSiteUrl } from '@/lib/site-url';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -36,7 +37,7 @@ interface CategoryPageProps {
   }>;
 }
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 
 // 1. PROGRAMMATIC SEO META TAGS
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {

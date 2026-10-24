@@ -12,6 +12,7 @@ import FeaturedProvidersSlider from '@/components/FeaturedProvidersSlider';
 import { getAllProviders, CATEGORIES, getCategoryName } from '@/lib/db';
 import { getDictionary } from '@/lib/get-dictionary';
 import JsonLd from '@/components/JsonLd';
+import { getSiteUrl } from '@/lib/site-url';
 
 interface PageProps {
   params: Promise<{
@@ -19,7 +20,7 @@ interface PageProps {
   }>;
 }
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;

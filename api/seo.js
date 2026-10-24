@@ -4,7 +4,7 @@
 
 import { generateSiloUrl } from '../lib/transliterate.js';
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
+const DOMAIN = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://baseera-services-directory.vercel.app';
 
 export default function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

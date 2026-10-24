@@ -18,6 +18,7 @@ import {
   AlertCircle,
   ChevronRight,
 } from '@/components/Icons';
+import { getSiteUrl } from '@/lib/site-url';
 
 interface SearchPageProps {
   params: Promise<{
@@ -30,7 +31,7 @@ interface SearchPageProps {
   }>;
 }
 
-const DOMAIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({
   params,

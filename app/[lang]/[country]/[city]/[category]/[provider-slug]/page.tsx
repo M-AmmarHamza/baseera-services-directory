@@ -36,6 +36,7 @@ import LeadTrackButton from '@/components/LeadTrackButton';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
 import ProfileUnderReview from '@/components/ProfileUnderReview';
+import { getSiteUrl } from '@/lib/site-url';
 
 interface ProviderPageProps {
   params: Promise<{
@@ -47,7 +48,7 @@ interface ProviderPageProps {
   }>;
 }
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 
 // DYNAMIC CATEGORY SPECIALIZATIONS (ZERO HARDCODED MISMATCHES)
 const CATEGORY_SPECIALIZATIONS: Record<string, Array<{ title: string; desc: string }>> = {

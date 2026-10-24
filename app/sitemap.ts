@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { CATEGORIES, CITIES, COUNTRIES, getAllProviders, Provider } from '@/lib/db';
+import { getSiteUrl } from '@/lib/site-url';
 
-const DOMAIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 const SUPPORTED_LOCALES = ['en', 'ur', 'ar'];
 const PROVIDER_CHUNK_SIZE = 1000;
 

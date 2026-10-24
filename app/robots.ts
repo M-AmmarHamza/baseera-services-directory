@@ -1,8 +1,26 @@
 import { MetadataRoute } from 'next';
-
-const DOMAIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://baseera-services-directory.vercel.app';
+import { getSiteUrl, isIndexingAllowed } from '@/lib/site-url';
 
 export default function robots(): MetadataRoute.Robots {
+  const domain = getSiteUrl();
+  const allowIndexing = isIndexingAllowed();
+
+  // STAGING / TEMPORARY DOMAIN PROTECTION:
+  // If indexing is not explicitly enabled, disallow all crawlers from the root
+  // to avoid duplicate content penalties before the production custom domain is live.
+  if (!allowIndexing) {
+    return {
+      rules: [
+        {
+          userAgent: '*',
+          disallow: '/',
+        },
+      ],
+      sitemap: `${domain}/sitemap.xml`,
+    };
+  }
+
+  // PRODUCTION CONFIGURATION:
   return {
     rules: [
       {
@@ -23,9 +41,9 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: [
-      `${DOMAIN}/sitemap.xml`,
-      `${DOMAIN}/sitemap/0.xml`,
-      `${DOMAIN}/sitemap/1.xml`,
+      `${domain}/sitemap.xml`,
+      `${domain}/sitemap/0.xml`,
+      `${domain}/sitemap/1.xml`,
     ],
   };
 }

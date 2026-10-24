@@ -2,8 +2,9 @@ import React, { Suspense } from 'react';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
 import ListServiceForm from '@/components/ListServiceForm';
+import { getSiteUrl } from '@/lib/site-url';
 
-const DOMAIN = 'https://baseera-services-directory.vercel.app';
+const DOMAIN = getSiteUrl();
 
 interface PageProps {
   params: Promise<{
