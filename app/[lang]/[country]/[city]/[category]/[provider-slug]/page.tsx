@@ -306,6 +306,10 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
         : `Contact ${providerName} for verified ${categoryName} services in ${cityName}. Direct contact with zero commission.`);
 
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`;
+  const socialImage = provider.profile_picture || provider.avatar_url || getProviderCoverUrl(provider);
+  const socialDescription = provider.trade_title
+    ? `${provider.trade_title} • ${provider.district ? `${provider.district}، ` : ''}${cityName} (${categoryName}) | Baseera`
+    : description;
 
   return {
     title,
@@ -322,19 +326,25 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     },
     openGraph: {
       title,
-      description,
+      description: socialDescription,
       url: canonicalUrl,
       siteName: lang === 'ur' ? 'بصیرہ ڈائریکٹری' : lang === 'ar' ? 'دليل بصيرة' : 'Baseera Local Services Directory',
       images: [
         {
-          url: getProviderCoverUrl(provider),
-          width: 1200,
-          height: 630,
-          alt: `${providerName} - ${categoryName} in ${cityName}`,
+          url: socialImage,
+          width: 800,
+          height: 800,
+          alt: `${providerName} - ${provider.trade_title || categoryName} in ${cityName}`,
         },
       ],
       locale: lang === 'ur' ? 'ur_PK' : lang === 'ar' ? 'ar_AE' : 'en_US',
       type: 'profile',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: socialDescription,
+      images: [socialImage],
     },
   };
 }

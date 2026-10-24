@@ -7,6 +7,7 @@ import {
   MapPin,
   MessageCircle,
   ChevronRight,
+  ChevronLeft,
   ArrowRight,
   Sparkles,
   PlusCircle,
@@ -20,6 +21,7 @@ import {
   getLocalizedCityName,
   toTitleCase,
 } from '@/lib/db';
+import { getCategoryCoverBanner } from '@/lib/category-banners';
 import { formatVisitingPrice } from '@/lib/currencies';
 import RelatedSlider from '@/components/RelatedSlider';
 import QuickFacts from '@/components/QuickFacts';
@@ -36,25 +38,35 @@ interface CategoryPageProps {
     city: string;
     category: string;
   }>;
+  searchParams?: Promise<{
+    page?: string;
+  }>;
 }
 
 const DOMAIN = getSiteUrl();
 
 // 1. PROGRAMMATIC SEO META TAGS
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: CategoryPageProps): Promise<Metadata> {
   const { lang, country, city, category } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const currentPage = Math.max(1, parseInt(resolvedSearchParams?.page || '1', 10) || 1);
   const catObj = getCategoryBySlug(category);
   const categoryName = getCategoryName(catObj, lang);
   const cityName = getLocalizedCityName(city, lang);
   const countryObj = getCountryByCode(country);
   const countryName = getLocalizedCountryName(countryObj, lang);
+  const categoryBannerUrl = getCategoryCoverBanner(category);
+
+  const pageSuffix = currentPage > 1 ? ` - Page ${currentPage}` : '';
+  const pageSuffixUr = currentPage > 1 ? ` - صفحہ ${currentPage}` : '';
+  const pageSuffixAr = currentPage > 1 ? ` - صفحة ${currentPage}` : '';
 
   const title =
     lang === 'ur'
-      ? `${cityName} میں بہترین تصدیق شدہ ${categoryName} | بصیرہ`
+      ? `${cityName} میں بہترین تصدیق شدہ ${categoryName}${pageSuffixUr} | بصیرہ`
       : lang === 'ar'
-      ? `أفضل ${categoryName} في ${cityName}، ${countryName} | ملفات معتمدة`
-      : `Best ${categoryName} in ${cityName}, ${countryName} | Top Rated Profiles`;
+      ? `أفضل ${categoryName} في ${cityName}، ${countryName}${pageSuffixAr} | ملفات معتمدة`
+      : `Best ${categoryName} in ${cityName}, ${countryName}${pageSuffix} | Top Rated Profiles`;
 
   const description =
     lang === 'ur'
@@ -63,7 +75,8 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       ? `هل تبحث عن ${categoryName} موثوق في ${cityName}؟ تصفح الملفات المعتمدة، واطلع على التقييمات، وتواصل مباشرة عبر واتساب بدون وسيط!`
       : `Looking for a reliable ${categoryName} in ${cityName}? Browse verified profiles, check ratings, view portfolios, and chat directly on WhatsApp. No middlemen!`;
 
-  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
+  const baseUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
+  const canonicalUrl = currentPage > 1 ? `${baseUrl}?page=${currentPage}` : baseUrl;
 
   return {
     title,
@@ -71,10 +84,10 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
-        ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
-        ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
-        'x-default': `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`,
+        en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}${currentPage > 1 ? `?page=${currentPage}` : ''}`,
+        ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}${currentPage > 1 ? `?page=${currentPage}` : ''}`,
+        ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}${currentPage > 1 ? `?page=${currentPage}` : ''}`,
+        'x-default': `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}${currentPage > 1 ? `?page=${currentPage}` : ''}`,
       },
     },
     openGraph: {
@@ -82,14 +95,30 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       description,
       url: canonicalUrl,
       siteName: lang === 'ur' ? 'بصیرہ ڈائریکٹری' : lang === 'ar' ? 'دليل بصيرة' : 'Baseera Local Services Directory',
+      images: [
+        {
+          url: categoryBannerUrl,
+          width: 1200,
+          height: 630,
+          alt: `${categoryName} in ${cityName}`,
+        },
+      ],
       locale: lang === 'ur' ? 'ur_PK' : lang === 'ar' ? 'ar_AE' : 'en_US',
       type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [categoryBannerUrl],
     },
   };
 }
 
-export default async function CategoryListingPage({ params }: CategoryPageProps) {
+export default async function CategoryListingPage({ params, searchParams }: CategoryPageProps) {
   const { lang, country, city, category } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const requestedPage = Math.max(1, parseInt(resolvedSearchParams?.page || '1', 10) || 1);
   const providers = await getProviders(city, category);
   const catObj = getCategoryBySlug(category);
   const categoryName = getCategoryName(catObj, lang);
@@ -97,7 +126,30 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
   const countryObj = getCountryByCode(country);
   const countryName = getLocalizedCountryName(countryObj, lang);
   const commaSeparator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
-  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
+
+  const baseUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
+  const relativeBaseUrl = `/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
+
+  // Pagination Settings & Logic
+  const ITEMS_PER_PAGE = 12;
+  const totalPages = Math.max(1, Math.ceil(providers.length / ITEMS_PER_PAGE));
+  const currentPage = Math.min(requestedPage, totalPages);
+  const paginatedProviders = providers.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const prevPageUrl = currentPage > 1
+    ? currentPage === 2
+      ? baseUrl
+      : `${baseUrl}?page=${currentPage - 1}`
+    : null;
+
+  const nextPageUrl = currentPage < totalPages
+    ? `${baseUrl}?page=${currentPage + 1}`
+    : null;
+
+  const canonicalUrl = currentPage > 1 ? `${baseUrl}?page=${currentPage}` : baseUrl;
 
   // Programmatic BreadcrumbList Schema
   const breadcrumbJsonLd = {
@@ -218,6 +270,12 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
     <div className={`min-h-screen bg-white text-neutral-900 pb-24 md:pb-16 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
       {/* Programmatic BreadcrumbList & CollectionPage JSON-LD Injection */}
       <JsonLd data={[breadcrumbJsonLd, categoryCollectionJsonLd]} />
+
+      {/* Rel Prev/Next Link Tags in Head for Search Engine Crawlers */}
+      <head>
+        {prevPageUrl && <link rel="prev" href={prevPageUrl} />}
+        {nextPageUrl && <link rel="next" href={nextPageUrl} />}
+      </head>
 
       {/* Breadcrumbs Navigation */}
       <div className="border-b border-gray-200 bg-white">
@@ -391,7 +449,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {providers.map((provider, idx) => {
+            {paginatedProviders.map((provider, idx) => {
               const cleanPhone = provider.whatsapp_number.replace(/[^0-9]/g, '');
               const whatsappMessage = encodeURIComponent(
                 lang === 'ur'
@@ -526,6 +584,80 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
             );
           })}
               </div>
+
+              {/* Crawlable Pagination Controls */}
+              {totalPages > 1 && (
+                <nav
+                  aria-label="Provider list pagination"
+                  className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200"
+                >
+                  <div className="text-xs text-gray-500 font-medium">
+                    {lang === 'ur'
+                      ? `کل ${providers.length} میں سے ${(currentPage - 1) * ITEMS_PER_PAGE + 1} تا ${Math.min(currentPage * ITEMS_PER_PAGE, providers.length)} کاریگر دکھائے جا رہے ہیں (صفحہ ${currentPage} از ${totalPages})`
+                      : lang === 'ar'
+                      ? `عرض ${(currentPage - 1) * ITEMS_PER_PAGE + 1} إلى ${Math.min(currentPage * ITEMS_PER_PAGE, providers.length)} من أصل ${providers.length} فني (صفحة ${currentPage} من ${totalPages})`
+                      : `Showing ${(currentPage - 1) * ITEMS_PER_PAGE + 1}–${Math.min(currentPage * ITEMS_PER_PAGE, providers.length)} of ${providers.length} specialists (Page ${currentPage} of ${totalPages})`}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {/* Previous Page Link */}
+                    {prevPageUrl ? (
+                      <Link
+                        href={currentPage === 2 ? relativeBaseUrl : `${relativeBaseUrl}?page=${currentPage - 1}`}
+                        rel="prev"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-xs font-semibold text-gray-700 transition-colors shadow-2xs"
+                      >
+                        <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
+                        <span>{lang === 'ur' ? 'پچھلا' : lang === 'ar' ? 'السابق' : 'Previous'}</span>
+                      </Link>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400 cursor-not-allowed">
+                        <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
+                        <span>{lang === 'ur' ? 'پچھلا' : lang === 'ar' ? 'السابق' : 'Previous'}</span>
+                      </span>
+                    )}
+
+                    {/* Page Number Chips */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((pNum) => {
+                        const isCurrent = pNum === currentPage;
+                        const pageHref = pNum === 1 ? relativeBaseUrl : `${relativeBaseUrl}?page=${pNum}`;
+                        return (
+                          <Link
+                            key={pNum}
+                            href={pageHref}
+                            aria-current={isCurrent ? 'page' : undefined}
+                            className={`w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold transition-all ${
+                              isCurrent
+                                ? 'bg-[#059669] text-white shadow-2xs'
+                                : 'border border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
+                            }`}
+                          >
+                            {pNum}
+                          </Link>
+                        );
+                      })}
+                    </div>
+
+                    {/* Next Page Link */}
+                    {nextPageUrl ? (
+                      <Link
+                        href={`${relativeBaseUrl}?page=${currentPage + 1}`}
+                        rel="next"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 text-xs font-semibold text-gray-700 transition-colors shadow-2xs"
+                      >
+                        <span>{lang === 'ur' ? 'اگلا' : lang === 'ar' ? 'التالي' : 'Next'}</span>
+                        <ChevronRight className="w-4 h-4 rtl:rotate-180" />
+                      </Link>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400 cursor-not-allowed">
+                        <span>{lang === 'ur' ? 'اگلا' : lang === 'ar' ? 'التالي' : 'Next'}</span>
+                        <ChevronRight className="w-4 h-4 rtl:rotate-180" />
+                      </span>
+                    )}
+                  </div>
+                </nav>
+              )}
             </div>
           </div>
         )}

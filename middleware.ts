@@ -60,6 +60,27 @@ const LEGACY_PROVIDER_MAP: Record<string, { category: string; slug: string }> = 
   'rashid-al-nuaimi': { category: 'ac-technician', slug: 'rashid-al-nuaimi' },
 };
 
+export interface ProviderRedirectTarget {
+  country?: string;
+  city?: string;
+  category?: string;
+  slug?: string;
+}
+
+// 301 Permanent Redirect Mapping for Provider Migrations
+// Handles future URL migrations when a provider's slug, category, or city changes
+export const PROVIDER_PERMANENT_REDIRECTS: Record<string, ProviderRedirectTarget> = {
+  'tariq-electric': { category: 'electrician', slug: 'tariq-mahmood', city: 'karachi', country: 'pk' },
+  'irfan-electrician': { category: 'electrician', slug: 'tariq-mahmood', city: 'karachi', country: 'pk' },
+  'master-plumber-saleem': { category: 'plumber', slug: 'saleem-master-plumber', city: 'karachi', country: 'pk' },
+  'karachi-cooling-expert': { category: 'ac-technician', slug: 'kashif-ali', city: 'karachi', country: 'pk' },
+  // Compound key mapping: "city/category/old-slug"
+  'karachi/electrician/tariq-electric': { category: 'electrician', slug: 'tariq-mahmood', city: 'karachi', country: 'pk' },
+  'karachi/electrician/irfan-electrician': { category: 'electrician', slug: 'tariq-mahmood', city: 'karachi', country: 'pk' },
+  'karachi/plumber/master-plumber-saleem': { category: 'plumber', slug: 'saleem-master-plumber', city: 'karachi', country: 'pk' },
+  'karachi/ac-technician/karachi-cooling-expert': { category: 'ac-technician', slug: 'kashif-ali', city: 'karachi', country: 'pk' },
+};
+
 // SEO Slug redirects for legacy or alias category names to canonical slugs
 const SHORT_CATEGORY_REDIRECTS: Record<string, string> = {
   ac: 'ac-technician',
@@ -104,6 +125,14 @@ export async function middleware(request: NextRequest) {
     pathname === '/llms-full.txt'
   ) {
     return NextResponse.next();
+  }
+
+  // Trailing slash 301 Permanent Redirect to prevent duplicate content
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    const cleanPath = pathname.slice(0, -1);
+    const redirectUrl = new URL(cleanPath, request.url);
+    redirectUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(redirectUrl, 301);
   }
 
   // 1. Detect user country and city using Vercel Edge req.geo with header fallbacks
@@ -225,7 +254,7 @@ export async function middleware(request: NextRequest) {
     );
   }
 
-  // Canonical SEO Category Slug Redirects (e.g., /pk/karachi/ac -> /pk/karachi/ac-repair)
+  // Canonical SEO Category Slug Redirects (e.g., /pk/karachi/ac -> /pk/karachi/ac-technician)
   if (segments.length >= 4 && !['blog', 'admin', 'dashboard', 'privacy', 'terms', 'about', 'list-service'].includes(segments[1])) {
     const rawCategory = segments[3].toLowerCase();
     const canonicalCategory = SHORT_CATEGORY_REDIRECTS[rawCategory];
@@ -234,7 +263,35 @@ export async function middleware(request: NextRequest) {
       canonicalSegments[3] = canonicalCategory;
       const targetUrl = new URL(`/${canonicalSegments.join('/')}`, request.url);
       targetUrl.search = request.nextUrl.search;
-      return NextResponse.redirect(targetUrl, 308);
+      return NextResponse.redirect(targetUrl, 301); // 301 Permanent Redirect
+    }
+  }
+
+  // 301 Permanent Redirects for Provider Migrations (e.g. slug, city, or category updates)
+  if (segments.length === 5 && !['admin', 'api', '_next', 'blog', 'dashboard', 'privacy', 'terms', 'about', 'list-service'].includes(segments[1])) {
+    const [_, currentCountry, currentCity, currentCategory, currentSlug] = segments;
+    const compoundKey = `${currentCity.toLowerCase()}/${currentCategory.toLowerCase()}/${currentSlug.toLowerCase()}`;
+    const redirectTarget = PROVIDER_PERMANENT_REDIRECTS[compoundKey] || PROVIDER_PERMANENT_REDIRECTS[currentSlug.toLowerCase()];
+
+    if (redirectTarget) {
+      const targetCountry = (redirectTarget.country || currentCountry).toLowerCase();
+      const targetCity = (redirectTarget.city || currentCity).toLowerCase();
+      const targetCategory = (redirectTarget.category || currentCategory).toLowerCase();
+      const targetSlug = (redirectTarget.slug || currentSlug).toLowerCase();
+
+      if (
+        targetCountry !== currentCountry.toLowerCase() ||
+        targetCity !== currentCity.toLowerCase() ||
+        targetCategory !== currentCategory.toLowerCase() ||
+        targetSlug !== currentSlug.toLowerCase()
+      ) {
+        const canonicalUrl = new URL(
+          `/${lang}/${targetCountry}/${targetCity}/${targetCategory}/${targetSlug}`,
+          request.url
+        );
+        canonicalUrl.search = request.nextUrl.search;
+        return NextResponse.redirect(canonicalUrl, 301); // 301 Permanent Redirect
+      }
     }
   }
 
