@@ -36,6 +36,8 @@ import LeadTrackButton from '@/components/LeadTrackButton';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
 import ProfileUnderReview from '@/components/ProfileUnderReview';
+import CategoryFaqSection from '@/components/CategoryFaqSection';
+import AdBanner from '@/components/AdBanner';
 import { getSiteUrl } from '@/lib/site-url';
 
 interface ProviderPageProps {
@@ -807,6 +809,17 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                 </div>
               </div>
             </div>
+
+            {/* Strategic Right Sidebar Ad Unit (Desktop sticky placement) */}
+            <div className="hidden lg:block">
+              <AdBanner
+                adSlot="profile-sidebar"
+                format="rectangle"
+                minHeight={250}
+                lang={lang}
+                className="rounded-2xl bg-white border border-gray-200/90 shadow-2xs"
+              />
+            </div>
           </div>
         </div>
 
@@ -853,6 +866,28 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               : `More Featured ${categoryName}s in ${cityName}`
           }
         />
+
+        {/* Strategic Ad Unit Placed Directly Above Dynamic FAQs */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="mb-8">
+            <AdBanner
+              adSlot="profile-pre-faq"
+              format="horizontal"
+              minHeight={100}
+              lang={lang}
+              className="rounded-2xl bg-white border border-gray-200/90 shadow-2xs w-full"
+            />
+          </div>
+
+          {/* Dynamic Category FAQs with FAQPage Schema */}
+          <CategoryFaqSection
+            categoryName={categoryName}
+            cityName={cityName}
+            countryName={countryName}
+            startingPrice={formatVisitingPrice(provider.starting_price, provider.country_code || country)}
+            lang={lang}
+          />
+        </div>
       </main>
 
       {/* CRITICAL UI: STICKY FLOATING ACTION BUTTON (FAB) ANCHORED BOTTOM-RIGHT WITH LEAD TRACKING */}

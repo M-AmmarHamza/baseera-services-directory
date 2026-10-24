@@ -1,6 +1,7 @@
 import '../globals.css';
 import React from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
 import { Plus } from 'lucide-react';
@@ -287,6 +288,16 @@ export default async function RootLayout({
 
         {/* Persistent Mobile Bottom Navigation Bar (Legacy Fidelity) */}
         <BottomNav lang={lang} />
+
+        {/* Third-Party AdSense Optimization: Non-blocking lazyOnload script */}
+        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+          <Script
+            id="google-adsense"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
+            strategy="lazyOnload"
+            crossOrigin="anonymous"
+          />
+        )}
       </body>
     </html>
   );

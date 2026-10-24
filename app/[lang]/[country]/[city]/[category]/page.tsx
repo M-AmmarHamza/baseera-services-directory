@@ -26,6 +26,7 @@ import QuickFacts from '@/components/QuickFacts';
 import CategoryFaqSection from '@/components/CategoryFaqSection';
 import FeaturedProfilesSlider from '@/components/FeaturedProfilesSlider';
 import JsonLd from '@/components/JsonLd';
+import AdBanner from '@/components/AdBanner';
 import { getSiteUrl } from '@/lib/site-url';
 
 interface CategoryPageProps {
@@ -390,7 +391,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {providers.map((provider) => {
+            {providers.map((provider, idx) => {
               const cleanPhone = provider.whatsapp_number.replace(/[^0-9]/g, '');
               const whatsappMessage = encodeURIComponent(
                 lang === 'ur'
@@ -403,10 +404,10 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
               const profileHref = `/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${provider.slug}`;
 
               return (
-                <div
-                  key={provider.id}
-                  className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 hover:border-gray-300 transition-colors flex flex-col justify-between shadow-2xs"
-                >
+                <React.Fragment key={provider.id}>
+                  <div
+                    className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 hover:border-gray-300 transition-colors flex flex-col justify-between shadow-2xs"
+                  >
                   <div>
                     {/* Top Row: Avatar, Name, Verified Badge, Rating */}
                     <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
@@ -508,8 +509,22 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
                     </a>
                   </div>
                 </div>
-              );
-            })}
+
+                {/* Strategic In-Feed Native Ad Insertion (after every 6th card) */}
+                {(idx + 1) % 6 === 0 && (
+                  <div className="col-span-1 md:col-span-2 lg:col-span-3 my-2">
+                    <AdBanner
+                      adSlot="category-in-feed"
+                      format="fluid"
+                      layoutKey="-gw-1+2a-9x+5c"
+                      lang={lang}
+                      className="rounded-2xl bg-white border border-gray-200/90 shadow-2xs"
+                    />
+                  </div>
+                )}
+              </React.Fragment>
+            );
+          })}
               </div>
             </div>
           </div>
