@@ -284,37 +284,54 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   const countryObj = getCountryByCode(country);
   const countryName = getLocalizedCountryName(countryObj, lang);
 
-  // Exact Programmatic SEO Formula
-  const title =
+  // Helper to strictly clamp strings to SEO length limits
+  const clampLength = (text: string, maxLen: number): string => {
+    if (text.length <= maxLen) return text;
+    return text.slice(0, maxLen - 3).trimEnd() + '...';
+  };
+
+  // 1. DYNAMIC META TITLE (Max 60 chars): [fullName] - [categoryName] in [cityName] | Baseera
+  const rawTitle =
     lang === 'ur'
-      ? `${providerName} - ${cityName} میں ماہر ${categoryName} | بصیرہ`
+      ? `${providerName} - ${cityName} میں ${categoryName} | بصیرہ`
       : lang === 'ar'
-      ? `${providerName} - فني ${categoryName} معتمد في ${cityName} | بصيرة`
-      : `${providerName} - Expert ${categoryName} in ${cityName} | Baseera`;
+      ? `${providerName} - ${categoryName} في ${cityName} | بصيرة`
+      : `${providerName} - ${categoryName} in ${cityName} | Baseera`;
+  const title = clampLength(rawTitle, 60);
 
-  const isProfilePremium = Boolean(provider.is_premium);
+  // 2. DYNAMIC META DESCRIPTION (Max 155 chars):
+  // Hire [fullName], expert [categoryName] in [cityName]. Direct WhatsApp: [whatsappNumber]. Zero commission & no hidden fees.
+  const whatsappContact = provider.whatsapp_number
+    ? provider.whatsapp_number
+    : lang === 'ur'
+    ? 'پروفائل پر دستیاب'
+    : lang === 'ar'
+    ? 'متاح في الملف'
+    : 'Available on profile';
 
-  const description = isProfilePremium
-    ? (lang === 'ur'
-        ? `${cityName} میں ${categoryName} سروسز کے لیے ${providerName} سے رابطہ کریں۔ کام کی تصاویر دیکھیں، تصدیق شدہ اسناد جانچیں اور براہِ راست واٹس ایپ کریں۔`
-        : lang === 'ar'
-        ? `تواصل مع ${providerName} للحصول على خدمات ${categoryName} في ${cityName}. اطلع على معرض الأعمال والشهادات وتواصل مباشرة عبر واتساب.`
-        : `Contact ${providerName} for professional ${categoryName} services in ${cityName}. View their work gallery, verified credentials, and message directly on WhatsApp.`)
-    : (lang === 'ur'
-        ? `${cityName} میں ${categoryName} سروسز کے لیے ${providerName} سے رابطہ کریں۔ پروفائل تفصیلات جانچیں اور براہِ راست واٹس ایپ کریں۔`
-        : lang === 'ar'
-        ? `تواصل مع ${providerName} للحصول على خدمات ${categoryName} في ${cityName}. تواصل مباشرة عبر واتساب.`
-        : `Contact ${providerName} for verified ${categoryName} services in ${cityName}. Direct contact with zero commission.`);
+  const rawDescription =
+    lang === 'ur'
+      ? `${cityName} میں ماہر ${categoryName} ${providerName} کی خدمات حاصل کریں۔ براہِ راست واٹس ایپ: ${whatsappContact}۔ زیرو کمیشن اور کوئی پوشیدہ فیس نہیں۔`
+      : lang === 'ar'
+      ? `وظّف ${providerName}، خبير ${categoryName} في ${cityName}. واتساب مباشر: ${whatsappContact}. صفر عمولة وبدون رسوم مخفية.`
+      : `Hire ${providerName}, expert ${categoryName} in ${cityName}. Direct WhatsApp: ${whatsappContact}. Zero commission & no hidden fees.`;
+  const description = clampLength(rawDescription, 155);
+
+  // 3. DYNAMIC META KEYWORDS: [categoryName], [categoryName] in [cityName], hire [categoryName], [fullName], Baseera
+  const keywords =
+    lang === 'ur'
+      ? [categoryName, `${cityName} میں ${categoryName}`, `${categoryName} کی خدمات`, providerName, 'بصیرہ']
+      : lang === 'ar'
+      ? [categoryName, `${categoryName} في ${cityName}`, `توظيف ${categoryName}`, providerName, 'بصيرة']
+      : [categoryName, `${categoryName} in ${cityName}`, `hire ${categoryName}`, providerName, 'Baseera'];
 
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`;
   const socialImage = provider.profile_picture || provider.avatar_url || getProviderCoverUrl(provider);
-  const socialDescription = provider.trade_title
-    ? `${provider.trade_title} • ${provider.district ? `${provider.district}، ` : ''}${cityName} (${categoryName}) | Baseera`
-    : description;
 
   return {
     title,
     description,
+    keywords,
     ...(robotsConfig ? { robots: robotsConfig } : {}),
     alternates: {
       canonical: canonicalUrl,
@@ -327,7 +344,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     },
     openGraph: {
       title,
-      description: socialDescription,
+      description,
       url: canonicalUrl,
       siteName: lang === 'ur' ? 'بصیرہ ڈائریکٹری' : lang === 'ar' ? 'دليل بصيرة' : 'Baseera Local Services Directory',
       images: [
@@ -335,7 +352,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
           url: socialImage,
           width: 800,
           height: 800,
-          alt: `${providerName} - ${provider.trade_title || categoryName} in ${cityName}`,
+          alt: `${providerName} - ${categoryName} in ${cityName}`,
         },
       ],
       locale: lang === 'ur' ? 'ur_PK' : lang === 'ar' ? 'ar_AE' : 'en_US',
@@ -344,7 +361,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     twitter: {
       card: 'summary_large_image',
       title,
-      description: socialDescription,
+      description,
       images: [socialImage],
     },
   };

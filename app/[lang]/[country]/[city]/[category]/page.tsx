@@ -57,23 +57,35 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
   const countryName = getLocalizedCountryName(countryObj, lang);
   const categoryBannerUrl = getCategoryCoverBanner(category);
 
-  const pageSuffix = currentPage > 1 ? ` - Page ${currentPage}` : '';
-  const pageSuffixUr = currentPage > 1 ? ` - صفحہ ${currentPage}` : '';
-  const pageSuffixAr = currentPage > 1 ? ` - صفحة ${currentPage}` : '';
+  const pageSuffix = currentPage > 1 ? ` (Page ${currentPage})` : '';
+  const pageSuffixUr = currentPage > 1 ? ` (صفحہ ${currentPage})` : '';
+  const pageSuffixAr = currentPage > 1 ? ` (صفحة ${currentPage})` : '';
 
+  // 1. DYNAMIC META TITLE: Top [categoryName] in [cityName] - Direct WhatsApp | Baseera
   const title =
     lang === 'ur'
-      ? `${cityName} میں بہترین تصدیق شدہ ${categoryName}${pageSuffixUr} | بصیرہ`
+      ? `${cityName} میں سرفہرست ${categoryName}${pageSuffixUr} - براہِ راست واٹس ایپ | بصیرہ`
       : lang === 'ar'
-      ? `أفضل ${categoryName} في ${cityName}، ${countryName}${pageSuffixAr} | ملفات معتمدة`
-      : `Best ${categoryName} in ${cityName}, ${countryName}${pageSuffix} | Top Rated Profiles`;
+      ? `أفضل ${categoryName} في ${cityName}${pageSuffixAr} - واتساب مباشر | بصيرة`
+      : `Top ${categoryName} in ${cityName}${pageSuffix} - Direct WhatsApp | Baseera`;
 
+  // 2. DYNAMIC META DESCRIPTION:
+  // Find the best [categoryName] in [cityName]. Browse verified profiles, check details, and contact directly on WhatsApp with zero commission on Baseera.
   const description =
     lang === 'ur'
-      ? `کیا آپ ${cityName} میں قابل اعتماد ${categoryName} تلاش کر رہے ہیں؟ تصدیق شدہ پروفائلز دیکھیں، ریٹنگز جانچیں اور بغیر کسی کمیشن کے براہِ راست واٹس ایپ پر رابطہ کریں۔`
+      ? `${cityName} میں بہترین ${categoryName} تلاش کریں۔ تصدیق شدہ پروفائلز دیکھیں، تفصیلات جانچیں اور بغیر کسی کمیشن کے براہِ راست واٹس ایپ پر بصیرہ پر رابطہ کریں۔`
       : lang === 'ar'
-      ? `هل تبحث عن ${categoryName} موثوق في ${cityName}؟ تصفح الملفات المعتمدة، واطلع على التقييمات، وتواصل مباشرة عبر واتساب بدون وسيط!`
-      : `Looking for a reliable ${categoryName} in ${cityName}? Browse verified profiles, check ratings, view portfolios, and chat directly on WhatsApp. No middlemen!`;
+      ? `ابحث عن أفضل ${categoryName} في ${cityName}. تصفح الملفات المعتمدة، واطلع على التفاصيل، وتواصل مباشرة عبر واتساب بدون عمولة على دليل بصيرة.`
+      : `Find the best ${categoryName} in ${cityName}. Browse verified profiles, check details, and contact directly on WhatsApp with zero commission on Baseera.`;
+
+  // 3. DYNAMIC META KEYWORDS:
+  // [categoryName] in [cityName], top [categoryName], best [categoryName] near me, Baseera [categoryName]
+  const keywords =
+    lang === 'ur'
+      ? [`${cityName} میں ${categoryName}`, `سرفہرست ${categoryName}`, `بہترین ${categoryName}`, `بصیرہ ${categoryName}`]
+      : lang === 'ar'
+      ? [`${categoryName} في ${cityName}`, `أفضل ${categoryName}`, `${categoryName} قريب مني`, `بصيرة ${categoryName}`]
+      : [`${categoryName} in ${cityName}`, `top ${categoryName}`, `best ${categoryName} near me`, `Baseera ${categoryName}`];
 
   const baseUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
   const canonicalUrl = currentPage > 1 ? `${baseUrl}?page=${currentPage}` : baseUrl;
@@ -81,6 +93,7 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
   return {
     title,
     description,
+    keywords,
     alternates: {
       canonical: canonicalUrl,
       languages: {
