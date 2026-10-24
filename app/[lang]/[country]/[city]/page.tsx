@@ -15,6 +15,7 @@ import {
 import SearchBar from '@/components/SearchBar';
 import RelatedSlider from '@/components/RelatedSlider';
 import QuickFacts from '@/components/QuickFacts';
+import JsonLd from '@/components/JsonLd';
 import {
   CategoryIcon,
   MapPin,
@@ -136,6 +137,7 @@ export default async function CityHomePage({ params }: PageProps) {
     url: canonicalUrl,
     mainEntity: {
       '@type': 'ItemList',
+      name: `Top Verified Specialists in ${cityName}`,
       numberOfItems: Math.min(providers.length, 10),
       itemListElement: providers.slice(0, 10).map((p, idx) => ({
         '@type': 'ListItem',
@@ -146,6 +148,12 @@ export default async function CityHomePage({ params }: PageProps) {
           url: `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${p.category_id}/${p.slug}`,
           image: p.avatar_url,
           telephone: p.whatsapp_number,
+          priceRange: p.starting_price ? `${p.starting_price}+` : '$$',
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: cityName,
+            addressCountry: countryCode,
+          },
         },
       })),
     },
@@ -153,14 +161,15 @@ export default async function CityHomePage({ params }: PageProps) {
 
   const cityFacts = [
     {
-      label: lang === 'ur' ? 'تصدیق کا معیار' : lang === 'ar' ? 'حالة التوثيق' : 'Verification Status',
-      value: lang === 'ur' ? '100% تصدیق شدہ' : lang === 'ar' ? 'موثق 100%' : '100% Verified',
+      label: lang === 'ur' ? 'تصدیق کا معیار' : lang === 'ar' ? 'حالة التوثيق' : 'Verified Status',
+      value: lang === 'ur' ? 'ہاں (100% تصدیق شدہ)' : lang === 'ar' ? 'نعم (موثق 100%)' : 'Yes (100% Phone & Trade Verified)',
       highlight: true,
+      badge: 'Verified',
       icon: 'verified' as const,
     },
     {
       label: lang === 'ur' ? 'پلیٹ فارم فیس' : lang === 'ar' ? 'رسوم المنصة' : 'Booking Fee',
-      value: lang === 'ur' ? '0% زیرو کمیشن' : lang === 'ar' ? '0% بدون عمولة' : '0% Zero Commission',
+      value: lang === 'ur' ? 'زیرو (0% کمیشن)' : lang === 'ar' ? 'صفر (بدون عمولة)' : 'Zero (0% Commission)',
       highlight: true,
       icon: 'fee' as const,
     },
@@ -180,7 +189,7 @@ export default async function CityHomePage({ params }: PageProps) {
       icon: 'experience' as const,
     },
     {
-      label: lang === 'ur' ? 'اوسط جوابی وقت' : lang === 'ar' ? 'متوسط وقت الرد' : 'Avg Response Time',
+      label: lang === 'ur' ? 'اوسط جوابی وقت' : lang === 'ar' ? 'متوسط وقت الرد' : 'Response Time',
       value: '< 15 Minutes',
       icon: 'time' as const,
     },
@@ -188,14 +197,8 @@ export default async function CityHomePage({ params }: PageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(cityCollectionJsonLd) }}
-      />
+      {/* Programmatic BreadcrumbList & CollectionPage JSON-LD Injection */}
+      <JsonLd data={[breadcrumbJsonLd, cityCollectionJsonLd]} />
 
       <div className={`bg-[#f9f9ff] min-h-screen text-[#141b2b] ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-24 md:pb-16 flex flex-col gap-10">

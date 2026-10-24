@@ -19,6 +19,8 @@ import {
   toTitleCase,
 } from '@/lib/db';
 import RelatedSlider from '@/components/RelatedSlider';
+import QuickFacts from '@/components/QuickFacts';
+import JsonLd from '@/components/JsonLd';
 
 interface CountryPageProps {
   params: Promise<{
@@ -100,32 +102,65 @@ export default async function CountryPage({ params }: CountryPageProps) {
     ],
   };
 
-  const jsonLdItemList = {
+  const countryCollectionSchema = {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: `Verified Local Professionals & Cities in ${countryName}`,
+    '@type': 'CollectionPage',
+    name: `Verified Local Services & Cities in ${countryName}`,
     description: `Hire the best verified professionals in ${countryName}. From expert AC repair to creative interior designers, connect directly via WhatsApp with zero booking fees.`,
     url: canonicalUrl,
-    numberOfItems: cities.length,
-    itemListElement: cities.map((c, idx) => ({
-      '@type': 'ListItem',
-      position: idx + 1,
-      name: `${c.name}, ${countryName}`,
-      url: `${DOMAIN}/${lang}/${country.toLowerCase()}/${c.slug}`,
-    })),
+    mainEntity: {
+      '@type': 'ItemList',
+      name: `Active Cities in ${countryName}`,
+      numberOfItems: cities.length,
+      itemListElement: cities.map((c, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: `${c.name}, ${countryName}`,
+        url: `${DOMAIN}/${lang}/${country.toLowerCase()}/${c.slug}`,
+      })),
+    },
   };
+
+  const countryFacts = [
+    {
+      label: lang === 'ur' ? 'تصدیق کا معیار' : lang === 'ar' ? 'حالة التوثيق' : 'Verified Status',
+      value: lang === 'ur' ? 'ہاں (100% تصدیق شدہ)' : lang === 'ar' ? 'نعم (موثق 100%)' : 'Yes (100% Verified)',
+      highlight: true,
+      badge: 'Verified',
+      icon: 'verified' as const,
+    },
+    {
+      label: lang === 'ur' ? 'پلیٹ فارم فیس' : lang === 'ar' ? 'رسوم المنصة' : 'Booking Fee',
+      value: lang === 'ur' ? 'زیرو (0% کمیشن)' : lang === 'ar' ? 'صفر (بدون عمولة)' : 'Zero (0% Commission)',
+      highlight: true,
+      icon: 'fee' as const,
+    },
+    {
+      label: lang === 'ur' ? 'رابطہ کا ذریعہ' : lang === 'ar' ? 'قناة التواصل' : 'Contact Channel',
+      value: lang === 'ur' ? 'براہِ راست واٹس ایپ' : lang === 'ar' ? 'واتساب مباشر' : 'Direct WhatsApp',
+      icon: 'contact' as const,
+    },
+    {
+      label: lang === 'ur' ? 'فعال شہر' : lang === 'ar' ? 'المدن النشطة' : 'Active Cities',
+      value: `${cities.length} Cities in ${countryName}`,
+      icon: 'location' as const,
+    },
+    {
+      label: lang === 'ur' ? 'دستیاب کیٹیگریز' : lang === 'ar' ? 'التخصصات المتاحة' : 'Specialties',
+      value: `${CATEGORIES.length}+ Verified Trades`,
+      icon: 'experience' as const,
+    },
+    {
+      label: lang === 'ur' ? 'اوسط جوابی وقت' : lang === 'ar' ? 'متوسط وقت الرد' : 'Response Time',
+      value: '< 15 Minutes',
+      icon: 'time' as const,
+    },
+  ];
 
   return (
     <div className={`min-h-screen bg-white text-neutral-900 pb-20 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
-      {/* Programmatic BreadcrumbList & ItemList JSON-LD Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdItemList) }}
-      />
+      {/* Programmatic BreadcrumbList & CollectionPage JSON-LD Schema */}
+      <JsonLd data={[breadcrumbSchema, countryCollectionSchema]} />
 
       {/* Breadcrumb Navigation */}
       <div className="border-b border-gray-200 bg-white">
@@ -169,6 +204,9 @@ export default async function CountryPage({ params }: CountryPageProps) {
               ? `استعن بأفضل المهنيين المعتمدين في ${countryName}. من تصليح المكيفات إلى مصممي الديكور، تواصل مباشرة عبر واتساب بدون رسوم حجز.`
               : `Hire the best verified professionals in ${countryName}. From expert AC repair to creative interior designers, connect directly via WhatsApp with zero booking fees.`}
           </p>
+
+          {/* GEO Quick Facts High-Density Overview */}
+          <QuickFacts facts={countryFacts} lang={lang} className="mt-6 max-w-4xl mx-auto text-start" />
         </div>
       </section>
 

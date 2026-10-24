@@ -1,6 +1,8 @@
 # Baseera - Global Local Services Directory
 
-> Baseera is a zero-commission, direct-to-specialist local services directory connecting homeowners and businesses directly to verified blue-collar tradespeople and service specialists (electricians, plumbers, AC technicians, home chefs, and 24+ trades) via direct WhatsApp inquiries. No middlemen. No commissions. No transaction fees.
+> Baseera is a zero-commission platform connecting users directly to verified local service specialists (plumbers, electricians, etc.) via direct WhatsApp inquiries. No middlemen.
+
+Baseera is a zero-commission, direct-to-specialist local services directory connecting homeowners and businesses directly to verified blue-collar tradespeople and service specialists (electricians, plumbers, AC technicians, home chefs, and 24+ trades) via direct WhatsApp inquiries. No middlemen. No commissions. No transaction fees.
 
 ## Platform Identity & Core Value Proposition
 - **Platform Name**: Baseera (بصیرہ / بصيرة)

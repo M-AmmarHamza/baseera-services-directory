@@ -30,11 +30,13 @@ interface SearchPageProps {
   }>;
 }
 
+const DOMAIN = process.env.NEXT_PUBLIC_SITE_URL || 'https://baseera-services-directory.vercel.app';
+
 export async function generateMetadata({
   params,
   searchParams,
 }: SearchPageProps): Promise<Metadata> {
-  const { lang, city } = await params;
+  const { lang, country, city } = await params;
   const { q } = await searchParams;
   const query = q || '';
   const cityName = getLocalizedCityName(city, lang);
@@ -58,9 +60,24 @@ export async function generateMetadata({
       ? `ابحث عن فنيين معتمدين في ${cityName}. تواصل مباشرة عبر واتساب بدون عمولة.`
       : `Search verified plumbers, electricians, AC technicians, and home chefs across ${cityName}. Direct WhatsApp contact with zero platform fee.`;
 
+  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/search`;
+
   return {
     title,
     description,
+    robots: {
+      index: false,
+      follow: true,
+    },
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/search`,
+        ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}/search`,
+        ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}/search`,
+        'x-default': `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/search`,
+      },
+    },
   };
 }
 

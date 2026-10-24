@@ -25,6 +25,7 @@ import RelatedSlider from '@/components/RelatedSlider';
 import QuickFacts from '@/components/QuickFacts';
 import CategoryFaqSection from '@/components/CategoryFaqSection';
 import FeaturedProfilesSlider from '@/components/FeaturedProfilesSlider';
+import JsonLd from '@/components/JsonLd';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -128,55 +129,69 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
     ],
   };
 
-  // Programmatic JSON-LD Schema (ItemList for Category Pages)
-  const jsonLdItemList = {
+  // Programmatic JSON-LD Schema (CollectionPage & ItemList for Category Pages)
+  const categoryCollectionJsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
+    '@type': 'CollectionPage',
     name: `Best ${categoryName} in ${cityName}, ${countryName}`,
     description: `Looking for a reliable ${categoryName} in ${cityName}? Browse verified profiles, check ratings, view portfolios, and chat directly on WhatsApp. No middlemen!`,
     url: canonicalUrl,
-    numberOfItems: providers.length,
-    itemListElement: providers.map((p, idx) => ({
-      '@type': 'ListItem',
-      position: idx + 1,
-      item: {
-        '@type': 'LocalBusiness',
-        name: p.name,
-        url: `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${p.slug}`,
-        image: p.avatar_url,
-        telephone: p.whatsapp_number,
-        priceRange: formatVisitingPrice(p.starting_price, p.country_code || country),
-        address: {
-          '@type': 'PostalAddress',
-          addressLocality: cityName,
-          addressCountry: countryObj.code.toUpperCase(),
+    mainEntity: {
+      '@type': 'ItemList',
+      name: `Top Verified ${categoryName} in ${cityName}`,
+      numberOfItems: providers.length,
+      itemListElement: providers.map((p, idx) => ({
+        '@type': 'ListItem',
+        position: idx + 1,
+        item: {
+          '@type': 'LocalBusiness',
+          name: p.name,
+          url: `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${p.slug}`,
+          image: p.avatar_url,
+          telephone: p.whatsapp_number,
+          priceRange: formatVisitingPrice(p.starting_price, p.country_code || country),
+          address: {
+            '@type': 'PostalAddress',
+            addressLocality: cityName,
+            addressCountry: countryObj.code.toUpperCase(),
+          },
+          ...(p.review_count && p.review_count > 0
+            ? {
+                aggregateRating: {
+                  '@type': 'AggregateRating',
+                  ratingValue: p.rating.toFixed(1),
+                  reviewCount: p.review_count.toString(),
+                },
+              }
+            : {}),
         },
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: p.rating.toFixed(1),
-          reviewCount: p.review_count.toString(),
-        },
-      },
-    })),
+      })),
+    },
   };
 
   const categoryFacts = [
     {
-      label: lang === 'ur' ? 'دستیاب ماہرین' : lang === 'ar' ? 'الفنيون المتاحون' : 'Verified Specialists',
-      value: `${providers.length} ${lang === 'ur' ? 'کاریگر دستیاب' : lang === 'ar' ? 'فني معتمد' : 'Verified in ' + cityName}`,
+      label: lang === 'ur' ? 'تصدیق کا معیار' : lang === 'ar' ? 'حالة التوثيق' : 'Verified Status',
+      value: lang === 'ur' ? 'ہاں (100% تصدیق شدہ)' : lang === 'ar' ? 'نعم (موثق 100%)' : 'Yes (100% Phone & Trade Verified)',
       highlight: true,
+      badge: 'Verified',
       icon: 'verified' as const,
     },
     {
-      label: lang === 'ur' ? 'پلیٹ فارم فیس' : lang === 'ar' ? 'رسوم المنصة' : 'Platform Fee',
-      value: lang === 'ur' ? '0% بغیر کسی کمیشن کے' : lang === 'ar' ? '0% بدون أي عمولة' : '0% Zero Commission',
+      label: lang === 'ur' ? 'پلیٹ فارم فیس' : lang === 'ar' ? 'رسوم المنصة' : 'Booking Fee',
+      value: lang === 'ur' ? 'زیرو (0% کمیشن)' : lang === 'ar' ? 'صفر (بدون عمولة)' : 'Zero (0% Commission)',
       highlight: true,
       icon: 'fee' as const,
     },
     {
-      label: lang === 'ur' ? 'رابطہ کا ذریعہ' : lang === 'ar' ? 'طريقة الحجز' : 'Booking Mode',
-      value: lang === 'ur' ? 'براہِ راست واٹس ایپ' : lang === 'ar' ? 'واتساب مباشر فوري' : 'Direct WhatsApp Chat',
+      label: lang === 'ur' ? 'رابطہ کا ذریعہ' : lang === 'ar' ? 'طريقة التواصل' : 'Contact Channel',
+      value: lang === 'ur' ? 'براہِ راست واٹس ایپ' : lang === 'ar' ? 'واتساب مباشر فوري' : 'Direct WhatsApp',
       icon: 'contact' as const,
+    },
+    {
+      label: lang === 'ur' ? 'دستیاب ماہرین' : lang === 'ar' ? 'الفنيون المتاحون' : 'Specialists Available',
+      value: `${providers.length} ${lang === 'ur' ? 'کاریگر دستیاب' : lang === 'ar' ? 'فني معتمد' : 'Verified in ' + cityName}`,
+      icon: 'experience' as const,
     },
     {
       label: lang === 'ur' ? 'ابتدائی وزٹ فیس' : lang === 'ar' ? 'رسوم الزيارة' : 'Visiting Charges',
@@ -191,7 +206,7 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
       icon: 'location' as const,
     },
     {
-      label: lang === 'ur' ? 'اوسط جوابی وقت' : lang === 'ar' ? 'متوسط وقت الرد' : 'Avg Response Time',
+      label: lang === 'ur' ? 'اوسط جوابی وقت' : lang === 'ar' ? 'متوسط وقت الرد' : 'Response Time',
       value: '< 15 Minutes',
       icon: 'time' as const,
     },
@@ -199,15 +214,8 @@ export default async function CategoryListingPage({ params }: CategoryPageProps)
 
   return (
     <div className={`min-h-screen bg-white text-neutral-900 pb-24 md:pb-16 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
-      {/* Programmatic BreadcrumbList & ItemList JSON-LD Injection */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdItemList) }}
-      />
+      {/* Programmatic BreadcrumbList & CollectionPage JSON-LD Injection */}
+      <JsonLd data={[breadcrumbJsonLd, categoryCollectionJsonLd]} />
 
       {/* Breadcrumbs Navigation */}
       <div className="border-b border-gray-200 bg-white">

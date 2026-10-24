@@ -11,6 +11,7 @@ import HomepageSearchBar from '@/components/HomepageSearchBar';
 import FeaturedProvidersSlider from '@/components/FeaturedProvidersSlider';
 import { getAllProviders, CATEGORIES, getCategoryName } from '@/lib/db';
 import { getDictionary } from '@/lib/get-dictionary';
+import JsonLd from '@/components/JsonLd';
 
 interface PageProps {
   params: Promise<{
@@ -45,6 +46,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         en: `${DOMAIN}/en`,
         ur: `${DOMAIN}/ur`,
         ar: `${DOMAIN}/ar`,
+        'x-default': `${DOMAIN}/en`,
       },
     },
     openGraph: {
@@ -110,14 +112,7 @@ export default async function HomePage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-white text-neutral-900 pb-20 md:pb-12">
       {/* Programmatic JSON-LD Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoriesItemListSchema) }}
-      />
+      <JsonLd data={[websiteSchema, categoriesItemListSchema]} />
 
       {/* 1. HERO SECTION */}
       <section className="border-b border-gray-200 bg-white pt-10 pb-12 sm:pt-16 sm:pb-16 px-4 sm:px-6 lg:px-8">
