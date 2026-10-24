@@ -20,15 +20,21 @@ import {
   BarChart3,
   Layers,
   Sparkles,
+  Crown,
+  Eye,
 } from 'lucide-react';
 import { CategoryIcon, WhatsAppIcon } from '@/components/Icons';
 
 interface AnalyticsData {
   kpis: {
-    totalActiveProviders: number;
+    totalProviders: number;
     pendingApprovals: number;
-    totalActiveCities: number;
-    totalLeadClicks: number;
+    totalPremiumUsers: number;
+    totalProfileViews: number;
+    totalWhatsAppLeads: number;
+    totalActiveProviders?: number;
+    totalActiveCities?: number;
+    totalLeadClicks?: number;
   };
   topCategories: Array<{ slug: string; name: string; icon: string; clicks: number }>;
   topCities: Array<{ slug: string; name: string; clicks: number }>;
@@ -107,8 +113,12 @@ export default function AdminOverviewDashboard() {
               pendingApprovals: Math.max(0, data.kpis.pendingApprovals - 1),
               totalActiveProviders:
                 newStatus === 'approved'
-                  ? data.kpis.totalActiveProviders + 1
+                  ? (data.kpis.totalActiveProviders || 0) + 1
                   : data.kpis.totalActiveProviders,
+              totalProviders:
+                newStatus === 'approved'
+                  ? (data.kpis.totalProviders || 0) + 1
+                  : data.kpis.totalProviders,
             },
           });
         }
@@ -150,81 +160,110 @@ export default function AdminOverviewDashboard() {
         </div>
       </div>
 
-      {/* 1. KPI WIDGET CARDS (Requirement 4) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Active Providers */}
-        <div className="bg-white border border-gray-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-              Active Providers
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#006948] flex items-center justify-center">
-              <Users className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-gray-950">
-            {loading ? '...' : (data?.kpis.totalActiveProviders ?? 34).toLocaleString()}
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-[#006948] font-semibold mt-2">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Publicly live on directory</span>
-          </div>
+      {/* 1. ANALYTICS SUMMARY SECTION (Requirement 3) */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-gray-500 flex items-center gap-1.5">
+            <BarChart3 className="w-4 h-4 text-[#006948]" />
+            <span>Platform Analytics Summary</span>
+          </h2>
+          <span className="text-[11px] text-gray-400 font-medium">Real-time aggregate performance & revenue metrics</span>
         </div>
 
-        {/* Pending Approvals */}
-        <div className="bg-white border border-amber-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow bg-linear-to-b from-amber-50/20 to-transparent">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
-              Pending Approvals
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-amber-100/70 text-amber-700 flex items-center justify-center">
-              <Clock className="w-4 h-4" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {/* 1. Total Providers */}
+          <div className="bg-white border border-gray-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-sm transition-shadow">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                Total Providers
+              </span>
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-[#006948] flex items-center justify-center">
+                <Users className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-gray-950">
+              {loading ? '...' : (data?.kpis.totalProviders ?? data?.kpis.totalActiveProviders ?? 34).toLocaleString()}
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-[#006948] font-semibold mt-2">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Registered platform-wide</span>
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-amber-950">
-            {loading ? '...' : (data?.kpis.pendingApprovals ?? 3)}
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-amber-700 font-semibold mt-2">
-            <AlertCircle className="w-3.5 h-3.5" />
-            <span>Awaiting admin moderation</span>
-          </div>
-        </div>
 
-        {/* Total Active Cities */}
-        <div className="bg-white border border-gray-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-              Active Cities
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-              <MapPin className="w-4 h-4" />
+          {/* 2. Pending Approvals */}
+          <div className="bg-white border border-amber-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-sm transition-shadow bg-linear-to-b from-amber-50/20 to-transparent">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-700">
+                Pending Approvals
+              </span>
+              <div className="w-9 h-9 rounded-xl bg-amber-100/70 text-amber-700 flex items-center justify-center">
+                <Clock className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-amber-950">
+              {loading ? '...' : (data?.kpis.pendingApprovals ?? 3).toLocaleString()}
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-amber-700 font-semibold mt-2">
+              <AlertCircle className="w-3.5 h-3.5" />
+              <span>Awaiting moderation</span>
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-gray-950">
-            {loading ? '...' : (data?.kpis.totalActiveCities ?? 228).toLocaleString()}
-          </div>
-          <div className="flex items-center gap-1.5 text-xs text-sky-700 font-semibold mt-2">
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>Across 40+ countries</span>
-          </div>
-        </div>
 
-        {/* Total Lead Clicks */}
-        <div className="bg-white border border-emerald-200/90 rounded-2xl p-5 shadow-2xs hover:shadow-sm transition-shadow bg-linear-to-b from-emerald-50/20 to-transparent">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#006948]">
-              Total Lead Clicks
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-emerald-100/70 text-[#006948] flex items-center justify-center">
-              <Flame className="w-4 h-4" />
+          {/* 3. Total Premium Users (Revenue tracking) */}
+          <div className="bg-white border border-purple-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-sm transition-shadow bg-linear-to-b from-purple-50/20 to-transparent">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-purple-700">
+                Premium Users
+              </span>
+              <div className="w-9 h-9 rounded-xl bg-purple-100/70 text-purple-700 flex items-center justify-center">
+                <Crown className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-purple-950">
+              {loading ? '...' : (data?.kpis.totalPremiumUsers ?? 12).toLocaleString()}
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-purple-700 font-semibold mt-2">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Revenue tracking & Pro</span>
             </div>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950">
-            {loading ? '...' : (data?.kpis.totalLeadClicks ?? 1420).toLocaleString()}
+
+          {/* 4. Total Profile Views */}
+          <div className="bg-white border border-blue-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-sm transition-shadow bg-linear-to-b from-blue-50/20 to-transparent">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                Profile Views
+              </span>
+              <div className="w-9 h-9 rounded-xl bg-blue-100/70 text-blue-700 flex items-center justify-center">
+                <Eye className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-blue-950">
+              {loading ? '...' : (data?.kpis.totalProfileViews ?? 4820).toLocaleString()}
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-blue-700 font-semibold mt-2">
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>Organic page visits</span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-[#006948] font-semibold mt-2">
-            <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
-            <span>Direct WhatsApp & Call hits</span>
+
+          {/* 5. Total WhatsApp Leads */}
+          <div className="bg-white border border-emerald-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs hover:shadow-sm transition-shadow bg-linear-to-b from-emerald-50/20 to-transparent">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#006948]">
+                WhatsApp Leads
+              </span>
+              <div className="w-9 h-9 rounded-xl bg-emerald-100/70 text-[#006948] flex items-center justify-center">
+                <Flame className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-950">
+              {loading ? '...' : (data?.kpis.totalWhatsAppLeads ?? data?.kpis.totalLeadClicks ?? 1420).toLocaleString()}
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-[#006948] font-semibold mt-2">
+              <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
+              <span>Direct WhatsApp & Call hits</span>
+            </div>
           </div>
         </div>
       </div>

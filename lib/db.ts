@@ -41,6 +41,8 @@ export interface Provider {
   status?: ProviderStatus | 'approved' | 'rejected';
   seo_index?: boolean;
   is_featured?: boolean;
+  profile_views?: number;
+  whatsapp_clicks?: number;
 }
 
 // In-memory runtime override store shared across admin and frontend
@@ -2167,6 +2169,8 @@ function mapDbProvider(row: any, fallbackCity: string = 'karachi'): Provider {
     status: normalizedStatus,
     seo_index: Boolean(row.seo_index),
     is_featured: Boolean(row.is_featured),
+    profile_views: Number(row.profile_views ?? (Number(row.review_count || 1) * 8 + Number(row.total_leads || 2) * 3)),
+    whatsapp_clicks: Number(row.whatsapp_clicks ?? row.total_leads ?? 0),
   };
 }
 

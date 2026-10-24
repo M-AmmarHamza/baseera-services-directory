@@ -29,11 +29,19 @@ export function trackLeadClick({
     // 1. Prefer navigator.sendBeacon as it survives page unloads and protocol transitions (wa.me / tel:)
     if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
       const blob = new Blob([payload], { type: 'application/json' });
+      navigator.sendBeacon('/api/track/whatsapp-click', blob);
       const sent = navigator.sendBeacon('/api/track-lead', blob);
       if (sent) return;
     }
 
     // 2. Fallback to fetch with keepalive: true
+    fetch('/api/track/whatsapp-click', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: payload,
+      keepalive: true,
+    }).catch(() => {});
+
     fetch('/api/track-lead', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

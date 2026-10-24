@@ -104,6 +104,8 @@ create table if not exists public.providers (
   rating numeric(3, 1) default 5.0,
   review_count int default 0,
   total_leads int default 0,
+  profile_views int default 0, -- Total full profile page impressions
+  whatsapp_clicks int default 0, -- Total outbound WhatsApp / Phone leads generated
   created_at timestamptz default timezone('utc'::text, now()) not null,
   updated_at timestamptz default timezone('utc'::text, now()) not null
 );

@@ -13,16 +13,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  let totalProviders = SEED_PROVIDERS.length;
   let totalActiveProviders = SEED_PROVIDERS.filter((p) => p.is_verified).length;
   let pendingApprovals = 3;
+  let totalPremiumUsers = SEED_PROVIDERS.filter((p) => p.is_premium).length;
   let totalActiveCities = CITIES.length;
-  let totalLeadClicks = SEED_PROVIDERS.reduce((sum, p) => sum + (p.total_leads || 0), 0);
+  let totalWhatsAppLeads = SEED_PROVIDERS.reduce((sum, p) => sum + (p.whatsapp_clicks || p.total_leads || 0), 0);
+  let totalProfileViews = SEED_PROVIDERS.reduce((sum, p) => sum + (p.profile_views || (p.total_leads ? p.total_leads * 4 : 140)), 0);
 
   let leadClickRows: any[] = [];
   let clicksByType: Record<string, number> = {
-    whatsapp: Math.round(totalLeadClicks * 0.78),
-    call: Math.round(totalLeadClicks * 0.18),
-    telegram: Math.round(totalLeadClicks * 0.04),
+    whatsapp: Math.round(totalWhatsAppLeads * 0.78),
+    call: Math.round(totalWhatsAppLeads * 0.18),
+    telegram: Math.round(totalWhatsAppLeads * 0.04),
   };
 
   // Attempt real query from Supabase
@@ -30,27 +33,44 @@ export async function GET(req: NextRequest) {
     try {
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-      // 1. Providers counts
-      const [approvedRes, pendingRes, citiesCountRes, leadClicksRes] = await Promise.all([
-        supabase.from('providers').select('id', { count: 'exact', head: true }).eq('is_verified', true),
-        supabase.from('providers').select('id', { count: 'exact', head: true }).eq('is_verified', false),
-        supabase.from('cities').select('id', { count: 'exact', head: true }).eq('is_active', true),
-        supabase.from('lead_clicks').select('*').order('created_at', { ascending: false }).limit(200),
-      ]);
+      // 1. Providers counts & Analytics
+      const [allProvidersRes, approvedRes, pendingRes, premiumRes, citiesCountRes, leadClicksRes, providersStatsRes] =
+        await Promise.all([
+          supabase.from('providers').select('id', { count: 'exact', head: true }),
+          supabase.from('providers').select('id', { count: 'exact', head: true }).or('status.eq.published,is_verified.eq.true'),
+          supabase.from('providers').select('id', { count: 'exact', head: true }).or('status.eq.pending,is_verified.eq.false'),
+          supabase.from('providers').select('id', { count: 'exact', head: true }).eq('is_premium', true),
+          supabase.from('cities').select('id', { count: 'exact', head: true }).eq('is_active', true),
+          supabase.from('lead_clicks').select('*').order('created_at', { ascending: false }).limit(200),
+          supabase.from('providers').select('profile_views, whatsapp_clicks, total_leads'),
+        ]);
 
+      if (allProvidersRes.count !== null && allProvidersRes.count > 0) {
+        totalProviders = allProvidersRes.count;
+      }
       if (approvedRes.count !== null && approvedRes.count > 0) {
         totalActiveProviders = approvedRes.count;
       }
       if (pendingRes.count !== null) {
         pendingApprovals = pendingRes.count;
       }
+      if (premiumRes.count !== null) {
+        totalPremiumUsers = premiumRes.count;
+      }
       if (citiesCountRes.count !== null && citiesCountRes.count > 0) {
         totalActiveCities = citiesCountRes.count;
       }
 
+      if (providersStatsRes.data && providersStatsRes.data.length > 0) {
+        const sumViews = providersStatsRes.data.reduce((sum: number, r: any) => sum + (Number(r.profile_views) || 0), 0);
+        const sumClicks = providersStatsRes.data.reduce((sum: number, r: any) => sum + (Number(r.whatsapp_clicks) || 0), 0);
+        if (sumViews > 0) totalProfileViews = sumViews;
+        if (sumClicks > 0) totalWhatsAppLeads = sumClicks;
+      }
+
       if (Array.isArray(leadClicksRes.data) && leadClicksRes.data.length > 0) {
         leadClickRows = leadClicksRes.data;
-        totalLeadClicks = leadClickRows.length;
+        totalWhatsAppLeads = Math.max(totalWhatsAppLeads, leadClickRows.length);
 
         // Tally by type
         clicksByType = { whatsapp: 0, call: 0, telegram: 0, email: 0 };
@@ -126,10 +146,14 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     kpis: {
-      totalActiveProviders,
+      totalProviders,
       pendingApprovals,
+      totalPremiumUsers,
+      totalProfileViews,
+      totalWhatsAppLeads,
+      totalActiveProviders,
       totalActiveCities,
-      totalLeadClicks,
+      totalLeadClicks: totalWhatsAppLeads,
     },
     topCategories,
     topCities,

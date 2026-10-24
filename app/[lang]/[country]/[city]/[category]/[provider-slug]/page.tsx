@@ -38,6 +38,7 @@ import FeaturedProfilesSlider from '@/components/FeaturedProfilesSlider';
 import LeadTrackButton from '@/components/LeadTrackButton';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
+import ProfileViewTracker from '@/components/ProfileViewTracker';
 import ProfileUnderReview from '@/components/ProfileUnderReview';
 import CategoryFaqSection from '@/components/CategoryFaqSection';
 import AdBanner from '@/components/AdBanner';
@@ -572,6 +573,9 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     <div className={`min-h-screen bg-white text-neutral-900 pb-28 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
       {/* Programmatic BreadcrumbList & LocalBusiness JSON-LD Injection */}
       <JsonLd data={[breadcrumbSchema, localBusinessSchema]} />
+
+      {/* Dynamic Profile Impression & View Tracker */}
+      <ProfileViewTracker providerId={provider.id} />
 
       {/* Breadcrumbs Navigation */}
       <div className="border-b border-gray-200 bg-white">
