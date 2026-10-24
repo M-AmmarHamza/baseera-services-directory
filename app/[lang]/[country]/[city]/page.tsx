@@ -13,7 +13,7 @@ import {
   getCityDistricts,
 } from '@/lib/db';
 import SearchBar from '@/components/SearchBar';
-import RelatedSlider from '@/components/RelatedSlider';
+import CategoryGrid from '@/components/CategoryGrid';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
 import { getSiteUrl } from '@/lib/site-url';
@@ -286,15 +286,17 @@ export default async function CityHomePage({ params }: PageProps) {
             />
           </section>
 
-          {/* Popular Services Slider */}
-          <RelatedSlider
-            type="categories"
+          {/* 24+ Verified Specialties Responsive Grid (Replacing horizontal slider for optimal UX) */}
+          <CategoryGrid
+            lang={lang}
+            country={country}
+            city={city}
             title={
               lang === 'ur'
-                ? `${cityName} میں مقبول ترین سروسز`
+                ? `${cityName} میں تمام 24+ تصدیق شدہ سروسز`
                 : lang === 'ar'
-                ? `الخدمات الشائعة في ${cityName}`
-                : `Popular Services in ${cityName}`
+                ? `كافة الخدمات المعتمدة في ${cityName}`
+                : `All 24+ Verified Services in ${cityName}`
             }
             subtitle={
               lang === 'ur'
@@ -303,10 +305,7 @@ export default async function CityHomePage({ params }: PageProps) {
                 ? 'فنيون محترفون ومعتمدون في منطقتك'
                 : `Verified community specialists & technicians across ${cityName}`
             }
-            items={CATEGORIES}
-            lang={lang}
-            country={country}
-            city={city}
+            className="my-8 sm:my-12"
           />
 
           {/* Verified Specialists Section */}

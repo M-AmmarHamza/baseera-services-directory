@@ -19,6 +19,7 @@ import {
   toTitleCase,
 } from '@/lib/db';
 import RelatedSlider from '@/components/RelatedSlider';
+import CategoryGrid from '@/components/CategoryGrid';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
 import { getSiteUrl } from '@/lib/site-url';
@@ -249,42 +250,28 @@ export default async function CountryPage({ params }: CountryPageProps) {
         />
       </section>
 
-      {/* Section 2: 24+ Verified Specialties */}
+      {/* Section 2: 24+ Verified Specialties Responsive Grid */}
       <section className="border-t border-gray-200 bg-gray-50/50 py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-6">
-            <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-2 pt-1' : 'leading-snug'}`}>
-              {lang === 'ur'
+          <CategoryGrid
+            lang={lang}
+            country={country}
+            city={defaultCitySlug}
+            title={
+              lang === 'ur'
                 ? `${countryName} میں 24+ تصدیق شدہ شعبہ جات دیکھیں`
                 : lang === 'ar'
                 ? `تصفح أكثر من 24 تخصصاً معتمداً في ${countryName}`
-                : `Browse 24+ Verified Specialties in ${countryName}`}
-            </h2>
-            <p className={`text-sm text-gray-500 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-              {lang === 'ur'
+                : `Browse 24+ Verified Specialties in ${countryName}`
+            }
+            subtitle={
+              lang === 'ur'
                 ? 'زیرو کمیشن اور براہِ راست واٹس ایپ رابطہ'
                 : lang === 'ar'
                 ? 'حجز مباشر عبر واتساب بدون أي عمولة'
-                : 'Direct WhatsApp booking with zero platform commission'}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/${lang}/${country.toLowerCase()}/${defaultCitySlug}/${cat.slug}`}
-                className="flex flex-col items-center justify-center p-3 rounded-2xl bg-white border border-gray-200 hover:border-[#006948] hover:shadow-xs transition-all text-center group"
-              >
-                <div className="w-11 h-11 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-2 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
-                  <CategoryIcon slug={cat.slug} id={cat.id} name={cat.name} icon={cat.icon} className="w-5 h-5" />
-                </div>
-                <span className={`text-xs font-bold text-gray-900 group-hover:text-[#006948] line-clamp-2 leading-tight ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-                  {getCategoryName(cat, lang)}
-                </span>
-              </Link>
-            ))}
-          </div>
+                : 'Direct WhatsApp booking with zero platform commission'
+            }
+          />
         </div>
       </section>
     </div>

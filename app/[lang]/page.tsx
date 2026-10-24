@@ -7,6 +7,7 @@ import {
   Clock,
 } from 'lucide-react';
 import CategoryIcon from '@/components/CategoryIcon';
+import CategoryGrid from '@/components/CategoryGrid';
 import HomepageSearchBar from '@/components/HomepageSearchBar';
 import FeaturedProvidersSlider from '@/components/FeaturedProvidersSlider';
 import { getAllProviders, CATEGORIES, getCategoryName } from '@/lib/db';
@@ -138,61 +139,15 @@ export default async function HomePage({ params }: PageProps) {
 
       {/* 2. BROWSE BY SPECIALTY (RESPONSIVE NON-OVERFLOWING GRID) */}
       <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 overflow-hidden scroll-mt-20">
-        {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-5 sm:mb-6">
-          <div>
-            <h2 className={`text-xl sm:text-2xl font-semibold tracking-tight text-neutral-900 ${lang === 'ur' ? 'font-urdu leading-[2.5] mb-2 pt-2' : 'leading-snug'}`}>
-              {h2Text}
-            </h2>
-            <p className={`text-sm text-gray-500 mt-1 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-              {dict.home?.specialtySubtitle || 'Verified community technicians & specialists worldwide'}
-            </p>
-          </div>
-          <div className={`text-sm font-semibold text-emerald-700 whitespace-nowrap shrink-0 ${lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}`}>
-            {CATEGORIES.length} {dict.home?.categoriesCount || 'Categories'}
-          </div>
-        </div>
-
-        {/* Responsive Categories Grid (2 cols on iPhone SE/mobile, 3 on sm, 4 on md, 6 on lg) */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 w-full max-w-full overflow-hidden">
-          {CATEGORIES.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/${lang}/pk/karachi/${cat.slug}`}
-              className={`w-full min-w-0 max-w-full flex flex-col items-center justify-between p-3 sm:p-4 rounded-2xl bg-white hover:border-[#006948] border border-gray-200/80 shadow-2xs hover:shadow-sm transition-all text-center group cursor-pointer overflow-hidden box-border ${
-                lang === 'ur' ? 'min-h-[160px] sm:min-h-[170px]' : 'min-h-[130px] sm:min-h-[140px]'
-              }`}
-            >
-              {/* Soft circular background behind icon */}
-              <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center mb-1.5 shrink-0 group-hover:scale-105 group-hover:bg-[#006948] group-hover:text-white transition-all">
-                <CategoryIcon slug={cat.slug} id={cat.id} name={cat.name} icon={cat.icon} className="w-5 h-5" />
-              </div>
-
-              {/* Title Container - Zero clipping, natural line height, break-words for narrow screens */}
-              <div className="flex-1 flex items-center justify-center w-full min-w-0 my-auto py-1 px-0.5 overflow-hidden">
-                <span
-                  className={`font-bold text-gray-900 group-hover:text-[#006948] transition-colors text-center break-words ${
-                    lang === 'ur'
-                      ? 'font-urdu text-xs sm:text-sm leading-[2.3] py-0.5 tracking-normal'
-                      : 'text-xs line-clamp-2 leading-tight flex items-center justify-center'
-                  }`}
-                >
-                  {getCategoryName(cat, lang)}
-                </span>
-              </div>
-
-              {/* Active provider count Subtext */}
-              <span
-                dir="auto"
-                className={`text-[10px] sm:text-xs text-gray-500 font-medium shrink-0 mt-1 truncate ${
-                  lang === 'ur' ? 'font-urdu leading-[1.8] pt-0.5' : ''
-                }`}
-              >
-                {cat.count}+ {dict.home?.activeCount || 'Active'}
-              </span>
-            </Link>
-          ))}
-        </div>
+        <CategoryGrid
+          lang={lang}
+          country="pk"
+          city="karachi"
+          title={h2Text}
+          subtitle={dict.home?.specialtySubtitle || 'Verified community technicians & specialists worldwide'}
+          activeCountText={dict.home?.activeCount}
+          categoriesCountText={dict.home?.categoriesCount}
+        />
       </section>
 
       {/* 3. CONTINUOUS SLIDING 20 FEATURED PROVIDERS */}
