@@ -100,31 +100,33 @@ export default function QuickFacts({
         {facts.map((fact, idx) => (
           <div
             key={idx}
-            className={`flex flex-col justify-between p-2.5 sm:p-3 rounded-xl border transition-all ${
+            className={`h-full flex flex-col justify-start p-2.5 sm:p-3 rounded-xl border transition-all ${
               fact.highlight
                 ? 'bg-emerald-50/70 border-emerald-200 ring-1 ring-emerald-500/20'
                 : 'bg-white border-gray-200/80 hover:border-gray-300'
             }`}
           >
-            <dt className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-gray-500 mb-1">
+            <dt className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-gray-500 mb-1.5">
               {renderIcon(fact.icon)}
               <span className={`truncate ${isUrdu ? 'font-urdu leading-[2.0]' : ''}`}>
                 {fact.label}
               </span>
             </dt>
-            <dd className="mt-auto">
-              <span
-                className={`block text-xs sm:text-sm font-bold text-gray-900 break-words ${
-                  isUrdu ? 'font-urdu leading-[2.2]' : ''
-                }`}
-              >
-                {fact.value}
-              </span>
-              {fact.badge && (
-                <span className="inline-block mt-1 text-[9px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                  {fact.badge}
+            <dd className="w-full">
+              <div className="flex flex-row items-center flex-wrap gap-2">
+                <span
+                  className={`text-xs sm:text-sm font-bold text-gray-900 break-words ${
+                    isUrdu ? 'font-urdu leading-[2.2]' : ''
+                  }`}
+                >
+                  {fact.value}
                 </span>
-              )}
+                {fact.badge && (
+                  <span className="inline-flex items-center text-[9px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 shrink-0">
+                    {fact.badge}
+                  </span>
+                )}
+              </div>
             </dd>
           </div>
         ))}
