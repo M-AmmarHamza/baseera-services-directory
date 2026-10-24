@@ -13,10 +13,11 @@ export interface UpdateProviderParams {
   seo_index?: boolean;
   is_featured?: boolean;
   is_verified?: boolean;
+  is_premium?: boolean;
 }
 
 export async function updateProviderAction(params: UpdateProviderParams) {
-  const { id, status, seo_index, is_featured, is_verified } = params;
+  const { id, status, seo_index, is_featured, is_verified, is_premium } = params;
   if (!id) return { success: false, error: 'Provider ID is required' };
 
   const updates: Record<string, any> = {};
@@ -28,6 +29,7 @@ export async function updateProviderAction(params: UpdateProviderParams) {
   if (seo_index !== undefined) updates.seo_index = Boolean(seo_index);
   if (is_featured !== undefined) updates.is_featured = Boolean(is_featured);
   if (is_verified !== undefined) updates.is_verified = Boolean(is_verified);
+  if (is_premium !== undefined) updates.is_premium = Boolean(is_premium);
 
   // In-memory override update
   const existing = localProvidersOverrides.get(id) || {};

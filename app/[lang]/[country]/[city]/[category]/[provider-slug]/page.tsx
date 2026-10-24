@@ -12,6 +12,9 @@ import {
   CheckCircle2,
   Zap,
   Phone,
+  Award,
+  Sparkles,
+  ExternalLink,
 } from 'lucide-react';
 import { WhatsAppIcon } from '@/components/Icons';
 import { getDictionary } from '@/lib/get-dictionary';
@@ -288,12 +291,19 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
       ? `${providerName} - فني ${categoryName} معتمد في ${cityName} | بصيرة`
       : `${providerName} - Expert ${categoryName} in ${cityName} | Baseera`;
 
-  const description =
-    lang === 'ur'
-      ? `${cityName} میں ${categoryName} سروسز کے لیے ${providerName} سے رابطہ کریں۔ کام کی تصاویر دیکھیں، ریٹنگز جانچیں اور براہِ راست واٹس ایپ کریں۔`
-      : lang === 'ar'
-      ? `تواصل مع ${providerName} للحصول على خدمات ${categoryName} في ${cityName}. اطلع على معرض الأعمال وتواصل مباشرة عبر واتساب.`
-      : `Contact ${providerName} for professional ${categoryName} services in ${cityName}. View their work gallery, core specialties, and message directly on WhatsApp.`;
+  const isProfilePremium = Boolean(provider.is_premium);
+
+  const description = isProfilePremium
+    ? (lang === 'ur'
+        ? `${cityName} میں ${categoryName} سروسز کے لیے ${providerName} سے رابطہ کریں۔ کام کی تصاویر دیکھیں، تصدیق شدہ اسناد جانچیں اور براہِ راست واٹس ایپ کریں۔`
+        : lang === 'ar'
+        ? `تواصل مع ${providerName} للحصول على خدمات ${categoryName} في ${cityName}. اطلع على معرض الأعمال والشهادات وتواصل مباشرة عبر واتساب.`
+        : `Contact ${providerName} for professional ${categoryName} services in ${cityName}. View their work gallery, verified credentials, and message directly on WhatsApp.`)
+    : (lang === 'ur'
+        ? `${cityName} میں ${categoryName} سروسز کے لیے ${providerName} سے رابطہ کریں۔ پروفائل تفصیلات جانچیں اور براہِ راست واٹس ایپ کریں۔`
+        : lang === 'ar'
+        ? `تواصل مع ${providerName} للحصول على خدمات ${categoryName} في ${cityName}. تواصل مباشرة عبر واتساب.`
+        : `Contact ${providerName} for verified ${categoryName} services in ${cityName}. Direct contact with zero commission.`);
 
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`;
 
@@ -405,10 +415,27 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     ],
   };
 
-  // 2. DYNAMIC JSON-LD LOCALBUSINESS & SERVICE SCHEMA MARKUP (LOCAL SEO)
+  const isPremium = Boolean(provider.is_premium);
+
+  // Freemium tier: For free users, bio is strictly capped to 150 chars. For premium users, full bio is displayed.
+  const effectiveBio = isPremium
+    ? (provider.bio || provider.short_bio || '')
+    : (provider.bio || provider.short_bio || '').slice(0, 150);
+
+  // Freemium Local SEO rules:
+  // - If is_premium is false: Strictly do NOT render target_areas in HTML/DOM or JSON-LD schema (prevents indexing hyper-local keywords)
+  // - If is_premium is true: Render target_areas in DOM and include AdministrativeArea in JSON-LD schema
+  const effectiveTargetAreas = isPremium
+    ? (Array.isArray(provider.target_areas) && provider.target_areas.length > 0
+        ? provider.target_areas
+        : Array.isArray(provider.service_area) && provider.service_area.length > 0
+        ? provider.service_area
+        : [])
+    : [];
+
   const areaServedList =
-    Array.isArray(provider.service_area) && provider.service_area.length > 0
-      ? provider.service_area.map((area: string) => ({
+    isPremium && effectiveTargetAreas.length > 0
+      ? effectiveTargetAreas.map((area: string) => ({
           '@type': 'AdministrativeArea',
           name: `${area}, ${cityName}`,
         }))
@@ -425,7 +452,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     '@id': canonicalUrl,
     name: providerName,
     description:
-      provider.short_bio ||
+      effectiveBio ||
       `${providerName} is a verified ${categoryName} serving ${cityName}, ${countryName}. Direct contact with zero middleman commission.`,
     image: [effectiveCover, effectiveAvatar].filter(Boolean),
     telephone: provider.whatsapp_number,
@@ -493,7 +520,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     },
     {
       label: lang === 'ur' ? 'سروس کا علاقہ' : lang === 'ar' ? 'منطقة التغطية' : 'Service Area',
-      value: provider.district ? `${provider.district}, ${cityName}` : cityName,
+      value: isPremium && provider.district ? `${provider.district}, ${cityName}` : cityName,
       icon: 'location' as const,
     },
     {
@@ -503,11 +530,15 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     },
   ];
 
-  // Portfolio photos with category cover banner as slide #1
+  // Portfolio photos with category cover banner as slide #1 + provider gallery images
   const portfolioPhotos = [
     effectiveCover,
-    'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80',
-    'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
+    ...(provider.gallery_images && provider.gallery_images.length > 0
+      ? provider.gallery_images
+      : [
+          'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=1200&q=80',
+        ]),
   ];
 
   // Dynamic Specializations
@@ -558,19 +589,32 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
       </div>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* H2 for Portfolio: Work Showcase & Projects by ${providerName} */}
-        <div className="mb-3">
-          <h2 className={`text-base sm:text-lg font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3]' : 'leading-snug'}`}>
-            {lang === 'ur'
-              ? `${providerName} کے کام کی تصاویر اور پروجیکٹس`
-              : lang === 'ar'
-              ? `معرض أعمال ومشاريع ${providerName}`
-              : `Work Showcase & Projects by ${providerName}`}
-          </h2>
-        </div>
+        {/* TOP BANNER / GALLERY (Gated by Subscription Tier) */}
+        {!isPremium ? (
+          <div className="h-44 sm:h-52 w-full rounded-2xl bg-gradient-to-r from-emerald-800 to-teal-900 overflow-hidden relative shadow-inner">
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute top-4 start-4 px-3 py-1.5 bg-black/40 backdrop-blur-sm rounded-full text-white text-xs font-medium flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>{categoryName} • {cityName}</span>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* H2 for Portfolio: Work Showcase & Projects by ${providerName} */}
+            <div className="mb-3">
+              <h2 className={`text-base sm:text-lg font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3]' : 'leading-snug'}`}>
+                {lang === 'ur'
+                  ? `${providerName} کے کام کی تصاویر اور پروجیکٹس`
+                  : lang === 'ar'
+                  ? `معرض أعمال ومشاريع ${providerName}`
+                  : `Work Showcase & Projects by ${providerName}`}
+              </h2>
+            </div>
 
-        {/* TOP IMAGE SLIDER (Next.js Image unoptimized={true}) */}
-        <ProviderImageSlider images={portfolioPhotos} providerName={provider.name} />
+            {/* TOP IMAGE SLIDER (Next.js Image unoptimized={true}) */}
+            <ProviderImageSlider images={portfolioPhotos} providerName={provider.name} />
+          </>
+        )}
 
         {/* OVERLAPPING AVATAR & BASIC DETAILS */}
         <div className="relative px-2 sm:px-6 mb-8">
@@ -613,6 +657,15 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                   <BadgeCheck className="w-6 h-6 fill-emerald-50 text-[#059669]" />
                 </span>
               )}
+              {isPremium && (
+                <span
+                  title="Premium Specialist Partner"
+                  className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  <span>★ Premium</span>
+                </span>
+              )}
             </div>
 
             {/* Primary Category Title */}
@@ -636,7 +689,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
               <div className="flex items-center gap-1">
                 <MapPin className="w-4 h-4 text-gray-400" />
-                <span>{provider.district}، {cityName}</span>
+                <span>{isPremium && provider.district ? `${provider.district}، ${cityName}` : cityName}</span>
               </div>
 
               <div className="flex items-center gap-1">
@@ -663,7 +716,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                 {lang === 'ur' ? 'تعارف اور پیشہ ورانہ تجربہ' : lang === 'ar' ? 'نبذة عن الخبرة المهنية' : 'About & Professional Experience'}
               </h2>
               <p className={`text-base text-gray-700 whitespace-pre-line overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5]' : 'leading-relaxed'}`}>
-                {provider.short_bio}
+                {effectiveBio}
               </p>
             </div>
 
@@ -690,26 +743,116 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               </div>
             </div>
 
-            {/* Service Area Tags */}
-            <div className="p-6 border border-gray-200 rounded-2xl bg-white overflow-visible">
-              <h2 className={`text-xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-4 pt-1' : 'leading-snug mb-3'}`}>
-                {lang === 'ur'
-                  ? `${cityName} میں سروس ایریا اور علاقے`
-                  : lang === 'ar'
-                  ? `نطاق الخدمة في ${cityName}`
-                  : `Service Area Coverage in ${cityName}`}
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {provider.service_area.map((area, idx) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 bg-gray-50 border border-gray-200 rounded-lg text-xs font-medium text-gray-700"
-                  >
-                    {area}
+            {/* Hyper-Local Target Service Areas (GATED: Premium Tier Only) */}
+            {isPremium && effectiveTargetAreas.length > 0 && (
+              <div className="p-6 border border-gray-200 rounded-2xl bg-white overflow-visible">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className={`text-xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-1 pt-1' : 'leading-snug'}`}>
+                    {lang === 'ur'
+                      ? `${cityName} میں کور کیے جانے والے علاقے اور ٹارگٹ لوکیشنز`
+                      : lang === 'ar'
+                      ? `نطاق التغطية والمناطق المخدومة في ${cityName}`
+                      : `Target Service Areas & Coverage in ${cityName}`}
+                  </h2>
+                  <span className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded-md flex items-center gap-1 shadow-2xs">
+                    <Sparkles className="w-3 h-3 text-amber-600" />
+                    <span>Hyper-Local</span>
                   </span>
-                ))}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {effectiveTargetAreas.map((area: string, idx: number) => (
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-900"
+                    >
+                      {area}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {/* Google Map Location (GATED: Premium Tier Only) */}
+            {isPremium && provider.google_map_url && (
+              <div className="p-6 border border-gray-200 rounded-2xl bg-white overflow-visible">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-emerald-600" />
+                    <h2 className={`text-xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-1' : 'leading-snug'}`}>
+                      {lang === 'ur' ? 'ورکشاپ / دفتر کا مقام (گوگل میپس)' : lang === 'ar' ? 'موقع الورشة أو المكتب (خرائط جوجل)' : 'Workshop & Office Location'}
+                    </h2>
+                  </div>
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-md">
+                    GPS Navigation
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                  {lang === 'ur'
+                    ? 'پیشہ ورانہ ورکشاپ اور سروس سینٹر تک آسان براہِ راست رسائی اور سمت معلوم کریں۔'
+                    : lang === 'ar'
+                    ? 'احصل على الاتجاهات المباشرة إلى موقع الورشة أو المقر الرسمي.'
+                    : 'Get direct GPS turn-by-turn directions to the verified workshop or service center.'}
+                </p>
+                <a
+                  href={provider.google_map_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gray-900 hover:bg-gray-800 text-white text-xs font-semibold transition-all shadow-2xs"
+                >
+                  <MapPin className="w-4 h-4 text-emerald-400" />
+                  <span>
+                    {lang === 'ur' ? 'گوگل میپس پر لوکیشن کھولیں' : lang === 'ar' ? 'فتح الموقع في خرائط Google' : 'Open in Google Maps'}
+                  </span>
+                  <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                </a>
+              </div>
+            )}
+
+            {/* Verified Trade Licenses & Certificates (GATED: Premium Tier Only) */}
+            {isPremium && provider.certificates && provider.certificates.length > 0 && (
+              <div className="p-6 border border-gray-200 rounded-2xl bg-white overflow-visible">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-5 h-5 text-amber-600" />
+                    <h2 className={`text-xl font-semibold text-neutral-900 overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.3] mb-1' : 'leading-snug'}`}>
+                      {lang === 'ur' ? 'تصدیق شدہ اسناد و لائسنس' : lang === 'ar' ? 'الشهادات والتراخيص المعتمدة' : 'Verified Licenses & Certifications'}
+                    </h2>
+                  </div>
+                  <span className="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Official Proof</span>
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {provider.certificates.map((certUrl, idx) => (
+                    <div key={idx} className="group relative rounded-xl border border-gray-200 overflow-hidden bg-gray-50 hover:shadow-md transition-shadow">
+                      <div className="h-44 w-full overflow-hidden bg-gray-100 flex items-center justify-center">
+                        <img
+                          src={certUrl}
+                          alt={`${providerName} License #${idx + 1}`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="p-3 bg-white flex items-center justify-between border-t border-gray-100">
+                        <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-800">
+                          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                          <span>{lang === 'ur' ? `سند نمبر ${idx + 1}` : lang === 'ar' ? `وثيقة ${idx + 1}` : `License / Document #${idx + 1}`}</span>
+                        </div>
+                        <a
+                          href={certUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1"
+                        >
+                          <span>{lang === 'ur' ? 'بڑا کر کے دیکھیں' : lang === 'ar' ? 'عرض' : 'View Full'}</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Trust Badges */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

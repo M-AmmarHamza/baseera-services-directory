@@ -83,15 +83,22 @@ create table if not exists public.providers (
   slug text unique not null, -- STRICTLY English Slug (Transliterated from Urdu/Arabic)
   profile_type text not null default 'individual' check (profile_type in ('individual', 'shop')),
   whatsapp_number text not null,
-  service_area text[] default '{}', -- e.g. ['Clifton', 'DHA', 'PECHS']
-  short_bio text,
+  service_area text[] default '{}', -- e.g. ['Clifton', 'DHA', 'PECHS'] (Legacy)
+  target_areas text[] default '{}', -- Hyper-Local target areas for SEO
+  short_bio text, -- Legacy short bio
+  bio text, -- Full bio (max 150 chars for Free, unlimited for Premium)
   status text not null default 'pending' check (status in ('pending', 'published', 'suspended', 'approved', 'rejected')),
   seo_index boolean default false, -- Controls search engine indexing (noindex when false)
   is_verified boolean default false, -- Admin verification & trust badge
   is_featured boolean default false, -- Sponsored / Premium provider flag in top sliders
   is_available boolean default true, -- Provider studio toggle: "Available Now"
-  avatar_url text,
-  portfolio_photos text[] default '{}', -- Max 4 photos stored in 'provider-portfolios' bucket
+  is_premium boolean default false, -- Freemium subscription tier (Free vs Premium)
+  avatar_url text, -- Profile avatar URL
+  profile_picture text, -- Canonical profile picture URL
+  portfolio_photos text[] default '{}', -- Legacy photos array
+  gallery_images text[] default '{}', -- Premium gallery images array
+  google_map_url text, -- Premium Google Maps location / embed URL
+  certificates text[] default '{}', -- Premium certification URLs
   cnic_document_url text, -- Stored securely in private bucket 'secure-documents'
   starting_price int default 500,
   rating numeric(3, 1) default 5.0,

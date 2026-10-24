@@ -149,6 +149,20 @@ export function createProviderRegistrationSchema(lang: string = 'en') {
     profile_type: z.enum(['individual', 'shop']).default('individual'),
     avatar_url: z.string().optional(),
     cover_url: z.string().optional(),
+    profile_picture: z.string().optional(),
+    bio: z
+      .string()
+      .trim()
+      .max(MAX_BIO_LENGTH, { message: `Bio must not exceed ${MAX_BIO_LENGTH} characters.` })
+      .refine((val) => validateScript(val, lang, false), {
+        message: getScriptErrorMessage(lang, 'short_bio'),
+      })
+      .optional(),
+    target_areas: z.union([z.array(z.string().trim()), z.string()]).optional(),
+    is_premium: z.boolean().optional(),
+    gallery_images: z.array(z.string()).optional(),
+    google_map_url: z.string().optional(),
+    certificates: z.array(z.string()).optional(),
     lang: z.string().default('en'),
   });
 }

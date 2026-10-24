@@ -59,6 +59,7 @@ export async function GET(req: NextRequest) {
             is_verified: Boolean(p.is_verified),
             is_featured: Boolean(p.is_featured),
             is_available: Boolean(p.is_available),
+            is_premium: Boolean(p.is_premium),
             avatar_url: p.avatar_url,
             starting_price: p.starting_price || 0,
             rating: p.rating || 5.0,
@@ -85,6 +86,7 @@ export async function GET(req: NextRequest) {
       const baseSeo = (override as any).seo_index !== undefined ? Boolean((override as any).seo_index) : (baseStatus === 'published');
       const baseFeatured = (override as any).is_featured !== undefined ? Boolean((override as any).is_featured) : (idx === 0 || idx === 2);
       const baseVerified = (override as any).is_verified !== undefined ? Boolean((override as any).is_verified) : p.is_verified;
+      const basePremium = (override as any).is_premium !== undefined ? Boolean((override as any).is_premium) : (idx < 3);
 
       return {
         ...p,
@@ -93,6 +95,7 @@ export async function GET(req: NextRequest) {
         seo_index: baseSeo,
         is_featured: baseFeatured,
         is_verified: baseVerified,
+        is_premium: basePremium,
         created_at: (p as any).created_at || new Date(Date.now() - idx * 3600 * 24 * 1000).toISOString(),
         ...override,
       };
@@ -221,13 +224,17 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    const { id, status, seo_index, is_featured, is_verified, is_available } = await req.json();
+    const { id, status, seo_index, is_featured, is_verified, is_available, is_premium } = await req.json();
 
     if (!id) {
       return NextResponse.json({ error: 'Provider ID is required' }, { status: 400 });
     }
 
     const updates: Record<string, any> = {};
+
+    if (is_premium !== undefined) {
+      updates.is_premium = Boolean(is_premium);
+    }
 
     if (status !== undefined) {
       const normStatus = status === 'approved' ? 'published' : status === 'rejected' ? 'suspended' : status;

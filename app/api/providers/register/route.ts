@@ -275,6 +275,12 @@ export async function POST(request: NextRequest) {
             .filter(Boolean)
         : [cleanCityName];
 
+      const finalBio = (rawBody.bio || short_bio || '').trim().slice(0, 150);
+      const finalProfilePic = (rawBody.profile_picture || avatar_url || '').trim() || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`;
+      const targetAreasArray = Array.isArray(rawBody.target_areas)
+        ? rawBody.target_areas
+        : serviceAreaArray;
+
       const providerPayload = {
         country_id: countryId,
         city_id: cityId,
@@ -283,14 +289,21 @@ export async function POST(request: NextRequest) {
         slug: uniqueSlug,
         profile_type: profile_type === 'shop' ? 'shop' : 'individual',
         whatsapp_number: (resolvedWhatsApp || telegram_handle || '').trim(),
-        avatar_url: avatar_url?.trim() || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,
+        avatar_url: finalProfilePic,
+        profile_picture: finalProfilePic,
         service_area: serviceAreaArray,
-        short_bio: short_bio?.trim() || `${resolvedTradeTitle} serving ${cleanCityName}. Direct communication with zero commission.`,
+        target_areas: targetAreasArray,
+        short_bio: finalBio || `${resolvedTradeTitle} serving ${cleanCityName}. Direct communication with zero commission.`,
+        bio: finalBio || `${resolvedTradeTitle} serving ${cleanCityName}. Direct communication with zero commission.`,
         status: 'pending', // Strictly defaults to pending for admin moderation
         seo_index: false,
         is_verified: false,
         is_available: false,
         is_featured: false,
+        is_premium: false, // Gated: Free Tier by default
+        gallery_images: [],
+        google_map_url: '',
+        certificates: [],
         starting_price: cleanNumericPrice(starting_price, getCountryCurrency(country_code).defaultFee),
         rating: 5.0,
         review_count: 1,
@@ -314,6 +327,13 @@ export async function POST(request: NextRequest) {
         is_verified: false,
         is_available: false,
         is_featured: false,
+        is_premium: false,
+        bio: finalBio,
+        profile_picture: finalProfilePic,
+        target_areas: targetAreasArray,
+        gallery_images: [],
+        google_map_url: '',
+        certificates: [],
         category_id: resolvedCatId,
         city_slug: citySlug,
         country_code: cleanCountryCode,
@@ -342,6 +362,13 @@ export async function POST(request: NextRequest) {
       is_verified: false,
       is_available: false,
       is_featured: false,
+      is_premium: false,
+      bio: (rawBody.bio || short_bio || '').trim().slice(0, 150),
+      profile_picture: (rawBody.profile_picture || avatar_url || '').trim() || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`,
+      target_areas: Array.isArray(rawBody.target_areas) ? rawBody.target_areas : [cleanCityName],
+      gallery_images: [],
+      google_map_url: '',
+      certificates: [],
       category_id: resolvedCatId,
       city_slug: citySlug,
       country_code: cleanCountryCode,

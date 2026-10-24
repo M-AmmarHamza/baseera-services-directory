@@ -18,19 +18,26 @@ export interface Provider {
   country_code: string;
   district: string;
   service_area: string[];
+  target_areas?: string[];
   whatsapp_number: string;
   phone_number?: string;
   telegram_handle?: string;
   preferred_contact?: string;
   avatar_url: string;
+  profile_picture?: string;
   cover_url?: string;
   short_bio: string;
+  bio?: string;
   starting_price: number;
   rating: number;
   review_count: number;
   total_leads: number;
   is_verified: boolean;
   is_available: boolean;
+  is_premium?: boolean;
+  gallery_images?: string[];
+  google_map_url?: string;
+  certificates?: string[];
   status?: ProviderStatus | 'approved' | 'rejected';
   seo_index?: boolean;
   is_featured?: boolean;
@@ -62,6 +69,19 @@ export const SEED_PROVIDERS: Provider[] = [
     is_verified: true,
     is_available: true,
     is_featured: true,
+    is_premium: true,
+    bio: '18+ years experience servicing residential bungalows and commercial apartments across Karachi. Specialized in DB panel troubleshooting, short circuit emergency clearance, and hybrid solar UPS load segregation.',
+    profile_picture: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBK9qWTJzXQzuvOCxeaY9oaT5QnMSIE_WRvPrYq3ndOxqfGwgRJiuusiLQI6ptKnL9aXydagk97uFwsxC7j-gxTH2VH5N_HAJpsT3T0CG_IE0OBqsRNY1C_6XY0VC8sNDh1YBotW-weRk3E7XwleN6ZT1cvkRynmWL_e-anI_it8xQNPs3oqJRRO7Xrk7PfW-P6i2RwcClJxEboVmdY8ZF6bL0HcCJgGu5qW0x9sje5DlC6qn7x4H7V',
+    target_areas: ['PECHS', 'Clifton', 'DHA Phases 1-8', 'Bahadurabad'],
+    google_map_url: 'https://maps.google.com/?q=PECHS+Block+2+Karachi',
+    gallery_images: [
+      'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
+    ],
+    certificates: [
+      'https://images.unsplash.com/photo-1589330694653-dad6d3240e2b?auto=format&fit=crop&w=800&q=80',
+    ],
   },
   {
     id: 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e',
@@ -84,6 +104,18 @@ export const SEED_PROVIDERS: Provider[] = [
     is_verified: true,
     is_available: true,
     is_featured: true,
+    is_premium: true,
+    bio: 'Certified Inverter AC technician with digital manifold gauges and genuine R410a/R32 refrigerants. Specializing in error code diagnosis, PCB card repairs, and anti-bacterial pressure washing.',
+    profile_picture: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDrVEOf4Kmm3ZmFg2SVyQFHc7CD8jvopigKY9y06BL7csj1WLTVWDmQqVt9BLA-VImJWY1FnjTlOTMBdLORMVFgTEdwQKPPqGcSnJWhS5AriQLENY6vHirxqBOzQHMWyqZjRyr6tgRG-1ieePqu9nM2GIZj-GUmMil3H8fWsOahBKbVJj1EXc7oGAdad_P_Cb1e1CbAKo9FYlkkU-0dpz0biB1i9POZASr1lFg6dTIGFODNEO_8u9eb',
+    target_areas: ['Gulshan-e-Iqbal', 'Gulistan-e-Jauhar', 'Federal B Area'],
+    google_map_url: 'https://maps.google.com/?q=Gulshan-e-Iqbal+Karachi',
+    gallery_images: [
+      'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=800&q=80',
+    ],
+    certificates: [
+      'https://images.unsplash.com/photo-1589330694653-dad6d3240e2b?auto=format&fit=crop&w=800&q=80',
+    ],
   },
   {
     id: 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f',
@@ -2091,6 +2123,18 @@ function mapDbProvider(row: any, fallbackCity: string = 'karachi'): Provider {
   const normalizedStatus: 'pending' | 'published' | 'suspended' =
     rawStatus === 'approved' ? 'published' : rawStatus === 'rejected' ? 'suspended' : rawStatus;
 
+  const targetAreas = Array.isArray(row.target_areas) && row.target_areas.length > 0
+    ? row.target_areas
+    : Array.isArray(row.service_area) ? row.service_area : [];
+
+  const galleryImages = Array.isArray(row.gallery_images) && row.gallery_images.length > 0
+    ? row.gallery_images
+    : Array.isArray(row.portfolio_photos) ? row.portfolio_photos : [];
+
+  const certificates = Array.isArray(row.certificates) ? row.certificates : [];
+  const bio = row.bio || row.short_bio || '';
+  const avatar = row.profile_picture || row.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(row.name)}`;
+
   return {
     id: row.id,
     name: row.name,
@@ -2100,17 +2144,26 @@ function mapDbProvider(row: any, fallbackCity: string = 'karachi'): Provider {
     trade_title: row.trade_title || `${row.name} - Verified Professional`,
     city_slug: citySlug,
     country_code: countryCode,
-    district: Array.isArray(row.service_area) && row.service_area.length > 0 ? row.service_area[0] : 'Karachi',
-    service_area: Array.isArray(row.service_area) ? row.service_area : [],
+    district: targetAreas.length > 0 ? targetAreas[0] : 'Karachi',
+    service_area: targetAreas,
+    target_areas: targetAreas,
     whatsapp_number: row.whatsapp_number,
-    avatar_url: row.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(row.name)}`,
-    short_bio: row.short_bio || '',
+    phone_number: row.phone_number || row.whatsapp_number,
+    avatar_url: avatar,
+    profile_picture: avatar,
+    cover_url: row.cover_url,
+    short_bio: bio,
+    bio: bio,
     starting_price: cleanNumericPrice(row.starting_price, getCountryCurrency(countryCode).defaultFee),
     rating: Number(row.rating) || 4.8,
     review_count: Number(row.review_count) || 10,
     total_leads: Number(row.total_leads) || 25,
     is_verified: Boolean(row.is_verified),
     is_available: Boolean(row.is_available),
+    is_premium: Boolean(row.is_premium),
+    gallery_images: galleryImages,
+    google_map_url: row.google_map_url || '',
+    certificates: certificates,
     status: normalizedStatus,
     seo_index: Boolean(row.seo_index),
     is_featured: Boolean(row.is_featured),
@@ -2323,6 +2376,11 @@ export async function getProviderBySlug(citySlug: string, categorySlug: string, 
     if (pro.status === 'approved') pro.status = 'published';
     if (pro.seo_index === undefined) pro.seo_index = true;
     if (pro.is_featured === undefined) pro.is_featured = true;
+    if (pro.is_premium === undefined) pro.is_premium = Boolean(pro.is_featured);
+    if (!pro.target_areas) pro.target_areas = pro.service_area;
+    if (!pro.gallery_images) pro.gallery_images = [];
+    if (!pro.bio) pro.bio = pro.short_bio;
+    if (!pro.profile_picture) pro.profile_picture = pro.avatar_url;
     return pro;
   }
 
@@ -2333,6 +2391,10 @@ export async function getProviderBySlug(citySlug: string, categorySlug: string, 
     const normalizedStatus: 'pending' | 'published' | 'suspended' =
       rawStatus === 'approved' ? 'published' : rawStatus === 'rejected' ? 'suspended' : rawStatus;
 
+    const targetAreas = directOverride.target_areas || directOverride.service_area || [];
+    const avatar = directOverride.profile_picture || directOverride.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(normSlug)}`;
+    const bio = directOverride.bio || directOverride.short_bio || '';
+
     return {
       id: directOverride.id || normSlug,
       name: directOverride.name || normSlug,
@@ -2342,17 +2404,25 @@ export async function getProviderBySlug(citySlug: string, categorySlug: string, 
       trade_title: directOverride.trade_title || directOverride.name || 'Specialist',
       city_slug: directOverride.city_slug || normCity,
       country_code: directOverride.country_code || 'pk',
-      district: directOverride.district || normCity,
-      service_area: directOverride.service_area || [],
+      district: targetAreas.length > 0 ? targetAreas[0] : (directOverride.district || normCity),
+      service_area: targetAreas,
+      target_areas: targetAreas,
       whatsapp_number: directOverride.whatsapp_number || '',
-      avatar_url: directOverride.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(normSlug)}`,
-      short_bio: directOverride.short_bio || '',
+      avatar_url: avatar,
+      profile_picture: avatar,
+      cover_url: directOverride.cover_url,
+      short_bio: bio,
+      bio: bio,
       starting_price: directOverride.starting_price || 500,
       rating: directOverride.rating || 5.0,
       review_count: directOverride.review_count || 1,
       total_leads: directOverride.total_leads || 0,
       is_verified: Boolean(directOverride.is_verified),
       is_available: Boolean(directOverride.is_available),
+      is_premium: Boolean(directOverride.is_premium),
+      gallery_images: directOverride.gallery_images || [],
+      google_map_url: directOverride.google_map_url || '',
+      certificates: directOverride.certificates || [],
       status: normalizedStatus,
       seo_index: Boolean(directOverride.seo_index),
       is_featured: Boolean(directOverride.is_featured),

@@ -38,6 +38,11 @@ import {
   HelpCircle,
   ImageIcon,
   AlertCircle,
+  Lock,
+  MapPin,
+  Award,
+  Sparkles,
+  Images,
 } from 'lucide-react';
 import { WhatsAppIcon } from '@/components/Icons';
 
@@ -459,12 +464,19 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
       city_name: cityName.trim(),
       category_id: categoryId,
       trade_title: tradeTitle.trim(),
-      short_bio: shortBio.trim(),
+      short_bio: shortBio.trim().slice(0, MAX_BIO_LENGTH),
+      bio: shortBio.trim().slice(0, MAX_BIO_LENGTH),
       service_area: areasArray,
+      target_areas: areasArray,
       starting_price: cleanNumericPrice(startingPrice, getCountryCurrency(countryCode).defaultFee),
       profile_type: profileType,
       avatar_url: avatarBase64,
+      profile_picture: avatarBase64,
       cover_url: coverBase64,
+      gallery_images: [],
+      google_map_url: '',
+      certificates: [],
+      is_premium: false,
       lang,
     };
 
@@ -1015,15 +1027,20 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                   
-                  {/* 1. Profile Picture (Avatar) */}
-                  <div className="flex flex-col gap-2 text-start">
-                    <label className="text-xs font-semibold text-gray-700">
-                      {t('avatar_label')}
-                    </label>
+                  {/* 1. Profile Picture (Avatar) - Strict Free Tier Limit: 1 Photo */}
+                  <div className="flex flex-col gap-2 text-start sm:col-span-2 max-w-sm mx-auto sm:mx-0">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-semibold text-gray-700">
+                        {t('avatar_label')}
+                      </label>
+                      <span className="text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        Free Tier: 1 Photo Allowed
+                      </span>
+                    </div>
 
                     <div className="relative">
                       {avatarPreview ? (
-                        <div className="relative w-28 h-28 rounded-2xl overflow-hidden border-2 border-[#006948] bg-white shadow-2xs group mx-auto sm:mx-0">
+                        <div className="relative w-32 h-32 rounded-2xl overflow-hidden border-2 border-[#006948] bg-white shadow-2xs group mx-auto sm:mx-0">
                           <img
                             src={avatarPreview}
                             alt="Profile Avatar Preview"
@@ -1041,7 +1058,7 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
                       ) : (
                         <label
                           htmlFor="avatar-upload"
-                          className="flex flex-col items-center justify-center h-28 rounded-2xl border-2 border-dashed border-gray-300 hover:border-[#006948] bg-white hover:bg-emerald-50/30 transition-all cursor-pointer text-center p-3"
+                          className="flex flex-col items-center justify-center h-32 rounded-2xl border-2 border-dashed border-gray-300 hover:border-[#006948] bg-white hover:bg-emerald-50/30 transition-all cursor-pointer text-center p-3"
                         >
                           <Camera className="w-6 h-6 text-gray-400 mb-1" />
                           <span className="text-xs font-semibold text-gray-700">
@@ -1066,58 +1083,98 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
                     )}
                   </div>
 
-                  {/* 2. Cover Photo (Banner) */}
-                  <div className="flex flex-col gap-2 text-start">
-                    <label className="text-xs font-semibold text-gray-700">
-                      {t('cover_label')}
-                    </label>
+                </div>
 
-                    <div className="relative">
-                      {coverPreview ? (
-                        <div className="relative h-28 w-full rounded-2xl overflow-hidden border-2 border-[#006948] bg-white shadow-2xs group">
-                          <img
-                            src={coverPreview}
-                            alt="Cover Photo Preview"
-                            className="w-full h-full object-cover"
-                          />
-                          <button
-                            type="button"
-                            onClick={removeCover}
-                            className="absolute top-1 end-1 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 shadow-sm transition-all cursor-pointer"
-                            title={t('remove_image')}
-                          >
-                            <X className="w-3 h-3" />
-                          </button>
-                        </div>
-                      ) : (
-                        <label
-                          htmlFor="cover-upload"
-                          className="flex flex-col items-center justify-center h-28 rounded-2xl border-2 border-dashed border-gray-300 hover:border-[#006948] bg-white hover:bg-emerald-50/30 transition-all cursor-pointer text-center p-3"
-                        >
-                          <Upload className="w-6 h-6 text-gray-400 mb-1" />
-                          <span className="text-xs font-semibold text-gray-700">
-                            {t('cover_upload_btn')}
-                          </span>
-                          <span className="text-xs text-gray-500 mt-0.5">
-                            JPG, PNG, WEBP (Max 10MB)
-                          </span>
-                        </label>
-                      )}
-                      <input
-                        id="cover-upload"
-                        ref={coverInputRef}
-                        type="file"
-                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                        onChange={handleCoverChange}
-                        className="hidden"
-                      />
-                    </div>
-                    {coverError && (
-                      <span className="text-xs text-red-600 font-semibold">{coverError}</span>
-                    )}
+                {/* ============================================================== */}
+                {/* LOCKED PREMIUM SECTIONS (Free Tier Disabled / Locked Overlays) */}
+                {/* ============================================================== */}
+                <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Premium Profile Add-Ons</span>
+                    </span>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-300 px-2 py-0.5 rounded-full shadow-2xs">
+                      🔒 Premium Only
+                    </span>
                   </div>
 
+                  {/* 1. Locked Gallery Images Field */}
+                  <div className="relative rounded-2xl border border-gray-200 bg-gray-50/90 p-4 overflow-hidden">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Images className="w-4 h-4 text-gray-400" />
+                        <span className="text-xs font-bold text-gray-500">Project Showcase Gallery (Up to 8 Images)</span>
+                      </div>
+                    </div>
+                    <div className="h-20 rounded-xl border border-dashed border-gray-300 bg-gray-100/70 flex items-center justify-center text-xs text-gray-400">
+                      <span>Multi-image gallery upload locked</span>
+                    </div>
+
+                    {/* UI Lock Overlay */}
+                    <div className="absolute inset-0 bg-white/75 backdrop-blur-[1.5px] flex flex-col items-center justify-center p-3 text-center transition-all">
+                      <div className="w-7 h-7 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 mb-1.5 shadow-2xs">
+                        <Lock className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-xs font-bold text-gray-900">Project Gallery Locked</span>
+                      <span className="text-[11px] text-gray-500 max-w-xs mt-0.5">
+                        Upgrade to Premium to unlock high-resolution portfolio photos on your public profile.
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 2. Locked Google Map Pin Field */}
+                  <div className="relative rounded-2xl border border-gray-200 bg-gray-50/90 p-4 overflow-hidden">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-gray-400" />
+                        <span className="text-xs font-bold text-gray-500">Interactive Google Maps Pin</span>
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      disabled
+                      placeholder="https://maps.google.com/?q=..."
+                      className="w-full px-3 py-2 rounded-xl border border-gray-200 bg-gray-100 text-xs text-gray-400 cursor-not-allowed"
+                    />
+
+                    {/* UI Lock Overlay */}
+                    <div className="absolute inset-0 bg-white/75 backdrop-blur-[1.5px] flex flex-col items-center justify-center p-3 text-center transition-all">
+                      <div className="w-7 h-7 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 mb-1.5 shadow-2xs">
+                        <Lock className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-xs font-bold text-gray-900">Google Map URL Locked</span>
+                      <span className="text-[11px] text-gray-500 max-w-xs mt-0.5">
+                        Upgrade to Premium to embed direct Google Maps GPS navigation to your workshop or shop.
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 3. Locked Certificates Field */}
+                  <div className="relative rounded-2xl border border-gray-200 bg-gray-50/90 p-4 overflow-hidden">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Award className="w-4 h-4 text-gray-400" />
+                        <span className="text-xs font-bold text-gray-500">Verified Trade Licenses & Certificates</span>
+                      </div>
+                    </div>
+                    <div className="h-16 rounded-xl border border-dashed border-gray-300 bg-gray-100/70 flex items-center justify-center text-xs text-gray-400">
+                      <span>Certification document uploader locked</span>
+                    </div>
+
+                    {/* UI Lock Overlay */}
+                    <div className="absolute inset-0 bg-white/75 backdrop-blur-[1.5px] flex flex-col items-center justify-center p-3 text-center transition-all">
+                      <div className="w-7 h-7 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 mb-1.5 shadow-2xs">
+                        <Lock className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="text-xs font-bold text-gray-900">Certificates Locked</span>
+                      <span className="text-[11px] text-gray-500 max-w-xs mt-0.5">
+                        Upgrade to Premium to showcase official trade licenses, diplomas, and brand distributor proofs.
+                      </span>
+                    </div>
+                  </div>
                 </div>
+
               </div>
 
               {/* Service Areas (Strict limit: Max 3 areas) */}
@@ -1159,6 +1216,17 @@ export default function ListServiceForm({ lang, dict }: ListServiceFormProps) {
                       {serviceAreaError || t('service_areas_max_error')}
                     </span>
                   )}
+                </div>
+
+                {/* Free Tier Notice: Target areas are saved but only visible/SEO-indexed with Premium */}
+                <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-amber-900 text-xs">
+                  <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="leading-relaxed">
+                    <span className="font-semibold text-amber-950">Notice: </span>
+                    <span className="text-amber-800">
+                      Target areas are saved but will only be publicly visible and SEO-indexed upon Premium Upgrade.
+                    </span>
+                  </div>
                 </div>
 
                 {/* Interactive Area Tag Chips */}

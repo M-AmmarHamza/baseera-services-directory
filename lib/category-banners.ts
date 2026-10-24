@@ -68,7 +68,10 @@ export function getDefaultAvatarUrl(name?: string): string {
 /**
  * Returns the provider's avatar URL, falling back to a branded initials avatar.
  */
-export function getProviderAvatarUrl(provider: { avatar_url?: string; name: string }): string {
+export function getProviderAvatarUrl(provider: { avatar_url?: string; profile_picture?: string; name: string }): string {
+  if (provider.profile_picture && provider.profile_picture.trim().length > 0) {
+    return provider.profile_picture.trim();
+  }
   if (provider.avatar_url && provider.avatar_url.trim().length > 0) {
     return provider.avatar_url.trim();
   }

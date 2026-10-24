@@ -49,6 +49,7 @@ interface AdminProvider {
   seo_index: boolean;
   is_verified: boolean;
   is_featured: boolean;
+  is_premium: boolean;
   avatar_url?: string;
   starting_price?: number;
   rating?: number;
@@ -327,6 +328,52 @@ function AdminProvidersContent() {
       }
     } catch (err) {
       console.error('Verified toggle error:', err);
+      fetchProviders();
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  // 5. FREEMIUM TIER TOGGLE (Free vs Premium)
+  const handleTogglePremium = async (provider: AdminProvider) => {
+    const nextVal = !provider.is_premium;
+    setUpdatingId(provider.id);
+
+    // Optimistic update
+    setProviders((prev) =>
+      prev.map((p) => (p.id === provider.id ? { ...p, is_premium: nextVal } : p))
+    );
+
+    try {
+      const res = await updateProviderAction({
+        id: provider.id,
+        is_premium: nextVal,
+      });
+
+      if (res.success) {
+        showToast(
+          nextVal
+            ? `${provider.name}: Upgraded to PREMIUM Tier (Unlocked Gallery, Map, Certs & Target Areas)`
+            : `${provider.name}: Downgraded to FREE Tier (Strict 150-char bio & 1 photo)`
+        );
+        fetchProviders();
+      } else {
+        const clientRes = await fetch('/api/admin/providers', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: provider.id, is_premium: nextVal }),
+        });
+        if (clientRes.ok) {
+          showToast(
+            nextVal
+              ? `${provider.name}: Upgraded to PREMIUM Tier`
+              : `${provider.name}: Set to FREE Tier`
+          );
+          fetchProviders();
+        }
+      }
+    } catch (err) {
+      console.error('Premium toggle error:', err);
       fetchProviders();
     } finally {
       setUpdatingId(null);
@@ -635,6 +682,7 @@ function AdminProvidersContent() {
                   <th className="py-3 px-4 text-center">2. SEO Index</th>
                   <th className="py-3 px-4 text-center">3. Top Slider</th>
                   <th className="py-3 px-4 text-center">4. Trust Badge</th>
+                  <th className="py-3 px-4 text-center">5. Plan / Tier</th>
                   <th className="py-3 px-4 text-end">Actions</th>
                 </tr>
               </thead>
@@ -808,6 +856,28 @@ function AdminProvidersContent() {
                             }`}
                           />
                           <span>{p.is_verified ? 'Verified' : 'Unverified'}</span>
+                        </button>
+                      </td>
+
+                      {/* CONTROL 5: FREEMIUM TIER TOGGLE (Free vs Premium) */}
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          type="button"
+                          disabled={isUpdating}
+                          onClick={() => handleTogglePremium(p)}
+                          title={
+                            p.is_premium
+                              ? 'Premium Tier Active: Unlocked Gallery, Google Maps, Certificates & SEO Target Areas. Click to downgrade to Free.'
+                              : 'Free Tier Active: Limited to single photo, max 150-char bio, no gallery/map/certs/target-areas. Click to upgrade to Premium.'
+                          }
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                            p.is_premium
+                              ? 'bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 shadow-2xs font-bold'
+                              : 'bg-gray-100 text-gray-500 border border-gray-200 hover:bg-amber-50 hover:text-amber-800'
+                          }`}
+                        >
+                          <Sparkles className={`w-3.5 h-3.5 ${p.is_premium ? 'text-amber-600 fill-amber-500' : 'text-gray-400'}`} />
+                          <span>{p.is_premium ? '★ Premium' : 'Free'}</span>
                         </button>
                       </td>
 
