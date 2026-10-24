@@ -502,7 +502,6 @@ export const COUNTRIES: Country[] = [
   { code: 'co', name: 'Colombia', defaultCity: 'bogota', flag: '🇨🇴', region: 'Americas' },
 
   // Europe
-  { code: 'uk', name: 'United Kingdom', defaultCity: 'london', flag: '🇬🇧', region: 'Europe' },
   { code: 'gb', name: 'United Kingdom', defaultCity: 'london', flag: '🇬🇧', region: 'Europe' },
   { code: 'de', name: 'Germany', defaultCity: 'berlin', flag: '🇩🇪', region: 'Europe' },
   { code: 'fr', name: 'France', defaultCity: 'paris', flag: '🇫🇷', region: 'Europe' },
@@ -675,17 +674,7 @@ export const CITIES: City[] = [
   { slug: 'medellin', name: 'Medellin', countryCode: 'co' },
   { slug: 'cali', name: 'Cali', countryCode: 'co' },
 
-  // United Kingdom (Top 10 Cities) - Dual code support ('uk' and 'gb')
-  { slug: 'london', name: 'London', countryCode: 'uk' },
-  { slug: 'birmingham', name: 'Birmingham', countryCode: 'uk' },
-  { slug: 'manchester', name: 'Manchester', countryCode: 'uk' },
-  { slug: 'glasgow', name: 'Glasgow', countryCode: 'uk' },
-  { slug: 'liverpool', name: 'Liverpool', countryCode: 'uk' },
-  { slug: 'edinburgh', name: 'Edinburgh', countryCode: 'uk' },
-  { slug: 'leeds', name: 'Leeds', countryCode: 'uk' },
-  { slug: 'sheffield', name: 'Sheffield', countryCode: 'uk' },
-  { slug: 'bristol', name: 'Bristol', countryCode: 'uk' },
-  { slug: 'cardiff', name: 'Cardiff', countryCode: 'uk' },
+  // United Kingdom (Top 10 Cities)
   { slug: 'london', name: 'London', countryCode: 'gb' },
   { slug: 'birmingham', name: 'Birmingham', countryCode: 'gb' },
   { slug: 'manchester', name: 'Manchester', countryCode: 'gb' },
@@ -915,7 +904,8 @@ export function toTitleCase(str: string): string {
 }
 
 export function getCountryByCode(code: string): Country {
-  const norm = (code || 'pk').toLowerCase();
+  let norm = (code || 'pk').toLowerCase();
+  if (norm === 'uk') norm = 'gb';
   const found = COUNTRIES.find((c) => c.code.toLowerCase() === norm);
   if (found) return found;
 
@@ -937,7 +927,8 @@ export function getCountryByCode(code: string): Country {
 }
 
 export function getCitiesByCountry(countryCode: string): City[] {
-  const norm = (countryCode || 'pk').toLowerCase();
+  let norm = (countryCode || 'pk').toLowerCase();
+  if (norm === 'uk') norm = 'gb';
   const list = CITIES.filter((c) => c.countryCode.toLowerCase() === norm);
   if (list.length > 0) return list;
 

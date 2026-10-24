@@ -83,7 +83,8 @@ export const DEFAULT_CURRENCY: CountryCurrency = {
  */
 export function getCountryCurrency(countryCode?: string): CountryCurrency {
   if (!countryCode) return DEFAULT_CURRENCY;
-  const key = countryCode.toLowerCase().trim();
+  let key = countryCode.toLowerCase().trim();
+  if (key === 'uk') key = 'gb';
   return COUNTRY_CURRENCIES[key] || DEFAULT_CURRENCY;
 }
 

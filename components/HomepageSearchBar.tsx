@@ -273,19 +273,36 @@ export default function HomepageSearchBar({ lang, defaultLocation }: Props) {
 
   // Filtered and grouped cities for selection modal using Smart Multi-field & Typo Search
   const groupedCities = useMemo(() => {
+    const effectiveFilter = countryFilter.toLowerCase() === 'uk' ? 'gb' : countryFilter.toLowerCase();
     const activeCountries =
-      countryFilter === 'all'
-        ? COUNTRIES
-        : COUNTRIES.filter((c) => c.code.toLowerCase() === countryFilter.toLowerCase());
+      effectiveFilter === 'all'
+        ? COUNTRIES.filter((c) => c.code.toLowerCase() !== 'uk')
+        : COUNTRIES.filter((c) => {
+            const code = c.code.toLowerCase();
+            return code === effectiveFilter || (effectiveFilter === 'gb' && code === 'uk');
+          });
 
-    const formatted = activeCountries.map((c) => ({
-      code: c.code,
-      name: c.name,
-      flag: c.flag,
-      region: c.region,
-      country: c,
-      cities: CITIES.filter((city) => city.countryCode.toLowerCase() === c.code.toLowerCase()),
-    }));
+    const formatted = activeCountries.map((c) => {
+      const targetCountryCode = c.code.toLowerCase() === 'uk' ? 'gb' : c.code.toLowerCase();
+      const seenSlugs = new Set<string>();
+      const cities = CITIES.filter((city) => {
+        const cityCountry = city.countryCode.toLowerCase() === 'uk' ? 'gb' : city.countryCode.toLowerCase();
+        if (cityCountry !== targetCountryCode) return false;
+        const normSlug = city.slug.toLowerCase();
+        if (seenSlugs.has(normSlug)) return false;
+        seenSlugs.add(normSlug);
+        return true;
+      });
+
+      return {
+        code: c.code,
+        name: c.name,
+        flag: c.flag,
+        region: c.region,
+        country: c,
+        cities,
+      };
+    });
 
     const filtered = filterLocationsSmart(
       formatted,
