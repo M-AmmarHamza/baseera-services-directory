@@ -5,6 +5,7 @@ import { getCategoryBySlug, getCountryByCode, getCategoryName, SEED_PROVIDERS, l
 import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
 import { providerRegistrationSchema, createProviderRegistrationSchema } from '@/lib/validations/provider';
 import { validateAndFormatE164 } from '@/lib/phone';
+import { getClientIp, checkRateLimit, rateLimitExceededResponse } from '@/lib/rate-limit';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -47,6 +48,16 @@ function phonesMatch(p1: string, p2: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  // Anti-Spam Rate Limiting (5 registrations / min per IP)
+  const clientIp = getClientIp(request);
+  const rateLimitResult = checkRateLimit(`register:${clientIp}`, { limit: 5, windowSec: 60 });
+  if (!rateLimitResult.success) {
+    return rateLimitExceededResponse(
+      rateLimitResult,
+      'Registration rate limit exceeded. Please wait a minute before submitting again.'
+    );
+  }
+
   try {
     const rawBody = await request.json();
     const requestLang = (rawBody && typeof rawBody === 'object' && rawBody.lang) || 'en';

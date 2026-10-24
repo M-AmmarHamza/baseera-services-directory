@@ -5,8 +5,19 @@ import {
   DEFAULT_ADMIN_EMAIL,
   DEFAULT_ADMIN_PASSWORD,
 } from '@/lib/admin-auth';
+import { getClientIp, checkRateLimit, rateLimitExceededResponse } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
+  // Anti-Brute Force Rate Limiting (5 attempts / min per IP)
+  const clientIp = getClientIp(req);
+  const rateLimitResult = checkRateLimit(`admin_login:${clientIp}`, { limit: 5, windowSec: 60 });
+  if (!rateLimitResult.success) {
+    return rateLimitExceededResponse(
+      rateLimitResult,
+      'Too many login attempts. Please wait 60 seconds before trying again.'
+    );
+  }
+
   try {
     const { email, password } = await req.json();
 

@@ -1,7 +1,10 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import { createClient } from '@supabase/supabase-js';
 import { localProvidersOverrides } from '@/lib/db';
+import { verifyAdminToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth';
+import { sanitizeText } from '@/lib/security';
 import { revalidatePath } from 'next/cache';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -17,8 +20,20 @@ export interface UpdateProviderParams {
 }
 
 export async function updateProviderAction(params: UpdateProviderParams) {
+  // Enforce Admin Authentication (OWASP A01: Broken Access Control & IDOR)
+  const cookieStore = await cookies();
+  const token = cookieStore.get(ADMIN_COOKIE_NAME)?.value;
+  const { valid } = await verifyAdminToken(token);
+  if (!valid) {
+    return {
+      success: false,
+      error: 'Unauthorized: Admin authentication required to alter provider attributes.',
+    };
+  }
+
   const { id, status, seo_index, is_featured, is_verified, is_premium } = params;
-  if (!id) return { success: false, error: 'Provider ID is required' };
+  const cleanId = sanitizeText(id);
+  if (!cleanId) return { success: false, error: 'Provider ID is required' };
 
   const updates: Record<string, any> = {};
   if (status !== undefined) {
@@ -32,8 +47,8 @@ export async function updateProviderAction(params: UpdateProviderParams) {
   if (is_premium !== undefined) updates.is_premium = Boolean(is_premium);
 
   // In-memory override update
-  const existing = localProvidersOverrides.get(id) || {};
-  localProvidersOverrides.set(id, { ...existing, ...updates });
+  const existing = localProvidersOverrides.get(cleanId) || {};
+  localProvidersOverrides.set(cleanId, { ...existing, ...updates });
 
   // Supabase update
   if (SUPABASE_URL && SUPABASE_KEY) {
@@ -42,7 +57,7 @@ export async function updateProviderAction(params: UpdateProviderParams) {
       await supabase
         .from('providers')
         .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', id);
+        .eq('id', cleanId);
     } catch (e: any) {
       console.warn('Supabase update note in action:', e?.message);
     }

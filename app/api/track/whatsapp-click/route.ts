@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { SEED_PROVIDERS, localProvidersOverrides } from '@/lib/db';
+import { getClientIp, checkRateLimit, rateLimitExceededResponse } from '@/lib/rate-limit';
+import { sanitizeText } from '@/lib/security';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export async function POST(req: NextRequest) {
+  // Rate limiting to prevent click inflation and DoS
+  const clientIp = getClientIp(req);
+  const rateLimitResult = checkRateLimit(`wa_click:${clientIp}`, { limit: 30, windowSec: 60 });
+  if (!rateLimitResult.success) {
+    return rateLimitExceededResponse(
+      rateLimitResult,
+      'Lead tracking rate limit exceeded. Too many requests.'
+    );
+  }
+
   try {
     let body: any = {};
     const contentType = req.headers.get('content-type') || '';
@@ -21,8 +33,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const providerId = body.provider_id || body.providerId || body.id;
-    const clickType = body.click_type || body.clickType || 'whatsapp';
+    const rawProviderId = body.provider_id || body.providerId || body.id;
+    const providerId = sanitizeText(rawProviderId);
+    const clickType = sanitizeText(body.click_type || body.clickType || 'whatsapp');
 
     if (!providerId) {
       return NextResponse.json(

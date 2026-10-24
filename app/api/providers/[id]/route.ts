@@ -11,20 +11,21 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    if (!id) {
-      return NextResponse.json({ error: 'Provider ID is required' }, { status: 400 });
+    const cleanId = (id || '').replace(/[^a-zA-Z0-9_-]/g, '').trim();
+    if (!cleanId) {
+      return NextResponse.json({ error: 'Valid provider ID or slug is required' }, { status: 400 });
     }
 
     let updatedViews = 1;
 
     // 1. Update in-memory local provider overrides
-    const override = localProvidersOverrides.get(id) || {};
+    const override = localProvidersOverrides.get(cleanId) || {};
     override.profile_views = (override.profile_views || 20) + 1;
-    localProvidersOverrides.set(id, override);
+    localProvidersOverrides.set(cleanId, override);
     updatedViews = override.profile_views;
 
     // Also update seed provider reference if matched
-    const seed = SEED_PROVIDERS.find((p) => p.id === id || p.slug === id);
+    const seed = SEED_PROVIDERS.find((p) => p.id === cleanId || p.slug === cleanId);
     if (seed) {
       seed.profile_views = (seed.profile_views || 20) + 1;
       updatedViews = seed.profile_views;
@@ -35,11 +36,11 @@ export async function POST(
       try {
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Fetch current profile_views
+        // Fetch current profile_views using safe sanitized identifier
         const { data: existing } = await supabase
           .from('providers')
           .select('id, profile_views')
-          .or(`id.eq.${id},slug.eq.${id}`)
+          .or(`id.eq.${cleanId},slug.eq.${cleanId}`)
           .maybeSingle();
 
         if (existing) {
@@ -76,6 +77,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const cleanId = (id || '').replace(/[^a-zA-Z0-9_-]/g, '').trim();
   const shouldIncrement = req.nextUrl.searchParams.get('inc') === '1' || req.nextUrl.searchParams.get('increment') === 'true';
 
   if (shouldIncrement) {
@@ -83,12 +85,12 @@ export async function GET(
   }
 
   // Return provider details
-  const seed = SEED_PROVIDERS.find((p) => p.id === id || p.slug === id);
-  const override = localProvidersOverrides.get(id);
+  const seed = SEED_PROVIDERS.find((p) => p.id === cleanId || p.slug === cleanId);
+  const override = localProvidersOverrides.get(cleanId);
   const views = override?.profile_views ?? seed?.profile_views ?? 25;
 
   return NextResponse.json({
-    provider_id: id,
+    provider_id: cleanId,
     profile_views: views,
   });
 }

@@ -17,22 +17,41 @@ import { validateAndFormatE164 } from '@/lib/phone';
 import { generateEnglishSlug } from '@/lib/transliterate';
 import { generateUniqueSlug } from '@/lib/slug';
 import { getCountryCurrency } from '@/lib/currencies';
+import { sanitizeText, sanitizeCsvCell } from '@/lib/security';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Zod Schema for row validation
+// Safe string builder neutralizing CSV Formula/Macro Injection (CWE-1236) & XSS
+const safeString = (minLen = 0, fieldName = 'Field') =>
+  z
+    .string()
+    .transform((val) => sanitizeText(sanitizeCsvCell(val)))
+    .refine((val) => val.length >= minLen, {
+      message: `${fieldName} must be at least ${minLen} characters.`,
+    });
+
+// Zod Schema for row validation with strict anti-macro injection guards
 const rawRowSchema = z.object({
-  fullName: z.string().trim().min(2, { message: 'Full name must be at least 2 characters.' }),
-  whatsappNumber: z.string().trim().min(5, { message: 'WhatsApp number is required.' }),
-  categorySlug: z.string().trim().min(1, { message: 'Category slug is required.' }),
-  citySlug: z.string().trim().min(1, { message: 'City slug is required.' }),
-  countrySlug: z.string().trim().min(2, { message: 'Country slug (or code) is required.' }),
-  tradeTitle: z.string().trim().optional(),
-  shortBio: z.string().trim().optional(),
+  fullName: safeString(2, 'Full name'),
+  whatsappNumber: safeString(5, 'WhatsApp number'),
+  categorySlug: safeString(1, 'Category slug'),
+  citySlug: safeString(1, 'City slug'),
+  countrySlug: safeString(2, 'Country slug'),
+  tradeTitle: z
+    .string()
+    .optional()
+    .transform((val) => sanitizeText(sanitizeCsvCell(val || ''))),
+  shortBio: z
+    .string()
+    .optional()
+    .transform((val) => sanitizeText(sanitizeCsvCell(val || ''))),
   profileType: z.enum(['individual', 'shop']).optional().default('individual'),
   startingPrice: z.coerce.number().min(0).optional().default(0),
-  serviceArea: z.string().trim().optional(),
+  serviceArea: z
+    .string()
+    .optional()
+    .transform((val) => sanitizeText(sanitizeCsvCell(val || ''))),
 });
 
 interface FailedRowReport {

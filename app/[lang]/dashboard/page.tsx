@@ -14,7 +14,9 @@ import {
   Building,
   Image as ImageIcon,
   Sparkles,
+  AlertTriangle,
 } from 'lucide-react';
+import { validateUploadedImageFile } from '@/lib/security';
 
 interface Props {
   params: Promise<{
@@ -100,10 +102,16 @@ export default function ProviderOnboardingDashboard({ params }: Props) {
 
     setIsUploading(true);
     try {
-      // Simulating compression pipeline and upload
       const newUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
+        // Enforce strict file validation against malicious SVG / executable scripts (OWASP A07)
+        const check = validateUploadedImageFile(file);
+        if (!check.valid) {
+          alert(check.error || 'Invalid file uploaded. Only JPG, PNG, and WebP images are allowed.');
+          continue;
+        }
+
         console.log(`[Compression]: Compressing ${file.name} (${(file.size / 1024).toFixed(1)} KB) using browser-image-compression...`);
         // Placeholder preview URL
         const previewUrl = URL.createObjectURL(file);
@@ -363,7 +371,7 @@ export default function ProviderOnboardingDashboard({ params }: Props) {
                     <input
                       type="file"
                       multiple
-                      accept="image/*"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
                       onChange={handleImageFileChange}
                       className="hidden"
                     />

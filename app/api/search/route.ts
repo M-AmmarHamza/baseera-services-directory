@@ -16,16 +16,28 @@ import {
   CATEGORY_ALIASES,
 } from '@/lib/smart-search';
 import { transliterate } from '@/lib/transliterate';
+import { getClientIp, checkRateLimit, rateLimitExceededResponse } from '@/lib/rate-limit';
+import { sanitizeText } from '@/lib/security';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 export async function GET(req: NextRequest) {
+  // Rate limiting to prevent bot spam and DoS
+  const clientIp = getClientIp(req);
+  const rateLimitResult = checkRateLimit(`search:${clientIp}`, { limit: 60, windowSec: 60 });
+  if (!rateLimitResult.success) {
+    return rateLimitExceededResponse(
+      rateLimitResult,
+      'Search rate limit exceeded. Please slow down.'
+    );
+  }
+
   const { searchParams } = req.nextUrl;
-  const rawQuery = (searchParams.get('q') || '').trim();
-  const cityFilter = (searchParams.get('city') || '').toLowerCase().trim();
-  const countryFilter = (searchParams.get('country') || '').toLowerCase().trim();
-  const lang = searchParams.get('lang') || 'en';
+  const rawQuery = sanitizeText(searchParams.get('q') || '').trim();
+  const cityFilter = sanitizeText(searchParams.get('city') || '').toLowerCase().trim();
+  const countryFilter = sanitizeText(searchParams.get('country') || '').toLowerCase().trim();
+  const lang = sanitizeText(searchParams.get('lang') || 'en');
   const limit = Math.min(20, Math.max(1, parseInt(searchParams.get('limit') || '8', 10)));
 
   // Fast return for queries shorter than 3 characters (Requirement 1: debounced API calls after 3 characters)

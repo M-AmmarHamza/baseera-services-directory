@@ -1,4 +1,5 @@
 import React from 'react';
+import { safeJsonLdStringify } from '@/lib/security';
 
 interface JsonLdProps {
   data: Record<string, any> | Array<Record<string, any>>;
@@ -6,7 +7,7 @@ interface JsonLdProps {
 
 /**
  * Safely injects structured JSON-LD data into the document head.
- * Escapes opening angle brackets to prevent script injection / XSS vulnerabilities.
+ * Uses safeJsonLdStringify to neutralize script break-out and XSS sequences (<, >, &, \u2028, \u2029).
  */
 export default function JsonLd({ data }: JsonLdProps) {
   if (!data) return null;
@@ -15,7 +16,7 @@ export default function JsonLd({ data }: JsonLdProps) {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify(data).replace(/</g, '\\u003c'),
+        __html: safeJsonLdStringify(data),
       }}
     />
   );

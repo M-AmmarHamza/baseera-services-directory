@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { sanitizeText, isSafeImageUrl } from '@/lib/security';
 
 export const MAX_SERVICE_AREAS = 3;
 export const MAX_BIO_LENGTH = 150;
@@ -87,7 +88,8 @@ export function createProviderRegistrationSchema(lang: string = 'en') {
     name: z
       .string()
       .trim()
-      .min(2, {
+      .transform(sanitizeText)
+      .refine((val) => val.length >= 2, {
         message:
           lang === 'ur'
             ? 'نام کم از کم 2 حروف پر مشتمل ہونا چاہیے۔'
@@ -105,19 +107,23 @@ export function createProviderRegistrationSchema(lang: string = 'en') {
     country_code: z
       .string()
       .trim()
-      .min(2, { message: 'Valid country code is required.' }),
+      .transform(sanitizeText)
+      .refine((val) => val.length >= 2, { message: 'Valid country code is required.' }),
     city_name: z
       .string()
       .trim()
-      .min(1, { message: 'City is required.' }),
+      .transform(sanitizeText)
+      .refine((val) => val.length >= 1, { message: 'City is required.' }),
     category_id: z
       .string()
       .trim()
-      .min(1, { message: 'Service category is required.' }),
+      .transform(sanitizeText)
+      .refine((val) => val.length >= 1, { message: 'Service category is required.' }),
     trade_title: z
       .string()
       .trim()
-      .max(120, { message: 'Trade title must be 120 characters or fewer.' })
+      .transform(sanitizeText)
+      .refine((val) => val.length <= 120, { message: 'Trade title must be 120 characters or fewer.' })
       .refine((val) => validateScript(val, lang, false), {
         message: getScriptErrorMessage(lang, 'trade_title'),
       })
@@ -125,18 +131,19 @@ export function createProviderRegistrationSchema(lang: string = 'en') {
     short_bio: z
       .string()
       .trim()
-      .max(MAX_BIO_LENGTH, { message: `Short bio must not exceed ${MAX_BIO_LENGTH} characters.` })
+      .transform(sanitizeText)
+      .refine((val) => val.length <= MAX_BIO_LENGTH, { message: `Short bio must not exceed ${MAX_BIO_LENGTH} characters.` })
       .refine((val) => validateScript(val, lang, false), {
         message: getScriptErrorMessage(lang, 'short_bio'),
       })
       .optional(),
     service_area: z
       .union([
-        z.array(z.string().trim().min(1)),
+        z.array(z.string().trim().transform(sanitizeText).refine((s) => s.length >= 1)),
         z.string().transform((val) =>
           val
             .split(',')
-            .map((s) => s.trim())
+            .map((s) => sanitizeText(s.trim()))
             .filter(Boolean)
         ),
       ])
@@ -147,22 +154,55 @@ export function createProviderRegistrationSchema(lang: string = 'en') {
       .default([]),
     starting_price: z.coerce.number().min(0).optional(),
     profile_type: z.enum(['individual', 'shop']).default('individual'),
-    avatar_url: z.string().optional(),
-    cover_url: z.string().optional(),
-    profile_picture: z.string().optional(),
+    avatar_url: z
+      .string()
+      .refine(isSafeImageUrl, { message: 'SVG or executable files are strictly prohibited.' })
+      .optional(),
+    cover_url: z
+      .string()
+      .refine(isSafeImageUrl, { message: 'SVG or executable files are strictly prohibited.' })
+      .optional(),
+    profile_picture: z
+      .string()
+      .refine(isSafeImageUrl, { message: 'SVG or executable files are strictly prohibited.' })
+      .optional(),
     bio: z
       .string()
       .trim()
-      .max(MAX_BIO_LENGTH, { message: `Bio must not exceed ${MAX_BIO_LENGTH} characters.` })
+      .transform(sanitizeText)
+      .refine((val) => val.length <= MAX_BIO_LENGTH, { message: `Bio must not exceed ${MAX_BIO_LENGTH} characters.` })
       .refine((val) => validateScript(val, lang, false), {
         message: getScriptErrorMessage(lang, 'short_bio'),
       })
       .optional(),
-    target_areas: z.union([z.array(z.string().trim()), z.string()]).optional(),
+    target_areas: z
+      .union([
+        z.array(z.string().trim().transform(sanitizeText)),
+        z.string().transform((s) => [sanitizeText(s)]),
+      ])
+      .optional(),
     is_premium: z.boolean().optional(),
-    gallery_images: z.array(z.string()).optional(),
-    google_map_url: z.string().optional(),
-    certificates: z.array(z.string()).optional(),
+    gallery_images: z
+      .array(
+        z.string().refine(isSafeImageUrl, {
+          message: 'SVG or executable files are strictly prohibited.',
+        })
+      )
+      .optional(),
+    google_map_url: z
+      .string()
+      .refine(
+        (url) => !url || url.startsWith('https://maps.google.com') || url.startsWith('https://goo.gl/maps') || url.startsWith('https://www.google.com/maps'),
+        { message: 'Must be a valid Google Maps URL' }
+      )
+      .optional(),
+    certificates: z
+      .array(
+        z.string().refine(isSafeImageUrl, {
+          message: 'SVG or executable files are strictly prohibited.',
+        })
+      )
+      .optional(),
     lang: z.string().default('en'),
   });
 }
