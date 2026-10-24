@@ -542,16 +542,6 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
       icon: 'price' as const,
     },
     {
-      label: lang === 'ur' ? 'ریٹنگ اور جائزے' : lang === 'ar' ? 'تقييمات العملاء' : 'Customer Rating',
-      value: `${Number(provider.rating || 5).toFixed(1)} ★ (${provider.review_count || 1} Reviews)`,
-      icon: 'rating' as const,
-    },
-    {
-      label: lang === 'ur' ? 'سروس کا علاقہ' : lang === 'ar' ? 'منطقة التغطية' : 'Service Area',
-      value: isPremium && provider.district ? `${provider.district}, ${cityName}` : cityName,
-      icon: 'location' as const,
-    },
-    {
       label: lang === 'ur' ? 'اوسط جوابی وقت' : lang === 'ar' ? 'متوسط وقت الرد' : 'Response Time',
       value: '< 15 Minutes',
       icon: 'time' as const,

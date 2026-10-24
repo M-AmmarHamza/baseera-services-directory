@@ -268,11 +268,6 @@ export default async function CategoryListingPage({ params, searchParams }: Cate
       icon: 'price' as const,
     },
     {
-      label: lang === 'ur' ? 'شہری کوریج' : lang === 'ar' ? 'نطاق التغطية' : 'Coverage',
-      value: `${cityName}, ${countryName}`,
-      icon: 'location' as const,
-    },
-    {
       label: lang === 'ur' ? 'اوسط جوابی وقت' : lang === 'ar' ? 'متوسط وقت الرد' : 'Response Time',
       value: '< 15 Minutes',
       icon: 'time' as const,

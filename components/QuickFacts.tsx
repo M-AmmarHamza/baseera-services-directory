@@ -44,12 +44,6 @@ export default function QuickFacts({
     ? 'معلومات سريعة وملخص الخدمة'
     : 'Quick Facts & Key Details';
 
-  const defaultSubtitle = isUrdu
-    ? 'مصنوعی ذہانت اور صارفین کے لیے تصدیق شدہ خلاصہ'
-    : isArabic
-    ? 'ملخص موثق وموجز للمستخدمين ومحركات البحث الذكية'
-    : 'High-density verified snapshot for users & AI search engines';
-
   const renderIcon = (type?: string) => {
     switch (type) {
       case 'verified':
@@ -90,17 +84,19 @@ export default function QuickFacts({
             {title || defaultTitle}
           </h3>
         </div>
-        <span
-          className={`text-[11px] font-medium text-gray-500 hidden sm:inline-block ${
-            isUrdu ? 'font-urdu' : ''
-          }`}
-        >
-          {subtitle || defaultSubtitle}
-        </span>
+        {subtitle && (
+          <span
+            className={`text-[11px] font-medium text-gray-500 hidden sm:inline-block ${
+              isUrdu ? 'font-urdu' : ''
+            }`}
+          >
+            {subtitle}
+          </span>
+        )}
       </div>
 
-      {/* Tabular / Dense Grid Data List */}
-      <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-3 text-start">
+      {/* Perfectly Balanced 3-Column Grid Layout (3x2 for 6 items) */}
+      <dl className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3 text-start">
         {facts.map((fact, idx) => (
           <div
             key={idx}
