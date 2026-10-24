@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateEnglishSlug } from '@/lib/transliterate';
+import { generateUniqueSlug } from '@/lib/slug';
 import { getCategoryBySlug, getCountryByCode, getCategoryName, SEED_PROVIDERS, localProvidersOverrides } from '@/lib/db';
 import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
 import { providerRegistrationSchema, createProviderRegistrationSchema } from '@/lib/validations/provider';
@@ -182,13 +183,15 @@ export async function POST(request: NextRequest) {
     const cleanCountryCode = country_code.trim().toLowerCase();
     const cleanCityName = city_name.trim();
     const citySlug = generateEnglishSlug(cleanCityName) || 'karachi';
-    const baseSlug = generateEnglishSlug(name) || 'vendor';
-    // Append unique suffix to prevent slug collisions
-    const uniqueSlug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
-
     const catObj = getCategoryBySlug(category_id);
     const resolvedCatId = catObj ? catObj.id : category_id.toLowerCase();
     const resolvedTradeTitle = trade_title?.trim() || `${name} - Verified ${catObj?.name || 'Specialist'}`;
+
+    // Unique Slug Generator with 3-tier collision avoidance (Base -> Phone digits -> nanoid)
+    const uniqueSlug = await generateUniqueSlug(name, resolvedWhatsApp || phone_number, {
+      cityId: citySlug,
+      categoryId: resolvedCatId,
+    });
 
     // Target live URL for the vendor
     const publicUrl = `/${lang}/${cleanCountryCode}/${citySlug}/${resolvedCatId}/${uniqueSlug}`;

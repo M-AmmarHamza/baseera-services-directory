@@ -15,6 +15,7 @@ import {
 } from '@/lib/db';
 import { validateAndFormatE164 } from '@/lib/phone';
 import { generateEnglishSlug } from '@/lib/transliterate';
+import { generateUniqueSlug } from '@/lib/slug';
 import { getCountryCurrency } from '@/lib/currencies';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -89,6 +90,7 @@ export async function POST(req: NextRequest) {
 
     const validProvidersToInsert: Provider[] = [];
     const failedRows: FailedRowReport[] = [];
+    const batchSlugs = new Set<string>();
 
     // 2. Iterate, Validate and Relational Integrity Check
     for (let i = 0; i < rawRows.length; i++) {
@@ -264,9 +266,18 @@ export async function POST(req: NextRequest) {
             .filter(Boolean)
         : [cityObj.name];
 
-      const baseSlug = generateEnglishSlug(data.fullName) || 'specialist';
-      const randomSuffix = Math.random().toString(36).substring(2, 7);
-      const uniqueSlug = `${baseSlug}-${randomSuffix}`;
+      // Robust 3-tier Unique Slug Generation with in-batch and database collision detection
+      const uniqueSlug = await generateUniqueSlug(
+        data.fullName,
+        phoneValidation.e164 || data.whatsappNumber,
+        {
+          cityId: cityObj.slug,
+          categoryId: categoryObj.id,
+          existingSlugs: batchSlugs,
+        }
+      );
+      batchSlugs.add(uniqueSlug);
+
       const defaultFee = getCountryCurrency(countryObj.code).defaultFee;
 
       const newProvider: Provider = {
