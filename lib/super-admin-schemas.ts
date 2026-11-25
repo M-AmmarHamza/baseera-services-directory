@@ -197,3 +197,37 @@ export type GeneralSettingsInput = z.infer<typeof GeneralSettingsSchema>;
 export type StaffMutationInput = z.infer<typeof StaffMutationSchema>;
 export type StaffRoleUpdateInput = z.infer<typeof StaffRoleUpdateSchema>;
 
+// =========================================================================
+// BULK CSV PROVIDER UPLOAD SCHEMAS (OWASP HARDENED)
+// =========================================================================
+
+export const CsvProviderRowSchema = z.object({
+  fullName: z.string().trim().min(2, 'Full name must be at least 2 characters').max(100),
+  whatsappNumber: z.string().trim().min(7, 'WhatsApp number is invalid').max(30),
+  categorySlug: z.string().trim().min(1, 'Category slug is required'),
+  citySlug: z.string().trim().min(1, 'City slug is required'),
+  trade_title: z.string().trim().max(120).optional(),
+  target_areas: z.union([z.array(z.string()), z.string()]).optional(),
+  bio: z.string().trim().max(2500).optional(),
+  starting_price: z.coerce.number().min(0).optional().default(500),
+  is_premium: z.union([z.boolean(), z.string()]).optional().default(false),
+  status: z.enum(['pending', 'published', 'suspended', 'approved', 'rejected']).optional().default('pending'),
+  profile_type: z.enum(['individual', 'shop']).optional().default('individual'),
+  seo_index: z.union([z.boolean(), z.string()]).optional().default(false),
+  is_featured: z.union([z.boolean(), z.string()]).optional().default(false),
+  is_verified: z.union([z.boolean(), z.string()]).optional().default(false),
+  gallery_images: z.union([z.array(z.string()), z.string()]).optional(),
+  certificates: z.union([z.array(z.string()), z.string()]).optional(),
+  google_map_url: z.string().trim().optional(),
+});
+
+export const CsvBulkUploadPayloadSchema = z.object({
+  csvContent: z.string().min(1, 'CSV content cannot be empty'),
+  defaultStatus: z.enum(['pending', 'published', 'suspended']).default('pending'),
+  autoVerify: z.boolean().default(false),
+});
+
+export type CsvProviderRowInput = z.infer<typeof CsvProviderRowSchema>;
+export type CsvBulkUploadPayloadInput = z.infer<typeof CsvBulkUploadPayloadSchema>;
+
+

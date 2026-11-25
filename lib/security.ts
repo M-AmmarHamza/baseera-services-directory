@@ -36,6 +36,19 @@ export function sanitizeCsvCell(val: unknown): string {
 }
 
 /**
+ * Strips leading formula injection characters (=, +, -, @) and sanitizes against XSS.
+ * Specifically handles free-text inputs during bulk CSV ingestion.
+ */
+export function stripCsvFormulaChars(val: unknown): string {
+  if (val === null || val === undefined) return '';
+  let str = String(val).trim();
+  while (/^[=+\-@]/.test(str)) {
+    str = str.substring(1).trim();
+  }
+  return sanitizeText(str);
+}
+
+/**
  * Validates that an image URL or uploaded file is safe and does NOT contain SVG or executable payloads.
  * Disallows SVG (which can execute inline XML/scripts), HTML, and executables.
  */

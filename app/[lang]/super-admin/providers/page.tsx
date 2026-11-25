@@ -173,11 +173,14 @@ function SuperAdminProvidersContent() {
   const [csvModalOpen, setCsvModalOpen] = useState(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [csvRawText, setCsvRawText] = useState('');
+  const [csvParsedRows, setCsvParsedRows] = useState<any[]>([]);
   const [csvPreviewRows, setCsvPreviewRows] = useState<any[]>([]);
-  const [csvDefaultStatus, setCsvDefaultStatus] = useState<'approved' | 'pending'>('approved');
+  const [csvDefaultStatus, setCsvDefaultStatus] = useState<'pending' | 'published'>('pending');
+  const [csvAutoVerify, setCsvAutoVerify] = useState(false);
   const [csvUploading, setCsvUploading] = useState(false);
   const [csvResult, setCsvResult] = useState<any>(null);
   const [csvError, setCsvError] = useState<string | null>(null);
+  const [csvActiveTab, setCsvActiveTab] = useState<'all' | 'failed' | 'skipped'>('all');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load current user
@@ -508,8 +511,13 @@ function SuperAdminProvidersContent() {
     setCsvError(null);
     setCsvResult(null);
 
-    if (!selectedFile.name.endsWith('.csv')) {
+    if (!selectedFile.name.toLowerCase().endsWith('.csv')) {
       setCsvError('Please upload a valid .csv file.');
+      return;
+    }
+
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      setCsvError(`File size exceeds 5MB limit (${(selectedFile.size / 1024 / 1024).toFixed(2)}MB).`);
       return;
     }
 
@@ -524,11 +532,59 @@ function SuperAdminProvidersContent() {
         transformHeader: (h) => h.trim(),
         complete: (results) => {
           const rows = results.data as any[];
+          if (rows.length > 500) {
+            setCsvError(`Maximum 500 rows per batch limit exceeded. Found: ${rows.length} rows.`);
+            return;
+          }
+          setCsvParsedRows(rows);
           setCsvPreviewRows(rows.slice(0, 5));
         },
       });
     };
     reader.readAsText(selectedFile, 'utf-8');
+  };
+
+  const handleDownloadSampleCsv = () => {
+    const csvContent = [
+      'fullName,whatsappNumber,categorySlug,citySlug,trade_title,target_areas,bio,starting_price,is_premium,status,profile_type,gallery_images,certificates,google_map_url',
+      'Muhammad Tariq,+923001234567,electrician,karachi,Certified Master Electrician,Korangi|DHA|Clifton,15+ years experience in domestic and commercial electrical repairs.,800,false,pending,individual,,,',
+      'Ahmed Al-Mansoor,+971501234567,ac-technician,dubai,Chiller & VRF Specialist,Business Bay|Downtown|Marina,24/7 emergency central and split AC repair across Dubai. Licensed master HVAC engineering contractor.,250,true,published,shop,https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800|https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=800,HVAC Master License|DAIKIN Certified,https://maps.google.com/?q=25.2048,55.2708',
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'baseera_providers_bulk_template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDownloadFailedCsv = () => {
+    if (!csvResult) return;
+    const allErrors = [
+      ...(csvResult.failedRows || []).map((f: any) => ({
+        ...f.rawRow,
+        error_reason: f.reason,
+        error_type: 'VALIDATION_FAILED',
+      })),
+      ...(csvResult.skippedRows || []).map((s: any) => ({
+        ...s.rawRow,
+        error_reason: s.reason,
+        error_type: 'DUPLICATE_PHONE',
+      })),
+    ];
+    if (allErrors.length === 0) return;
+    const csvStr = Papa.unparse(allErrors);
+    const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'failed_providers_report.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleCsvImportSubmit = async () => {
@@ -538,28 +594,30 @@ function SuperAdminProvidersContent() {
     setCsvResult(null);
 
     try {
-      const res = await fetch('/api/admin/providers/bulk-import', {
+      const res = await fetch('/api/super-admin/providers/bulk-upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           csvContent: csvRawText,
           defaultStatus: csvDefaultStatus,
+          autoVerify: csvAutoVerify,
         }),
       });
       const data = await res.json();
       if (res.ok && data.success) {
         setCsvResult(data);
-        showToast(`Bulk imported ${data.importedCount} providers!`);
+        showToast(data.message || `Successfully imported ${data.importedCount} providers!`);
         fetchProviders();
       } else {
-        setCsvError(data.error || 'Bulk import failed');
+        setCsvError(data.error || 'Bulk upload failed. Please review your file.');
       }
     } catch (err: any) {
-      setCsvError(err?.message || 'Network error during CSV upload');
+      setCsvError(err?.message || 'Network error during bulk CSV upload.');
     } finally {
       setCsvUploading(false);
     }
   };
+
 
   return (
     <div className="space-y-6">
@@ -593,7 +651,7 @@ function SuperAdminProvidersContent() {
             className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-lg transition-colors shadow-sm"
           >
             <UploadCloud className="w-3.5 h-3.5 text-blue-400" />
-            <span>Bulk CSV Import</span>
+            <span>Bulk CSV Upload</span>
           </button>
 
           <button
@@ -1537,109 +1595,374 @@ function SuperAdminProvidersContent() {
       )}
 
       {/* ========================================================== */}
-      {/* BULK CSV UPLOAD MODAL                                      */}
+      {/* BULK CSV UPLOAD MODAL (OWASP HARDENED & PRODUCTION READY)  */}
       {/* ========================================================== */}
       {csvModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20">
-                  <UploadCloud className="w-4 h-4" />
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full p-6 sm:p-7 shadow-2xl space-y-6 animate-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                  <UploadCloud className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Bulk CSV Provider Import</h3>
-                  <p className="text-xs text-slate-400">Batch register with sequential public IDs</p>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-white tracking-tight">Bulk CSV Provider Upload</h3>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                      OWASP Protected
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Batch ingest providers with sequential Public IDs (1001+), anti-macro injection defense, and E.164 normalization.
+                  </p>
                 </div>
               </div>
               <button
-                onClick={() => setCsvModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg"
+                onClick={() => {
+                  setCsvModalOpen(false);
+                  if (csvResult?.importedCount > 0) fetchProviders();
+                }}
+                className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors"
+                title="Close Modal"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Dropzone */}
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-700 hover:border-emerald-500/60 rounded-xl p-6 text-center cursor-pointer transition-colors bg-slate-950/40"
-            >
-              <FileSpreadsheet className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
-              <p className="text-xs font-semibold text-white">
-                {csvFile ? csvFile.name : 'Click to select CSV file from your computer'}
-              </p>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Supports columns: fullName, whatsappNumber, categorySlug, citySlug, countrySlug, tradeTitle
-              </p>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".csv"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) handleCsvFileProcess(f);
-                }}
-              />
+            {/* Modal Body: Scrollable */}
+            <div className="flex-1 overflow-y-auto space-y-5 pr-1">
+              {/* Template Download Toolbar */}
+              <div className="bg-slate-950/60 border border-slate-800/80 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    Need the exact CSV header structure? Download our official pre-formatted template with sample rows.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDownloadSampleCsv}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 hover:border-emerald-500/40 transition-colors shrink-0"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download Sample CSV Template</span>
+                </button>
+              </div>
+
+              {/* POST-UPLOAD SUMMARY REPORT (If Upload Finished) */}
+              {csvResult ? (
+                <div className="space-y-5">
+                  {/* Summary Metric Cards */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800">
+                      <p className="text-[10px] font-bold uppercase text-slate-400">Total Rows</p>
+                      <p className="text-xl font-extrabold text-white mt-0.5">{csvResult.totalRows}</p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
+                      <p className="text-[10px] font-bold uppercase text-emerald-400">Imported Successfully</p>
+                      <p className="text-xl font-extrabold text-emerald-300 mt-0.5">{csvResult.importedCount}</p>
+                      {csvResult.publicIdRange && (
+                        <span className="text-[10px] font-mono font-bold text-emerald-400/90 block mt-0.5">
+                          Public IDs: {csvResult.publicIdRange}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/30">
+                      <p className="text-[10px] font-bold uppercase text-amber-400">Skipped (Duplicate Phone)</p>
+                      <p className="text-xl font-extrabold text-amber-300 mt-0.5">{csvResult.skippedCount || 0}</p>
+                    </div>
+
+                    <div className="p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/30">
+                      <p className="text-[10px] font-bold uppercase text-rose-400">Validation Failures</p>
+                      <p className="text-xl font-extrabold text-rose-300 mt-0.5">{csvResult.failedCount || 0}</p>
+                    </div>
+                  </div>
+
+                  {/* Actions for Errors / Skipped */}
+                  {((csvResult.failedRows && csvResult.failedRows.length > 0) ||
+                    (csvResult.skippedRows && csvResult.skippedRows.length > 0)) && (
+                    <div className="space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                            Issue Breakdown (
+                            {(csvResult.failedRows?.length || 0) + (csvResult.skippedRows?.length || 0)} rows)
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleDownloadFailedCsv}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/80 transition-colors"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Download Failed & Skipped Rows CSV</span>
+                        </button>
+                      </div>
+
+                      {/* Error & Skipped Table */}
+                      <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden max-h-56 overflow-y-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-900/90 text-slate-400 text-[10px] uppercase font-bold sticky top-0 border-b border-slate-800">
+                            <tr>
+                              <th className="px-3.5 py-2">Row</th>
+                              <th className="px-3.5 py-2">Name</th>
+                              <th className="px-3.5 py-2">WhatsApp</th>
+                              <th className="px-3.5 py-2">Type</th>
+                              <th className="px-3.5 py-2">Exact Error Reason</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/60 font-medium">
+                            {/* Validation Failures */}
+                            {csvResult.failedRows?.map((f: any, idx: number) => (
+                              <tr key={`fail-${idx}`} className="hover:bg-rose-950/10 text-rose-200">
+                                <td className="px-3.5 py-2 font-mono text-[11px] text-slate-400">#{f.rowNumber}</td>
+                                <td className="px-3.5 py-2 font-semibold text-white">{f.name || 'Unnamed'}</td>
+                                <td className="px-3.5 py-2 font-mono text-[11px] text-slate-400">{f.phone || '-'}</td>
+                                <td className="px-3.5 py-2">
+                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                                    Rejected
+                                  </span>
+                                </td>
+                                <td className="px-3.5 py-2 text-rose-300 text-[11px]">{f.reason}</td>
+                              </tr>
+                            ))}
+                            {/* Skipped Duplicate Phones */}
+                            {csvResult.skippedRows?.map((s: any, idx: number) => (
+                              <tr key={`skip-${idx}`} className="hover:bg-amber-950/10 text-amber-200">
+                                <td className="px-3.5 py-2 font-mono text-[11px] text-slate-400">#{s.rowNumber}</td>
+                                <td className="px-3.5 py-2 font-semibold text-white">{s.name || 'Unnamed'}</td>
+                                <td className="px-3.5 py-2 font-mono text-[11px] text-slate-400">{s.phone}</td>
+                                <td className="px-3.5 py-2">
+                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                                    Duplicate
+                                  </span>
+                                </td>
+                                <td className="px-3.5 py-2 text-amber-300 text-[11px]">{s.reason}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* PRE-UPLOAD FORM & PREVIEW */
+                <div className="space-y-5">
+                  {/* File Upload Dropzone */}
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
+                      csvFile
+                        ? 'border-emerald-500/60 bg-emerald-950/10'
+                        : 'border-slate-700 hover:border-emerald-500/60 bg-slate-950/40 hover:bg-slate-950/60'
+                    }`}
+                  >
+                    <FileSpreadsheet className="w-10 h-10 text-emerald-400 mx-auto mb-2" />
+                    <p className="text-sm font-bold text-white">
+                      {csvFile ? csvFile.name : 'Click to select CSV file from your computer'}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {csvFile
+                        ? `${(csvFile.size / 1024).toFixed(1)} KB • ${csvParsedRows.length} rows parsed`
+                        : 'Maximum 5MB file size • Up to 500 providers per batch'}
+                    </p>
+                    <span className="inline-block mt-3 text-[11px] font-semibold text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-500/30">
+                      {csvFile ? 'Click to change file' : 'Browse Local Files'}
+                    </span>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".csv,text/csv"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleCsvFileProcess(f);
+                      }}
+                    />
+                  </div>
+
+                  {/* Batch Configuration Options */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-950/60 border border-slate-800 p-4 rounded-xl">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                        Default Status (If omitted in CSV)
+                      </label>
+                      <select
+                        value={csvDefaultStatus}
+                        onChange={(e) => setCsvDefaultStatus(e.target.value as any)}
+                        className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-500 rounded-lg px-3 py-2 text-xs text-white focus:outline-none"
+                      >
+                        <option value="pending">pending (Requires admin review)</option>
+                        <option value="published">published (Live in directory immediately)</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-3 pt-6">
+                      <input
+                        type="checkbox"
+                        id="autoVerify"
+                        checked={csvAutoVerify}
+                        onChange={(e) => setCsvAutoVerify(e.target.checked)}
+                        className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-400 bg-slate-900 border-slate-700"
+                      />
+                      <label htmlFor="autoVerify" className="text-xs text-slate-300 font-medium select-none cursor-pointer">
+                        Mark all valid imported providers as <span className="font-bold text-white">Verified</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Error Notification */}
+                  {csvError && (
+                    <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-300 text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                      <span>{csvError}</span>
+                    </div>
+                  )}
+
+                  {/* Client-Side Preview Table (First 5 Rows) */}
+                  {csvPreviewRows.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold uppercase tracking-wider text-slate-300 text-[10px] flex items-center gap-1.5">
+                          <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                          Client-Side Preview (First {csvPreviewRows.length} of {csvParsedRows.length} rows)
+                        </span>
+                        <span className="text-[11px] font-semibold text-emerald-400 font-mono">
+                          {csvParsedRows.length} Total Rows Ready
+                        </span>
+                      </div>
+
+                      <div className="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden overflow-x-auto shadow-inner">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-900/80 text-slate-400 text-[10px] uppercase font-bold border-b border-slate-800">
+                            <tr>
+                              <th className="px-3.5 py-2.5">#</th>
+                              <th className="px-3.5 py-2.5">Full Name</th>
+                              <th className="px-3.5 py-2.5">WhatsApp</th>
+                              <th className="px-3.5 py-2.5">Category</th>
+                              <th className="px-3.5 py-2.5">City</th>
+                              <th className="px-3.5 py-2.5">Price</th>
+                              <th className="px-3.5 py-2.5 text-center">Tier</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/60 text-slate-300 font-medium">
+                            {csvPreviewRows.map((r, idx) => {
+                              const isPrem =
+                                r.is_premium === true ||
+                                String(r.is_premium || '').toLowerCase() === 'true';
+                              return (
+                                <tr key={idx} className="hover:bg-slate-800/30">
+                                  <td className="px-3.5 py-2 font-mono text-[11px] text-slate-400">
+                                    {idx + 1}
+                                  </td>
+                                  <td className="px-3.5 py-2 font-semibold text-white">
+                                    {r.fullName || r.full_name || r.name || 'N/A'}
+                                  </td>
+                                  <td className="px-3.5 py-2 font-mono text-[11px] text-slate-300">
+                                    {r.whatsappNumber || r.whatsapp_number || r.phone || 'N/A'}
+                                  </td>
+                                  <td className="px-3.5 py-2">
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-cyan-950/60 text-cyan-300 border border-cyan-800/40">
+                                      {r.categorySlug || r.category_slug || r.category || 'N/A'}
+                                    </span>
+                                  </td>
+                                  <td className="px-3.5 py-2 text-slate-300">
+                                    {r.citySlug || r.city_slug || r.city || 'N/A'}
+                                  </td>
+                                  <td className="px-3.5 py-2 font-mono text-emerald-400">
+                                    {r.starting_price || r.startingPrice || 500}
+                                  </td>
+                                  <td className="px-3.5 py-2 text-center">
+                                    <span
+                                      className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase ${
+                                        isPrem
+                                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                          : 'bg-slate-800 text-slate-400'
+                                      }`}
+                                    >
+                                      {isPrem ? 'Premium' : 'Free'}
+                                    </span>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Preview of top rows */}
-            {csvPreviewRows.length > 0 && (
-              <div className="space-y-2">
-                <span className="text-[11px] font-bold uppercase text-slate-400">
-                  Preview (First {csvPreviewRows.length} rows):
-                </span>
-                <div className="bg-slate-950 rounded-lg p-2.5 border border-slate-800 text-[11px] font-mono text-slate-300 overflow-x-auto max-h-32">
-                  <pre>{JSON.stringify(csvPreviewRows, null, 2)}</pre>
-                </div>
-              </div>
-            )}
+            {/* Modal Footer Actions */}
+            <div className="flex items-center justify-between pt-4 border-t border-slate-800 shrink-0">
+              {csvResult ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCsvResult(null);
+                      setCsvFile(null);
+                      setCsvRawText('');
+                      setCsvParsedRows([]);
+                      setCsvPreviewRows([]);
+                    }}
+                    className="px-4 py-2 bg-slate-800 text-slate-200 text-xs font-semibold rounded-xl hover:bg-slate-700 transition-colors"
+                  >
+                    Upload Another Batch
+                  </button>
 
-            {csvError && (
-              <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-xs">
-                {csvError}
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCsvModalOpen(false);
+                      fetchProviders();
+                    }}
+                    className="px-5 py-2 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+                  >
+                    Done & Refresh Providers
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setCsvModalOpen(false)}
+                    className="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl hover:bg-slate-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
 
-            {csvResult && (
-              <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs font-semibold">
-                ✓ Successfully imported {csvResult.importedCount} providers!
-              </div>
-            )}
-
-            <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-              <a
-                href="/admin/import"
-                target="_blank"
-                className="text-xs text-blue-400 hover:underline flex items-center gap-1"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>CSV Template & Guide</span>
-              </a>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setCsvModalOpen(false)}
-                  className="px-3 py-1.5 bg-slate-800 text-slate-300 text-xs rounded-lg hover:bg-slate-700"
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCsvImportSubmit}
-                  disabled={!csvRawText || csvUploading}
-                  className="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg disabled:opacity-50 flex items-center gap-1.5"
-                >
-                  {csvUploading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                  <span>Execute Bulk Import</span>
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    onClick={handleCsvImportSubmit}
+                    disabled={!csvRawText.trim() || csvUploading}
+                    className="px-5 py-2 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {csvUploading ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Validating & Ingesting ({csvParsedRows.length} rows)...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UploadCloud className="w-4 h-4" />
+                        <span>Execute Bulk Upload ({csvParsedRows.length || 0} rows)</span>
+                      </>
+                    )}
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
       )}
+
 
       {/* ========================================================== */}
       {/* DELETE CONFIRMATION MODAL (Strictly SUPER_ADMIN)           */}
