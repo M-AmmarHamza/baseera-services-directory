@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateEnglishSlug } from './lib/transliterate';
-import { verifyAdminToken, ADMIN_COOKIE_NAME } from './lib/admin-auth';
+import {
+  verifyAdminToken,
+  ADMIN_COOKIE_NAME,
+  isModeratorOrAbove,
+  isSuperAdmin,
+} from './lib/admin-auth';
 
 export const config = {
   matcher: [
@@ -12,6 +17,7 @@ export const config = {
      * - favicon.ico, images, documents, sitemap, robots, llms.txt
      */
     '/((?!api|_next/static|_next/image|favicon.ico|sitemap|robots.txt|llms.txt|llms-full.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js|txt|xml)$).*)',
+    '/api/super-admin/:path*',
   ],
 };
 
@@ -135,6 +141,28 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl, 301);
   }
 
+  // 0. API SUPER ADMIN AUTH & RBAC GUARD
+  if (pathname.startsWith('/api/super-admin')) {
+    const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
+    const { valid, session } = await verifyAdminToken(token);
+    if (!valid || !isModeratorOrAbove(session)) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized: Super Admin or Moderator privileges required.' },
+        { status: 401 }
+      );
+    }
+    // Hard deletes and DELETE method restricted strictly to SUPER_ADMIN
+    if (request.method === 'DELETE' && !isSuperAdmin(session)) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: Hard delete actions are strictly restricted to SUPER_ADMIN.' },
+        { status: 403 }
+      );
+    }
+    const response = NextResponse.next();
+    response.headers.set('x-baseera-role', session?.role || 'MODERATOR');
+    return response;
+  }
+
   // 1. Detect user country and city using Vercel Edge req.geo with header fallbacks
   const geoCountry = (
     (request as any).geo?.country ||
@@ -195,6 +223,23 @@ export async function middleware(request: NextRequest) {
 
   const lang = firstSegment;
  
+  // STRICT SUPER ADMIN AUTHENTICATION GUARD
+  const isSuperAdminRoute = segments.length >= 2 && segments[1].toLowerCase() === 'super-admin';
+  if (isSuperAdminRoute) {
+    const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
+    const { valid, session } = await verifyAdminToken(token);
+    if (!valid || !isModeratorOrAbove(session)) {
+      const loginUrl = new URL(`/${lang}/admin/login`, request.url);
+      loginUrl.searchParams.set('next', pathname);
+      return NextResponse.redirect(loginUrl, 307);
+    }
+    const response = NextResponse.next();
+    response.headers.set('x-baseera-lang', lang);
+    response.headers.set('x-baseera-admin-authorized', 'true');
+    response.headers.set('x-baseera-role', session?.role || 'MODERATOR');
+    return response;
+  }
+
   // STRICT ADMIN AUTHENTICATION GUARD
   const isAdminRoute = segments.length >= 2 && segments[1].toLowerCase() === 'admin';
   if (isAdminRoute) {
@@ -239,7 +284,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(`/${lang}`, request.url), 301);
     }
 
-    if (['list-service', 'search', 'services', 'dashboard', 'blog', 'admin', 'privacy', 'terms', 'about'].includes(secondSegment)) {
+    if (['list-service', 'search', 'services', 'dashboard', 'blog', 'admin', 'super-admin', 'privacy', 'terms', 'about'].includes(secondSegment)) {
       const response = NextResponse.next();
       response.headers.set('x-baseera-lang', lang);
       return response;
@@ -255,7 +300,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Canonical SEO Category Slug Redirects (e.g., /pk/karachi/ac -> /pk/karachi/ac-technician)
-  if (segments.length >= 4 && !['blog', 'admin', 'dashboard', 'privacy', 'terms', 'about', 'list-service'].includes(segments[1])) {
+  if (segments.length >= 4 && !['blog', 'admin', 'super-admin', 'dashboard', 'privacy', 'terms', 'about', 'list-service'].includes(segments[1])) {
     const rawCategory = segments[3].toLowerCase();
     const canonicalCategory = SHORT_CATEGORY_REDIRECTS[rawCategory];
     if (canonicalCategory && canonicalCategory !== rawCategory) {
@@ -268,7 +313,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // 301 Permanent Redirects for Provider Migrations (e.g. slug, city, or category updates)
-  if (segments.length === 5 && !['admin', 'api', '_next', 'blog', 'dashboard', 'privacy', 'terms', 'about', 'list-service'].includes(segments[1])) {
+  if (segments.length === 5 && !['admin', 'super-admin', 'api', '_next', 'blog', 'dashboard', 'privacy', 'terms', 'about', 'list-service'].includes(segments[1])) {
     const [_, currentCountry, currentCity, currentCategory, currentSlug] = segments;
     const compoundKey = `${currentCity.toLowerCase()}/${currentCategory.toLowerCase()}/${currentSlug.toLowerCase()}`;
     const redirectTarget = PROVIDER_PERMANENT_REDIRECTS[compoundKey] || PROVIDER_PERMANENT_REDIRECTS[currentSlug.toLowerCase()];

@@ -6,6 +6,7 @@ import {
   DEFAULT_ADMIN_PASSWORD,
 } from '@/lib/admin-auth';
 import { getClientIp, checkRateLimit, rateLimitExceededResponse } from '@/lib/rate-limit';
+import { recordAuditLog } from '@/lib/audit';
 
 export async function POST(req: NextRequest) {
   // Anti-Brute Force Rate Limiting (5 attempts / min per IP)
@@ -25,26 +26,41 @@ export async function POST(req: NextRequest) {
     const cleanPassword = (password || '').trim();
 
     // Verify credentials against admin env/defaults
-    const isValidCredentials =
+    const isSuperAdminUser =
       cleanEmail === DEFAULT_ADMIN_EMAIL.toLowerCase() &&
       cleanPassword === DEFAULT_ADMIN_PASSWORD;
 
-    if (!isValidCredentials) {
+    const modEmail = (process.env.MODERATOR_EMAIL || 'moderator@baseera.com').toLowerCase();
+    const modPassword = process.env.MODERATOR_PASSWORD || 'BaseeraMod2026!';
+    const isModeratorUser = cleanEmail === modEmail && cleanPassword === modPassword;
+
+    if (!isSuperAdminUser && !isModeratorUser) {
       return NextResponse.json(
         { success: false, error: 'Invalid admin email or password.' },
         { status: 401 }
       );
     }
 
+    const assignedRole = isSuperAdminUser ? 'SUPER_ADMIN' : 'MODERATOR';
+
     // Generate signed HMAC session token
-    const token = await createAdminToken(cleanEmail, 'admin');
+    const token = await createAdminToken(cleanEmail, assignedRole);
+
+    // Record login in audit log
+    await recordAuditLog({
+      adminId: cleanEmail,
+      action: 'ADMIN_LOGIN',
+      entityType: 'AUTH',
+      entityId: cleanEmail,
+      details: { role: assignedRole, ip: clientIp },
+    });
 
     const res = NextResponse.json({
       success: true,
       message: 'Admin authentication successful.',
       user: {
         email: cleanEmail,
-        role: 'admin',
+        role: assignedRole,
       },
     });
 
