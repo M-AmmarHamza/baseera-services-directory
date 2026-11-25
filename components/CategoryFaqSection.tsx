@@ -2,6 +2,7 @@ import React from 'react';
 import { HelpCircle, ChevronDown, CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
 import JsonLd from '@/components/JsonLd';
 import { createFaqSchema, FaqItem } from '@/lib/schema';
+import { getFaqs } from '@/lib/taxonomy-db';
 
 interface CategoryFaqProps {
   categoryName: string;
@@ -9,19 +10,39 @@ interface CategoryFaqProps {
   countryName: string;
   startingPrice?: string;
   lang?: string;
+  categorySlug?: string;
 }
 
-export default function CategoryFaqSection({
+export default async function CategoryFaqSection({
   categoryName,
   cityName,
   countryName,
   startingPrice = 'competitive market rates',
   lang = 'en',
+  categorySlug,
 }: CategoryFaqProps) {
   const isUrdu = lang === 'ur';
   const isArabic = lang === 'ar';
 
-  const faqs: FaqItem[] = isUrdu
+  // Dynamic FAQs fetched from Super Admin database
+  let dynamicFaqs: FaqItem[] = [];
+  try {
+    const rawFaqs = await getFaqs({
+      scope: 'CATEGORY',
+      categoryId: categorySlug || categoryName.toLowerCase().replace(/\s+/g, '-'),
+      activeOnly: true,
+    });
+    if (rawFaqs && rawFaqs.length > 0) {
+      dynamicFaqs = rawFaqs.map((f) => ({
+        question: isUrdu && f.question_ur ? f.question_ur : f.question_en,
+        answer: isUrdu && f.answer_ur ? f.answer_ur : f.answer_en,
+      }));
+    }
+  } catch (err) {
+    console.warn('CategoryFaqSection dynamic fetch notice:', err);
+  }
+
+  const baseFaqs: FaqItem[] = isUrdu
     ? [
         {
           question: `${cityName} میں ${categoryName} کے اوسط وزٹ چارجز کتنے ہیں؟`,
@@ -89,6 +110,9 @@ export default function CategoryFaqSection({
           answer: `Most verified specialists in ${cityName} respond within 10 to 15 minutes during regular operating hours. You can send fault photos or brief voice notes for prompt diagnosis.`,
         },
       ];
+
+  // Merge dynamic FAQs from CMS with base category FAQs
+  const faqs = dynamicFaqs.length > 0 ? [...dynamicFaqs, ...baseFaqs] : baseFaqs;
 
   // Dynamic FAQPage schema targeted for Google People Also Ask (PAA) rich snippets
   const faqSchema = createFaqSchema(faqs);

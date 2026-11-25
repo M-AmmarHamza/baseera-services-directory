@@ -15,6 +15,7 @@ import JsonLd from '@/components/JsonLd';
 import { createFaqSchema, createBreadcrumbSchema } from '@/lib/schema';
 import FaqAccordion, { FaqAccordionItem, FaqCategory } from '@/components/FaqAccordion';
 import { getSiteUrl } from '@/lib/site-url';
+import { getFaqs } from '@/lib/taxonomy-db';
 
 interface PageProps {
   params: Promise<{
@@ -302,9 +303,28 @@ export default async function FaqPage({ params }: PageProps) {
         },
       ];
 
+  // Dynamic FAQs fetched from Super Admin database table
+  let dynamicFaqs: FaqAccordionItem[] = [];
+  try {
+    const rawGlobalFaqs = await getFaqs({ scope: 'GLOBAL', activeOnly: true });
+    if (rawGlobalFaqs && rawGlobalFaqs.length > 0) {
+      dynamicFaqs = rawGlobalFaqs.map((f) => ({
+        id: f.id,
+        category: 'pricing',
+        categoryLabel: isUrdu ? 'پلیٹ فارم معلومات' : isArabic ? 'معلومات عامة' : 'Platform Policies',
+        question: isUrdu && f.question_ur ? f.question_ur : f.question_en,
+        answer: isUrdu && f.answer_ur ? f.answer_ur : f.answer_en,
+      }));
+    }
+  } catch (err) {
+    console.warn('Dynamic global FAQ fetch notice in page:', err);
+  }
+
+  const allFaqItems = [...dynamicFaqs, ...faqItems];
+
   // Static FAQPage Schema for SEO & Rich Snippets (Main Entity Q&A)
   const faqSchema = createFaqSchema(
-    faqItems.map((item) => ({
+    allFaqItems.map((item) => ({
       question: item.question,
       answer: item.answer,
     }))
@@ -443,7 +463,7 @@ export default async function FaqPage({ params }: PageProps) {
 
         {/* 5. Interactive Accordion with Category Filters & Search */}
         <FaqAccordion
-          items={faqItems}
+          items={allFaqItems}
           categories={categories}
           lang={lang}
           searchPlaceholder={

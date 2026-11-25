@@ -62,29 +62,40 @@ enum ProfileRole {
   admin
 }
 
+enum FaqScope {
+  GLOBAL
+  CATEGORY
+}
+
 model Country {
-  id        Int        @id @default(autoincrement())
-  name      String
-  code      String     @unique
-  slug      String     @unique
-  currency  String?    @default("PKR")
-  isActive  Boolean?   @default(true) @map("is_active")
-  createdAt DateTime   @default(now()) @map("created_at")
-  cities    City[]
-  providers Provider[]
+  id           Int        @id @default(autoincrement())
+  name         String
+  name_en      String?    @map("name_en")
+  name_ur      String?    @map("name_ur")
+  code         String     @unique
+  slug         String     @unique
+  currency     String?    @default("PKR")
+  premiumPrice Int?       @default(2500) @map("premium_price")
+  isActive     Boolean?   @default(true) @map("is_active")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  cities       City[]
+  providers    Provider[]
 
   @@map("countries")
 }
 
 model City {
-  id        Int        @id @default(autoincrement())
-  countryId Int        @map("country_id")
-  name      String
-  slug      String
-  isActive  Boolean?   @default(true) @map("is_active")
-  createdAt DateTime   @default(now()) @map("created_at")
-  country   Country    @relation(fields: [countryId], references: [id], onDelete: Cascade)
-  providers Provider[]
+  id          Int        @id @default(autoincrement())
+  countryId   Int        @map("country_id")
+  name        String
+  name_en     String?    @map("name_en")
+  name_ur     String?    @map("name_ur")
+  slug        String
+  targetAreas String[]   @default([]) @map("target_areas")
+  isActive    Boolean?   @default(true) @map("is_active")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  country     Country    @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  providers   Provider[]
 
   @@unique([countryId, slug])
   @@map("cities")
@@ -93,14 +104,42 @@ model City {
 model Category {
   id           String                @id
   name         String
+  name_en      String?               @map("name_en")
+  name_ur      String?               @map("name_ur")
   slug         String                @unique
-  icon         String                @default("build")
+  slug_en      String?               @unique @map("slug_en")
+  slug_ur      String?               @unique @map("slug_ur")
+  icon         String                @default("Wrench")
+  sortOrder    Int                   @default(0) @map("sort_order")
+  isActive     Boolean?              @default(true) @map("is_active")
   activeCount  Int?                  @default(0) @map("active_count")
   createdAt    DateTime              @default(now()) @map("created_at")
   translations CategoryTranslation[]
   providers    Provider[]
+  faqs         Faq[]
 
   @@map("categories")
+}
+
+model Faq {
+  id          String    @id @default(uuid())
+  scope       FaqScope  @default(GLOBAL)
+  categoryId  String?   @map("category_id")
+  question_en String    @map("question_en")
+  answer_en   String    @map("answer_en")
+  question_ur String?   @map("question_ur")
+  answer_ur   String?   @map("answer_ur")
+  sortOrder   Int       @default(0) @map("sort_order")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([scope])
+  @@index([categoryId])
+  @@index([sortOrder])
+  @@map("faqs")
 }
 
 model CategoryTranslation {

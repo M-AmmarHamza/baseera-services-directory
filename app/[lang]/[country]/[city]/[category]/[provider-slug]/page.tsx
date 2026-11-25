@@ -1091,6 +1091,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
           {/* Dynamic Category FAQs with FAQPage Schema */}
           <CategoryFaqSection
             categoryName={categoryName}
+            categorySlug={category}
             cityName={cityName}
             countryName={countryName}
             startingPrice={formatVisitingPrice(provider.starting_price, provider.country_code || country)}

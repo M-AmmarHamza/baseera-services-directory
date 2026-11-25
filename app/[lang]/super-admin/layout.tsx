@@ -246,7 +246,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                   />
                   <span>{item.title}</span>
                 </div>
-                {item.phase > 1 ? (
+                {item.phase > 2 ? (
                   <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60 uppercase tracking-wider">
                     P{item.phase}
                   </span>

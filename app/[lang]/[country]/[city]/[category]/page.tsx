@@ -673,6 +673,7 @@ export default async function CategoryListingPage({ params, searchParams }: Cate
         {/* Dynamic Category FAQ & FAQPage Schema */}
         <CategoryFaqSection
           categoryName={categoryName}
+          categorySlug={category}
           cityName={cityName}
           countryName={countryName}
           startingPrice={providers[0]?.starting_price ? formatVisitingPrice(providers[0].starting_price, providers[0].country_code || country) : undefined}
