@@ -41,8 +41,16 @@ export async function GET(req: NextRequest) {
           const normalizedStatus =
             rawStatus === 'approved' ? 'published' : rawStatus === 'rejected' ? 'suspended' : rawStatus;
 
+          const rawPublicId =
+            p.publicId !== undefined && p.publicId !== null
+              ? Number(p.publicId)
+              : p.public_id !== undefined && p.public_id !== null
+              ? Number(p.public_id)
+              : undefined;
+
           return {
             id: p.id,
+            publicId: rawPublicId,
             name: p.name,
             slug: p.slug,
             profile_type: p.profile_type || 'individual',
@@ -187,17 +195,35 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // Search filter
+  // Search filter (supports searching by #ID, Public ID, name, whatsapp, slug, category, city)
   if (searchQuery) {
+    const cleanSearchId = searchQuery.replace(/^#/, '').trim();
+    const isIdQuery = /^\d+$/.test(cleanSearchId);
+
     filtered = filtered.filter((p) => {
+      const matchesPublicId = p.publicId !== undefined && String(p.publicId) === cleanSearchId;
+      const partialPublicId = p.publicId !== undefined && String(p.publicId).includes(cleanSearchId);
+
       return (
+        matchesPublicId ||
+        (isIdQuery && partialPublicId) ||
         p.name?.toLowerCase().includes(searchQuery) ||
+        p.slug?.toLowerCase().includes(searchQuery) ||
         p.whatsapp_number?.toLowerCase().includes(searchQuery) ||
         p.category_id?.toLowerCase().includes(searchQuery) ||
         p.city_slug?.toLowerCase().includes(searchQuery) ||
         p.cityName?.toLowerCase().includes(searchQuery)
       );
     });
+
+    // If an exact publicId match exists, bubble it to the top
+    if (isIdQuery) {
+      filtered.sort((a, b) => {
+        const aExact = a.publicId !== undefined && String(a.publicId) === cleanSearchId ? 1 : 0;
+        const bExact = b.publicId !== undefined && String(b.publicId) === cleanSearchId ? 1 : 0;
+        return bExact - aExact;
+      });
+    }
   }
 
   const total = filtered.length;

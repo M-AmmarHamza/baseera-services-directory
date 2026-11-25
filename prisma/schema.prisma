@@ -1,0 +1,142 @@
+// =========================================================================
+// BASEERA DIRECTORY - PRISMA SCHEMA (POSTGRESQL / SUPABASE)
+// Lead Generation Directory Platform
+// =========================================================================
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum ProviderStatus {
+  pending
+  published
+  suspended
+  approved
+  rejected
+}
+
+enum ProfileRole {
+  customer
+  provider
+  admin
+}
+
+model Country {
+  id        Int        @id @default(autoincrement())
+  name      String
+  code      String     @unique
+  slug      String     @unique
+  currency  String?    @default("PKR")
+  isActive  Boolean?   @default(true) @map("is_active")
+  createdAt DateTime   @default(now()) @map("created_at")
+  cities    City[]
+  providers Provider[]
+
+  @@map("countries")
+}
+
+model City {
+  id        Int        @id @default(autoincrement())
+  countryId Int        @map("country_id")
+  name      String
+  slug      String
+  isActive  Boolean?   @default(true) @map("is_active")
+  createdAt DateTime   @default(now()) @map("created_at")
+  country   Country    @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  providers Provider[]
+
+  @@unique([countryId, slug])
+  @@map("cities")
+}
+
+model Category {
+  id           String                @id
+  name         String
+  slug         String                @unique
+  icon         String                @default("build")
+  activeCount  Int?                  @default(0) @map("active_count")
+  createdAt    DateTime              @default(now()) @map("created_at")
+  translations CategoryTranslation[]
+  providers    Provider[]
+
+  @@map("categories")
+}
+
+model CategoryTranslation {
+  id          Int      @id @default(autoincrement())
+  categoryId  String   @map("category_id")
+  lang        String
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, lang])
+  @@map("category_translations")
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  fullName  String   @map("full_name")
+  phone     String?
+  avatarUrl String?  @map("avatar_url")
+  role      String   @default("customer")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("profiles")
+}
+
+model Provider {
+  id              String   @id @default(uuid())
+  publicId        Int      @unique @default(autoincrement())
+  userId          String?  @map("user_id")
+  countryId       Int?     @default(1) @map("country_id")
+  cityId          Int?     @default(1) @map("city_id")
+  categoryId      String?  @map("category_id")
+  name            String
+  slug            String   @unique
+  profileType     String   @default("individual") @map("profile_type")
+  whatsappNumber  String   @map("whatsapp_number")
+  phoneNumber     String?  @map("phone_number")
+  serviceArea     String[] @default([]) @map("service_area")
+  targetAreas     String[] @default([]) @map("target_areas")
+  shortBio        String?  @map("short_bio")
+  bio             String?
+  status          String   @default("pending")
+  seoIndex        Boolean? @default(false) @map("seo_index")
+  isVerified      Boolean? @default(false) @map("is_verified")
+  isFeatured      Boolean? @default(false) @map("is_featured")
+  isAvailable     Boolean? @default(true) @map("is_available")
+  isPremium       Boolean? @default(false) @map("is_premium")
+  avatarUrl       String?  @map("avatar_url")
+  profilePicture  String?  @map("profile_picture")
+  portfolioPhotos String[] @default([]) @map("portfolio_photos")
+  galleryImages   String[] @default([]) @map("gallery_images")
+  googleMapUrl    String?  @map("google_map_url")
+  certificates    String[] @default([])
+  startingPrice   Int?     @default(500) @map("starting_price")
+  rating          Decimal? @default(5.0) @db.Decimal(3, 1)
+  reviewCount     Int?     @default(0) @map("review_count")
+  totalLeads      Int?     @default(0) @map("total_leads")
+  profileViews    Int?     @default(0) @map("profile_views")
+  whatsappClicks  Int?     @default(0) @map("whatsapp_clicks")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  country  Country?  @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  city     City?     @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([seoIndex])
+  @@index([isFeatured])
+  @@index([isVerified])
+  @@map("providers")
+}

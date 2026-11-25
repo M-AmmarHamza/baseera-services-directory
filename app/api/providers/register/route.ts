@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateEnglishSlug } from '@/lib/transliterate';
 import { generateUniqueSlug } from '@/lib/slug';
-import { getCategoryBySlug, getCountryByCode, getCategoryName, SEED_PROVIDERS, localProvidersOverrides } from '@/lib/db';
+import { getCategoryBySlug, getCountryByCode, getCategoryName, SEED_PROVIDERS, localProvidersOverrides, getNextPublicId } from '@/lib/db';
 import { getCountryCurrency, cleanNumericPrice } from '@/lib/currencies';
 import { providerRegistrationSchema, createProviderRegistrationSchema } from '@/lib/validations/provider';
 import { validateAndFormatE164 } from '@/lib/phone';
@@ -198,14 +198,8 @@ export async function POST(request: NextRequest) {
     const resolvedCatId = catObj ? catObj.id : category_id.toLowerCase();
     const resolvedTradeTitle = trade_title?.trim() || `${name} - Verified ${catObj?.name || 'Specialist'}`;
 
-    // Unique Slug Generator with 3-tier collision avoidance (Base -> Phone digits -> nanoid)
-    const uniqueSlug = await generateUniqueSlug(name, resolvedWhatsApp || phone_number, {
-      cityId: citySlug,
-      categoryId: resolvedCatId,
-    });
-
-    // Target live URL for the vendor
-    const publicUrl = `/${lang}/${cleanCountryCode}/${citySlug}/${resolvedCatId}/${uniqueSlug}`;
+    // Base English slug from full name
+    const baseSlug = generateEnglishSlug(name) || 'specialist';
 
     if (SUPABASE_URL && SUPABASE_KEY) {
       const headers = {
@@ -295,12 +289,15 @@ export async function POST(request: NextRequest) {
         ? rawBody.target_areas
         : serviceAreaArray;
 
+      // Temporary slug for initial row creation
+      const tempSlug = `${baseSlug}-temp-${Date.now()}`;
+
       const providerPayload = {
         country_id: countryId,
         city_id: cityId,
         category_id: resolvedCatId,
         name: name.trim(),
-        slug: uniqueSlug,
+        slug: tempSlug,
         profile_type: profile_type === 'shop' ? 'shop' : 'individual',
         whatsapp_number: (resolvedWhatsApp || telegram_handle || '').trim(),
         avatar_url: finalProfilePic,
@@ -333,10 +330,39 @@ export async function POST(request: NextRequest) {
       const insertResult = await insertRes.json();
       console.log('Provider registration Supabase response:', insertResult);
 
-      localProvidersOverrides.set(uniqueSlug, {
+      const insertedRow = Array.isArray(insertResult) && insertResult.length > 0 ? insertResult[0] : null;
+      const assignedPublicId: number =
+        insertedRow?.publicId !== undefined && insertedRow?.publicId !== null
+          ? Number(insertedRow.publicId)
+          : insertedRow?.public_id !== undefined && insertedRow?.public_id !== null
+          ? Number(insertedRow.public_id)
+          : getNextPublicId();
+
+      const finalSlug = `${baseSlug}-${assignedPublicId}`;
+      const publicUrl = `/${lang}/${cleanCountryCode}/${citySlug}/${resolvedCatId}/${finalSlug}`;
+
+      if (insertedRow?.id) {
+        try {
+          await fetch(`${SUPABASE_URL}/rest/v1/providers?id=eq.${insertedRow.id}`, {
+            method: 'PATCH',
+            headers: {
+              apikey: SUPABASE_KEY,
+              Authorization: `Bearer ${SUPABASE_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ slug: finalSlug, publicId: assignedPublicId, public_id: assignedPublicId }),
+          });
+        } catch (patchErr) {
+          console.warn('Failed to update canonical slug in Supabase:', patchErr);
+        }
+      }
+
+      const overrideRecord = {
+        id: insertedRow?.id || finalSlug,
+        publicId: assignedPublicId,
         name: name.trim(),
-        slug: uniqueSlug,
-        status: 'pending',
+        slug: finalSlug,
+        status: 'pending' as const,
         seo_index: false,
         is_verified: false,
         is_available: false,
@@ -352,12 +378,18 @@ export async function POST(request: NextRequest) {
         city_slug: citySlug,
         country_code: cleanCountryCode,
         whatsapp_number: resolvedWhatsApp,
-      });
+      };
+
+      localProvidersOverrides.set(finalSlug, overrideRecord);
+      if (insertedRow?.id) {
+        localProvidersOverrides.set(insertedRow.id, overrideRecord);
+      }
 
       if (insertRes.ok || (Array.isArray(insertResult) && insertResult.length > 0)) {
         return NextResponse.json({
           success: true,
-          slug: uniqueSlug,
+          publicId: assignedPublicId,
+          slug: finalSlug,
           publicUrl,
           status: 'pending',
           message: 'Provider registered successfully and submitted for moderation review',
@@ -368,10 +400,16 @@ export async function POST(request: NextRequest) {
       console.warn('Supabase RLS note:', insertResult);
     }
 
-    localProvidersOverrides.set(uniqueSlug, {
+    const fallbackPublicId = getNextPublicId();
+    const finalFallbackSlug = `${baseSlug}-${fallbackPublicId}`;
+    const fallbackPublicUrl = `/${lang}/${cleanCountryCode}/${citySlug}/${resolvedCatId}/${finalFallbackSlug}`;
+
+    const fallbackOverride = {
+      id: finalFallbackSlug,
+      publicId: fallbackPublicId,
       name: name.trim(),
-      slug: uniqueSlug,
-      status: 'pending',
+      slug: finalFallbackSlug,
+      status: 'pending' as const,
       seo_index: false,
       is_verified: false,
       is_available: false,
@@ -387,12 +425,15 @@ export async function POST(request: NextRequest) {
       city_slug: citySlug,
       country_code: cleanCountryCode,
       whatsapp_number: resolvedWhatsApp,
-    });
+    };
+
+    localProvidersOverrides.set(finalFallbackSlug, fallbackOverride);
 
     return NextResponse.json({
       success: true,
-      slug: uniqueSlug,
-      publicUrl,
+      publicId: fallbackPublicId,
+      slug: finalFallbackSlug,
+      publicUrl: fallbackPublicUrl,
       status: 'pending',
       message: 'Provider profile registered and submitted for moderation review',
     });

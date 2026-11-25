@@ -12,10 +12,11 @@ import {
   Provider,
   localImportedProviders,
   localProvidersOverrides,
+  getNextPublicId,
 } from '@/lib/db';
 import { validateAndFormatE164 } from '@/lib/phone';
 import { generateEnglishSlug } from '@/lib/transliterate';
-import { generateUniqueSlug } from '@/lib/slug';
+import { generateUniqueSlug, formatPublicIdSlug } from '@/lib/slug';
 import { getCountryCurrency } from '@/lib/currencies';
 import { sanitizeText, sanitizeCsvCell } from '@/lib/security';
 
@@ -285,22 +286,16 @@ export async function POST(req: NextRequest) {
             .filter(Boolean)
         : [cityObj.name];
 
-      // Robust 3-tier Unique Slug Generation with in-batch and database collision detection
-      const uniqueSlug = await generateUniqueSlug(
-        data.fullName,
-        phoneValidation.e164 || data.whatsappNumber,
-        {
-          cityId: cityObj.slug,
-          categoryId: categoryObj.id,
-          existingSlugs: batchSlugs,
-        }
-      );
+      // Sequential Public ID system (1001, 1002...) & clean slug format [slugified-fullName]-[publicId]
+      const publicId = getNextPublicId();
+      const uniqueSlug = formatPublicIdSlug(data.fullName, publicId);
       batchSlugs.add(uniqueSlug);
 
       const defaultFee = getCountryCurrency(countryObj.code).defaultFee;
 
       const newProvider: Provider = {
         id: crypto.randomUUID(),
+        publicId,
         name: data.fullName,
         slug: uniqueSlug,
         profile_type: data.profileType,
@@ -340,6 +335,8 @@ export async function POST(req: NextRequest) {
 
           const supabaseBatch = validProvidersToInsert.map((p) => ({
             id: p.id,
+            publicId: p.publicId,
+            public_id: p.publicId,
             name: p.name,
             slug: p.slug,
             profile_type: p.profile_type,
@@ -377,6 +374,16 @@ export async function POST(req: NextRequest) {
       for (const p of validProvidersToInsert) {
         localImportedProviders.unshift(p);
         localProvidersOverrides.set(p.id, {
+          publicId: p.publicId,
+          slug: p.slug,
+          status: p.status,
+          is_verified: p.is_verified,
+          is_available: p.is_available,
+        });
+        localProvidersOverrides.set(p.slug, {
+          id: p.id,
+          publicId: p.publicId,
+          slug: p.slug,
           status: p.status,
           is_verified: p.is_verified,
           is_available: p.is_available,

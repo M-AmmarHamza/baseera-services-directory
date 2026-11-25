@@ -8,6 +8,34 @@ export interface UniqueSlugOptions {
   cityId?: string | number;
   categoryId?: string | number;
   existingSlugs?: Set<string> | string[];
+  publicId?: number;
+}
+
+/**
+ * Formats canonical slug with sequential Public ID: [slugified-fullName]-[publicId]
+ * e.g., "Muhammad Ahmad" + 1001 -> "muhammad-ahmad-1001"
+ */
+export function formatPublicIdSlug(fullName: string, publicId: number): string {
+  const baseSlug = generateEnglishSlug(fullName) || 'specialist';
+  return `${baseSlug}-${publicId}`;
+}
+
+/**
+ * Extracts the numeric publicId from the end of a slug (after the last hyphen).
+ * e.g., "muhammad-ahmad-1001" -> 1001
+ *       "tariq-mahmood-1001" -> 1001
+ *       "1001" -> 1001
+ *       "tariq-mahmood" -> null
+ */
+export function extractPublicIdFromSlug(slug: string): number | null {
+  if (!slug) return null;
+  const trimmed = slug.trim();
+  const match = trimmed.match(/(?:^|-)(\d+)$/);
+  if (match && match[1]) {
+    const num = parseInt(match[1], 10);
+    return isNaN(num) ? null : num;
+  }
+  return null;
 }
 
 /**
@@ -117,17 +145,36 @@ export async function isSlugTaken(
 
 /**
  * Generates a collision-free unique slug for a provider profile:
- * 1. Base Slug: Slugify fullName (e.g. "muhammad-ahmad")
- * 2. If available, return baseSlug
- * 3. Collision Handling - Preferred: Append last 4 digits of phone number (e.g. "muhammad-ahmad-4582")
- * 4. Collision Handling - Fallback: If phone digits also collide or unavailable, append nanoid(5) (e.g. "muhammad-ahmad-a7x9c")
+ * Clean format: [slugified-fullName]-[publicId] (e.g. "muhammad-ahmad-1001")
  */
 export async function generateUniqueSlug(
   fullName: string,
-  phoneNumber?: string,
+  phoneNumberOrPublicId?: string | number,
   options?: UniqueSlugOptions
 ): Promise<string> {
   const baseSlug = generateEnglishSlug(fullName) || 'specialist';
+
+  // 1. If publicId is explicitly provided (as number or in options)
+  const explicitId =
+    typeof phoneNumberOrPublicId === 'number'
+      ? phoneNumberOrPublicId
+      : options?.publicId !== undefined
+      ? options.publicId
+      : null;
+
+  if (explicitId !== null) {
+    return `${baseSlug}-${explicitId}`;
+  }
+
+  // 2. Check if second parameter is a string that represents a numeric publicId (>= 1000)
+  if (
+    typeof phoneNumberOrPublicId === 'string' &&
+    /^\d{4,}$/.test(phoneNumberOrPublicId.trim())
+  ) {
+    return `${baseSlug}-${phoneNumberOrPublicId.trim()}`;
+  }
+
+  const phoneNumber = typeof phoneNumberOrPublicId === 'string' ? phoneNumberOrPublicId : undefined;
 
   // Step 1: Check if base slug is free
   const baseTaken = await isSlugTaken(baseSlug, options);
@@ -135,7 +182,7 @@ export async function generateUniqueSlug(
     return baseSlug;
   }
 
-  // Step 2: Preferred Method - Append last 4 digits of phone number
+  // Step 2: Fallback Method - Append last 4 digits of phone number
   const last4 = extractLastPhoneDigits(phoneNumber);
   if (last4 && last4.length >= 2) {
     const phoneCandidate = `${baseSlug}-${last4}`;

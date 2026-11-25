@@ -40,8 +40,12 @@ export async function GET(req: NextRequest) {
   const lang = sanitizeText(searchParams.get('lang') || 'en');
   const limit = Math.min(20, Math.max(1, parseInt(searchParams.get('limit') || '8', 10)));
 
-  // Fast return for queries shorter than 3 characters (Requirement 1: debounced API calls after 3 characters)
-  if (rawQuery.length < 3) {
+  const cleanNumericQuery = rawQuery.replace(/^#/, '').trim();
+  const isNumericQuery = /^\d+$/.test(cleanNumericQuery);
+  const queryPublicId = isNumericQuery ? parseInt(cleanNumericQuery, 10) : null;
+
+  // Fast return for queries shorter than 3 characters unless it is a numeric ID query
+  if (!isNumericQuery && rawQuery.length < 3) {
     return NextResponse.json({
       query: rawQuery,
       providers: [],
@@ -77,11 +81,15 @@ export async function GET(req: NextRequest) {
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       const cleanTerm = rawQuery.replace(/[%_]/g, '');
 
-      // Check fullName, trade_title, category_id in Supabase
+      const orFilter = queryPublicId !== null
+        ? `"publicId".eq.${queryPublicId},public_id.eq.${queryPublicId},name.ilike.%${cleanTerm}%,trade_title.ilike.%${cleanTerm}%,category_id.ilike.%${cleanTerm}%,short_bio.ilike.%${cleanTerm}%`
+        : `name.ilike.%${cleanTerm}%,trade_title.ilike.%${cleanTerm}%,category_id.ilike.%${cleanTerm}%,short_bio.ilike.%${cleanTerm}%`;
+
+      // Check publicId, fullName, trade_title, category_id in Supabase
       const { data: dbRows } = await supabase
         .from('providers')
         .select('*, cities!inner(slug,name), countries!inner(code,name)')
-        .or(`name.ilike.%${cleanTerm}%,trade_title.ilike.%${cleanTerm}%,category_id.ilike.%${cleanTerm}%,short_bio.ilike.%${cleanTerm}%`)
+        .or(orFilter)
         .limit(25);
 
       if (Array.isArray(dbRows)) {
@@ -91,8 +99,16 @@ export async function GET(req: NextRequest) {
             ? row.target_areas
             : Array.isArray(row.service_area) ? row.service_area : [];
 
+          const rawPublicId =
+            row.publicId !== undefined && row.publicId !== null
+              ? Number(row.publicId)
+              : row.public_id !== undefined && row.public_id !== null
+              ? Number(row.public_id)
+              : undefined;
+
           const mapped: Provider = {
             id: row.id,
+            publicId: rawPublicId,
             name: row.name,
             slug: row.slug,
             profile_type: row.profile_type || 'individual',
@@ -143,6 +159,13 @@ export async function GET(req: NextRequest) {
     const areas = [...(provider.target_areas || []), ...(provider.service_area || [])];
 
     let score = 0;
+
+    // 0. Priority exact match on Public ID (Requirement 3: numeric search query prioritizes publicId)
+    if (queryPublicId !== null && provider.publicId === queryPublicId) {
+      score += 20000; // Prioritize exact match on publicId to return at top
+    } else if (cleanNumericQuery && provider.publicId && String(provider.publicId).includes(cleanNumericQuery)) {
+      score += 500;
+    }
 
     // A. Check fullName
     const fullNameNorm = normalizeString(provider.name);
@@ -204,6 +227,7 @@ export async function GET(req: NextRequest) {
 
     return {
       id: provider.id,
+      publicId: provider.publicId,
       name: provider.name,
       slug: provider.slug,
       trade_title: provider.trade_title,

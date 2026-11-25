@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
 import {
   BadgeCheck,
@@ -20,6 +20,7 @@ import { WhatsAppIcon } from '@/components/Icons';
 import { getDictionary } from '@/lib/get-dictionary';
 import {
   getProviderBySlug,
+  getProviderByPublicId,
   getProviders,
   getCategoryBySlug,
   getCategoryName,
@@ -28,6 +29,8 @@ import {
   getLocalizedCityName,
   toTitleCase,
 } from '@/lib/db';
+import { extractPublicIdFromSlug } from '@/lib/slug';
+import PublicIdBadge from '@/components/PublicIdBadge';
 import { getProviderCoverUrl, getProviderAvatarUrl } from '@/lib/category-banners';
 import { formatVisitingPrice } from '@/lib/currencies';
 import { getCleanWhatsAppUrl, getCleanTelUrl } from '@/lib/phone';
@@ -221,7 +224,13 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   const resolvedParams = await params;
   const { lang, country, city, category } = resolvedParams;
   const slug = resolvedParams['provider-slug'];
-  const provider = await getProviderBySlug(city, category, slug);
+
+  const publicId = extractPublicIdFromSlug(slug);
+  let provider = publicId !== null ? await getProviderByPublicId(publicId) : null;
+  if (!provider) {
+    provider = await getProviderBySlug(city, category, slug);
+  }
+
   const categoryInfo = getCategoryBySlug(category);
 
   if (!provider) {
@@ -372,14 +381,28 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
   const { lang, country, city, category } = resolvedParams;
   const slug = resolvedParams['provider-slug'];
 
-  const provider = await getProviderBySlug(city, category, slug);
-  const categoryInfo = getCategoryBySlug(category);
-  const categoryName = getCategoryName(categoryInfo, lang);
-  const dict = await getDictionary(lang);
+  // Smart Route Resolution via Public ID & Canonical Slugs
+  const publicId = extractPublicIdFromSlug(slug);
+  let provider = publicId !== null ? await getProviderByPublicId(publicId) : null;
+  if (!provider) {
+    provider = await getProviderBySlug(city, category, slug);
+  }
 
   if (!provider) {
     notFound();
   }
+
+  // Canonical Slug Check: If incoming slug differs from current canonical slug, perform 301 permanent redirect
+  const canonicalSlug = provider.slug;
+  if (slug.toLowerCase() !== canonicalSlug.toLowerCase()) {
+    permanentRedirect(
+      `/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${canonicalSlug}`
+    );
+  }
+
+  const categoryInfo = getCategoryBySlug(category);
+  const categoryName = getCategoryName(categoryInfo, lang);
+  const dict = await getDictionary(lang);
 
   // MODERATION WORKFLOW GUARD: If status is not published/approved, render customized "Profile Under Review" UI
   if (provider.status !== 'published' && provider.status !== 'approved') {
@@ -687,6 +710,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
                   <span>★ Premium</span>
                 </span>
               )}
+              <PublicIdBadge publicId={provider.publicId} lang={lang} />
             </div>
 
             {/* Primary Category Title */}

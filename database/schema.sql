@@ -73,8 +73,13 @@ create table if not exists public.profiles (
 -- =========================================================================
 -- 5. PROVIDERS (Main Service Directory Table)
 -- =========================================================================
+create sequence if not exists "Provider_publicId_seq" start with 1001;
+alter sequence "Provider_publicId_seq" restart with 1001;
+
 create table if not exists public.providers (
   id uuid default uuid_generate_v4() primary key,
+  "publicId" int unique default nextval('"Provider_publicId_seq"'),
+  public_id int unique default nextval('"Provider_publicId_seq"'),
   user_id uuid references public.profiles(id) on delete set null,
   country_id int references public.countries(id) default 1,
   city_id int references public.cities(id) default 1,

@@ -9,6 +9,7 @@ export type ProviderStatus = 'pending' | 'published' | 'suspended';
 
 export interface Provider {
   id: string;
+  publicId?: number;
   name: string;
   slug: string;
   profile_type: 'individual' | 'shop';
@@ -48,6 +49,23 @@ export interface Provider {
 // In-memory runtime override store shared across admin and frontend
 export const localProvidersOverrides: Map<string, Partial<Provider>> = new Map();
 export const localImportedProviders: Provider[] = [];
+
+// Sequential Public ID Generator starting above Seed Providers (strictly >= 1001)
+let currentPublicIdCounter = 1021;
+
+export function getNextPublicId(): number {
+  return currentPublicIdCounter++;
+}
+
+export function peekNextPublicId(): number {
+  return currentPublicIdCounter;
+}
+
+export function syncPublicIdCounter(seenId?: number | null): void {
+  if (seenId && !isNaN(seenId) && seenId >= currentPublicIdCounter) {
+    currentPublicIdCounter = seenId + 1;
+  }
+}
 
 export const SEED_PROVIDERS: Provider[] = [
   {
@@ -503,6 +521,16 @@ export const SEED_PROVIDERS: Provider[] = [
     is_available: true,
   }
 ];
+
+// Ensure every SEED_PROVIDER has sequential publicId (strictly starting from 1001) and slug format [slug]-[publicId]
+SEED_PROVIDERS.forEach((p, idx) => {
+  if (!p.publicId) {
+    p.publicId = 1001 + idx;
+  }
+  if (!p.slug.endsWith(`-${p.publicId}`)) {
+    p.slug = `${p.slug}-${p.publicId}`;
+  }
+});
 
 export interface Country {
   code: string;
@@ -2125,6 +2153,16 @@ function mapDbProvider(row: any, fallbackCity: string = 'karachi'): Provider {
   const normalizedStatus: 'pending' | 'published' | 'suspended' =
     rawStatus === 'approved' ? 'published' : rawStatus === 'rejected' ? 'suspended' : rawStatus;
 
+  const rawPublicId =
+    row.publicId !== undefined && row.publicId !== null
+      ? Number(row.publicId)
+      : row.public_id !== undefined && row.public_id !== null
+      ? Number(row.public_id)
+      : undefined;
+  if (rawPublicId && !isNaN(rawPublicId)) {
+    syncPublicIdCounter(rawPublicId);
+  }
+
   const targetAreas = Array.isArray(row.target_areas) && row.target_areas.length > 0
     ? row.target_areas
     : Array.isArray(row.service_area) ? row.service_area : [];
@@ -2139,6 +2177,7 @@ function mapDbProvider(row: any, fallbackCity: string = 'karachi'): Provider {
 
   return {
     id: row.id,
+    publicId: rawPublicId,
     name: row.name,
     slug: row.slug,
     profile_type: row.profile_type || 'individual',
@@ -2344,31 +2383,43 @@ export async function getFeaturedProviders(
   return combined;
 }
 
-export async function getProviderBySlug(citySlug: string, categorySlug: string, providerSlug: string): Promise<Provider | null> {
-  const normSlug = (providerSlug || '').toLowerCase();
-  const normCity = (citySlug || 'karachi').toLowerCase();
+function extractPublicId(slug?: string): number | null {
+  if (!slug) return null;
+  const match = slug.trim().match(/(?:^|-)(\d+)$/);
+  return match && match[1] ? parseInt(match[1], 10) : null;
+}
 
-  // 1. Direct query in Supabase by slug
-  try {
-    const dbRows = await fetchSupabase<any[]>(
-      `providers?select=*,cities!inner(slug),countries!inner(code)&slug=eq.${encodeURIComponent(normSlug)}`
-    );
-    if (dbRows && dbRows.length > 0) {
-      const p = mapDbProvider(dbRows[0], normCity);
-      const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug);
-      if (override) {
-        Object.assign(p, override);
+export async function getProviderByPublicId(publicId: number): Promise<Provider | null> {
+  if (!publicId || isNaN(publicId)) return null;
+
+  // 1. Direct query in Supabase by publicId (supporting both "publicId" and "public_id")
+  if (SUPABASE_URL && SUPABASE_KEY) {
+    try {
+      const dbRows = await fetchSupabase<any[]>(
+        `providers?select=*,cities!inner(slug),countries!inner(code)&or=("publicId".eq.${publicId},public_id.eq.${publicId})`
+      );
+      if (dbRows && dbRows.length > 0) {
+        const p = mapDbProvider(dbRows[0]);
+        const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug);
+        if (override) {
+          Object.assign(p, override);
+        }
+        return p;
       }
-      return p;
+    } catch (err) {
+      console.warn('getProviderByPublicId direct fetch note:', err);
     }
-  } catch (err) {
-    console.warn('getProviderBySlug direct fetch note:', err);
   }
 
-  // 2. Direct match in SEED_PROVIDERS by exact slug or normalized slug
-  const seed = SEED_PROVIDERS.find(
-    (p) => p.slug.toLowerCase() === normSlug || p.slug.toLowerCase().replace(/-/g, '') === normSlug.replace(/-/g, '')
-  );
+  // 2. Search in localImportedProviders
+  const imported = localImportedProviders.find((p) => p.publicId === publicId);
+  if (imported) {
+    const override = localProvidersOverrides.get(imported.id) || localProvidersOverrides.get(imported.slug);
+    return override ? { ...imported, ...override } : imported;
+  }
+
+  // 3. Search in SEED_PROVIDERS
+  const seed = SEED_PROVIDERS.find((p) => p.publicId === publicId);
   if (seed) {
     const pro = { ...seed };
     const override = localProvidersOverrides.get(pro.id) || localProvidersOverrides.get(pro.slug);
@@ -2388,7 +2439,86 @@ export async function getProviderBySlug(citySlug: string, categorySlug: string, 
     return pro;
   }
 
-  // 3. Fallback: check local memory overrides directly by slug
+  // 4. Search in localProvidersOverrides
+  for (const [key, val] of localProvidersOverrides.entries()) {
+    if ((val as any).publicId === publicId) {
+      return getProviderBySlug(val.city_slug || 'karachi', val.category_id || '', val.slug || key);
+    }
+  }
+
+  return null;
+}
+
+export async function getProviderBySlug(citySlug: string, categorySlug: string, providerSlug: string): Promise<Provider | null> {
+  const normSlug = (providerSlug || '').toLowerCase();
+  const normCity = (citySlug || 'karachi').toLowerCase();
+
+  // 0. Extract publicId from end of providerSlug if present (Smart Route Lookup)
+  const extractedId = extractPublicId(normSlug);
+  if (extractedId !== null) {
+    const proById = await getProviderByPublicId(extractedId);
+    if (proById) return proById;
+  }
+
+  // 1. Direct query in Supabase by slug
+  try {
+    const dbRows = await fetchSupabase<any[]>(
+      `providers?select=*,cities!inner(slug),countries!inner(code)&slug=eq.${encodeURIComponent(normSlug)}`
+    );
+    if (dbRows && dbRows.length > 0) {
+      const p = mapDbProvider(dbRows[0], normCity);
+      const override = localProvidersOverrides.get(p.id) || localProvidersOverrides.get(p.slug);
+      if (override) {
+        Object.assign(p, override);
+      }
+      return p;
+    }
+  } catch (err) {
+    console.warn('getProviderBySlug direct fetch note:', err);
+  }
+
+  // 2. Direct match in SEED_PROVIDERS by exact slug or legacy slug (without ID suffix)
+  const seed = SEED_PROVIDERS.find((p) => {
+    const pSlug = p.slug.toLowerCase();
+    const pBase = pSlug.replace(/-\d+$/, '');
+    return (
+      pSlug === normSlug ||
+      pBase === normSlug ||
+      pSlug.replace(/-/g, '') === normSlug.replace(/-/g, '') ||
+      pBase.replace(/-/g, '') === normSlug.replace(/-/g, '')
+    );
+  });
+  if (seed) {
+    const pro = { ...seed };
+    const override = localProvidersOverrides.get(pro.id) || localProvidersOverrides.get(pro.slug);
+    if (override) {
+      Object.assign(pro, override);
+    } else if (!pro.status) {
+      pro.status = pro.is_verified ? 'published' : 'pending';
+    }
+    if (pro.status === 'approved') pro.status = 'published';
+    if (pro.seo_index === undefined) pro.seo_index = true;
+    if (pro.is_featured === undefined) pro.is_featured = true;
+    if (pro.is_premium === undefined) pro.is_premium = Boolean(pro.is_featured);
+    if (!pro.target_areas) pro.target_areas = pro.service_area;
+    if (!pro.gallery_images) pro.gallery_images = [];
+    if (!pro.bio) pro.bio = pro.short_bio;
+    if (!pro.profile_picture) pro.profile_picture = pro.avatar_url;
+    return pro;
+  }
+
+  // 3. Search in localImportedProviders
+  const imported = localImportedProviders.find((p) => {
+    const pSlug = p.slug.toLowerCase();
+    const pBase = pSlug.replace(/-\d+$/, '');
+    return pSlug === normSlug || pBase === normSlug;
+  });
+  if (imported) {
+    const override = localProvidersOverrides.get(imported.id) || localProvidersOverrides.get(imported.slug);
+    return override ? { ...imported, ...override } : imported;
+  }
+
+  // 4. Fallback: check local memory overrides directly by slug
   const directOverride = localProvidersOverrides.get(normSlug);
   if (directOverride) {
     const rawStatus = directOverride.status || 'pending';

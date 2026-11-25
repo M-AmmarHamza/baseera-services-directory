@@ -37,6 +37,7 @@ import { updateProviderAction } from './actions';
 
 interface AdminProvider {
   id: string;
+  publicId?: number;
   name: string;
   slug: string;
   category_id: string;
@@ -593,7 +594,7 @@ function AdminProvidersContent() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, phone (+92...), category, city..."
+              placeholder="Search by ID (#1001), name, phone (+92...), category, city..."
               className="w-full ps-10 pe-20 py-2 rounded-xl border border-gray-200 text-xs text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#006948]"
             />
             <button
@@ -676,6 +677,7 @@ function AdminProvidersContent() {
             <table className="w-full text-start text-xs">
               <thead>
                 <tr className="bg-gray-50/80 border-b border-gray-100 text-gray-500 uppercase font-bold text-[11px] tracking-wider">
+                  <th className="py-3 px-3 text-start w-16">ID</th>
                   <th className="py-3 px-4 text-start">Provider Details</th>
                   <th className="py-3 px-4 text-start">Contact / City</th>
                   <th className="py-3 px-4 text-start">1. Status</th>
@@ -701,6 +703,13 @@ function AdminProvidersContent() {
                         isPending ? 'bg-amber-50/20' : isSuspended ? 'bg-gray-50/40 opacity-80' : ''
                       }`}
                     >
+                      {/* Public ID */}
+                      <td className="py-3 px-3 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md font-mono font-bold text-xs bg-emerald-50 text-[#006948] border border-emerald-200">
+                          #{p.publicId || '—'}
+                        </span>
+                      </td>
+
                       {/* Name & Avatar */}
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
