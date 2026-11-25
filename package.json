@@ -19,6 +19,7 @@
     "seed:cities:asia": "node scripts/seed-asian-cities.mjs"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
     "@supabase/supabase-js": "^2.49.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.5",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@types/papaparse": "^5.5.2",
-    "pg": "^8.23.1"
+    "pg": "^8.23.1",
+    "prisma": "^6.19.3"
   }
 }

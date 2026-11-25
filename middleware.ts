@@ -6,6 +6,7 @@ import {
   isModeratorOrAbove,
   isSuperAdmin,
 } from './lib/admin-auth';
+import { lookupRedirect } from './lib/settings-db';
 
 export const config = {
   matcher: [
@@ -141,6 +142,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl, 301);
   }
 
+  // DYNAMIC 301/302 REDIRECT ENGINE (Configured via Super Admin /super-admin/seo)
+  const dynamicRedirect = lookupRedirect(pathname);
+  if (dynamicRedirect) {
+    const targetUrl = dynamicRedirect.destinationPath.startsWith('http')
+      ? new URL(dynamicRedirect.destinationPath)
+      : new URL(dynamicRedirect.destinationPath, request.url);
+    targetUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(targetUrl, dynamicRedirect.statusCode as 301 | 302 | 307 | 308);
+  }
+
   // 0. API SUPER ADMIN AUTH & RBAC GUARD
   if (pathname.startsWith('/api/super-admin')) {
     const token = request.cookies.get(ADMIN_COOKIE_NAME)?.value;
@@ -151,6 +162,22 @@ export async function middleware(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    // Phase 3 sensitive endpoints strictly require SUPER_ADMIN
+    const isPhase3Endpoint =
+      pathname.startsWith('/api/super-admin/seo') ||
+      pathname.startsWith('/api/super-admin/redirects') ||
+      pathname.startsWith('/api/super-admin/ads') ||
+      pathname.startsWith('/api/super-admin/settings') ||
+      pathname.startsWith('/api/super-admin/staff');
+
+    if (isPhase3Endpoint && !isSuperAdmin(session)) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: Super Admin privileges strictly required.' },
+        { status: 403 }
+      );
+    }
+
     // Hard deletes and DELETE method restricted strictly to SUPER_ADMIN
     if (request.method === 'DELETE' && !isSuperAdmin(session)) {
       return NextResponse.json(
@@ -233,6 +260,24 @@ export async function middleware(request: NextRequest) {
       loginUrl.searchParams.set('next', pathname);
       return NextResponse.redirect(loginUrl, 307);
     }
+
+    // Phase 3 page restriction: SEO, Ads, Staff strictly restricted to SUPER_ADMIN
+    const subRoute = (segments[2] || '').toLowerCase();
+    const isPhase3PageRoute = [
+      'seo',
+      'seo-redirects',
+      'ads',
+      'ads-pricing',
+      'staff',
+      'staff-logs',
+    ].includes(subRoute);
+
+    if (isPhase3PageRoute && !isSuperAdmin(session)) {
+      const overviewUrl = new URL(`/${lang}/super-admin`, request.url);
+      overviewUrl.searchParams.set('denied', 'super_admin_only');
+      return NextResponse.redirect(overviewUrl, 307);
+    }
+
     const response = NextResponse.next();
     response.headers.set('x-baseera-lang', lang);
     response.headers.set('x-baseera-admin-authorized', 'true');

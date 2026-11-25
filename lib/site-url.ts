@@ -1,3 +1,5 @@
+import { getGlobalAllowIndexingSync } from './settings-db';
+
 /**
  * Dynamic Base URL & SEO Environment Configuration
  * Baseera Global Local Services Directory
@@ -49,5 +51,10 @@ export const SITE_URL = getSiteUrl();
  * Set NEXT_PUBLIC_ALLOW_INDEXING=true in .env when production domain goes live.
  */
 export function isIndexingAllowed(): boolean {
-  return process.env.NEXT_PUBLIC_ALLOW_INDEXING === 'true';
+  // If the Super Admin master indexing switch has been explicitly evaluated, respect it
+  try {
+    return getGlobalAllowIndexingSync();
+  } catch {
+    return process.env.NEXT_PUBLIC_ALLOW_INDEXING === 'true';
+  }
 }

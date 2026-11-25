@@ -100,24 +100,30 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     },
     {
       title: 'Ads & Pricing',
-      href: `/${lang}/super-admin/ads-pricing`,
+      href: `/${lang}/super-admin/ads`,
+      aliasHref: `/${lang}/super-admin/ads-pricing`,
       icon: DollarSign,
       exact: false,
       phase: 3,
+      restricted: true,
     },
     {
       title: 'SEO & Redirects',
-      href: `/${lang}/super-admin/seo-redirects`,
+      href: `/${lang}/super-admin/seo`,
+      aliasHref: `/${lang}/super-admin/seo-redirects`,
       icon: Compass,
       exact: false,
       phase: 3,
+      restricted: true,
     },
     {
       title: 'Staff & Logs',
-      href: `/${lang}/super-admin/staff-logs`,
+      href: `/${lang}/super-admin/staff`,
+      aliasHref: `/${lang}/super-admin/staff-logs`,
       icon: FileText,
       exact: false,
-      phase: 1,
+      phase: 3,
+      restricted: true,
     },
   ];
 
@@ -125,7 +131,10 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     if (item.exact) {
       return pathname === item.href;
     }
-    return pathname?.startsWith(item.href);
+    return (
+      pathname?.startsWith(item.href) ||
+      (item.aliasHref && pathname?.startsWith(item.aliasHref))
+    );
   };
 
   const role = currentUser?.role?.toUpperCase() || 'SUPER_ADMIN';
@@ -246,9 +255,10 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                   />
                   <span>{item.title}</span>
                 </div>
-                {item.phase > 2 ? (
-                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60 uppercase tracking-wider">
-                    P{item.phase}
+                {item.restricted && !isSuperAdmin ? (
+                  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 uppercase tracking-wider flex items-center gap-1">
+                    <Shield className="w-2.5 h-2.5" />
+                    Root
                   </span>
                 ) : active ? (
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />

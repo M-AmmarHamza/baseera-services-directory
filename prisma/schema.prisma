@@ -215,3 +215,26 @@ model Provider {
   @@index([isVerified])
   @@map("providers")
 }
+
+model RedirectRule {
+  id              String   @id @default(uuid())
+  sourcePath      String   @unique @map("source_path")
+  destinationPath String   @map("destination_path")
+  statusCode      Int      @default(301) @map("status_code")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([sourcePath])
+  @@index([isActive])
+  @@map("redirect_rules")
+}
+
+model SiteSetting {
+  key       String   @id @unique
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+

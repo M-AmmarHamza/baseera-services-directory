@@ -63,6 +63,7 @@ interface AuditLog {
 export default function SuperAdminOverviewPage() {
   const params = useParams();
   const lang = (params?.lang as string) || 'en';
+  const [isDenied, setIsDenied] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<KpiStats>({
@@ -99,10 +100,31 @@ export default function SuperAdminOverviewPage() {
 
   useEffect(() => {
     fetchStats();
+    if (typeof window !== 'undefined') {
+      const q = new URLSearchParams(window.location.search);
+      if (q.get('denied') === 'super_admin_only') {
+        setIsDenied(true);
+      }
+    }
   }, []);
 
   return (
     <div className="space-y-8">
+      {/* Super Admin Privileges Required Alert */}
+      {isDenied && (
+        <div className="p-4 rounded-xl bg-rose-950/80 border border-rose-500/40 text-rose-300 text-xs flex items-center justify-between shadow-lg shadow-rose-950/40 animate-in fade-in duration-200">
+          <div className="flex items-center gap-2.5">
+            <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+            <div>
+              <p className="font-bold text-white text-xs">Access Restricted: Super Admin Only</p>
+              <p className="text-[11px] text-rose-300 mt-0.5">
+                The section you attempted to access (SEO, Ads, or Staff) requires full Super Admin privileges. Moderator accounts have operational access to Providers, Categories, Locations, and FAQs.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
         <div>
