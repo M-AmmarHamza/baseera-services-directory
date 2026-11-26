@@ -2,6 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   trailingSlash: false,
+  // Ensure blocking, synchronous <head> metadata SSR for all crawlers, bots, curl, and audit tools
+  htmlLimitedBots: /.*/,
   experimental: {
     agentUpgrade: 'security',
   },

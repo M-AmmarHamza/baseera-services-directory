@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { ShieldCheck, Lock, EyeOff, FileText, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildLanguageAlternates } from '@/lib/seo/alternates';
 
 interface PageProps {
   params: Promise<{
@@ -17,15 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: 'Privacy Policy | Baseera Local Services Directory',
     description: 'Learn how Baseera protects your privacy. Zero user tracking, zero data selling, and 100% direct connection between customers and local specialists.',
-    alternates: {
-      canonical: `${DOMAIN}/${lang}/privacy`,
-      languages: {
-        en: `${DOMAIN}/en/privacy`,
-        ur: `${DOMAIN}/ur/privacy`,
-        ar: `${DOMAIN}/ar/privacy`,
-        'x-default': `${DOMAIN}/en/privacy`,
-      },
-    },
+    alternates: buildLanguageAlternates('/privacy', lang),
   };
 }
 

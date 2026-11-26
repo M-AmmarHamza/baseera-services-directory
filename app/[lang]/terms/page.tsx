@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { FileText, ShieldAlert, CheckCircle2, ChevronRight, Scale, Handshake } from 'lucide-react';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildLanguageAlternates } from '@/lib/seo/alternates';
 
 interface PageProps {
   params: Promise<{
@@ -17,15 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: 'Terms & Conditions | Baseera Local Services Directory',
     description: 'Read the Terms and Conditions for using the Baseera platform. Independent service provider agreements, customer guidelines, and community policies.',
-    alternates: {
-      canonical: `${DOMAIN}/${lang}/terms`,
-      languages: {
-        en: `${DOMAIN}/en/terms`,
-        ur: `${DOMAIN}/ur/terms`,
-        ar: `${DOMAIN}/ar/terms`,
-        'x-default': `${DOMAIN}/en/terms`,
-      },
-    },
+    alternates: buildLanguageAlternates('/terms', lang),
   };
 }
 

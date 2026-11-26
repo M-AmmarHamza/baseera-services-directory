@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { getDictionary } from '@/lib/get-dictionary';
 import ListServiceForm from '@/components/ListServiceForm';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildLanguageAlternates } from '@/lib/seo/alternates';
 
 const DOMAIN = getSiteUrl();
 
@@ -36,15 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
-    alternates: {
-      canonical: `${DOMAIN}/${lang}/list-service`,
-      languages: {
-        en: `${DOMAIN}/en/list-service`,
-        ur: `${DOMAIN}/ur/list-service`,
-        ar: `${DOMAIN}/ar/list-service`,
-        'x-default': `${DOMAIN}/en/list-service`,
-      },
-    },
+    alternates: buildLanguageAlternates('/list-service', lang),
     openGraph: {
       title,
       description,

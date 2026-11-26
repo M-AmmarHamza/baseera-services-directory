@@ -17,6 +17,7 @@ import CategoryGrid from '@/components/CategoryGrid';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildLanguageAlternates } from '@/lib/seo/alternates';
 import {
   CategoryIcon,
   MapPin,
@@ -67,24 +68,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       ? `تواصل مباشرة مع فنيين معتمدين في ${cityName}، ${countryName} بدون وسطاء أو عمولات.`
       : `Connect directly with verified local specialists across ${cityName}, ${countryName} without intermediaries, commissions, or delay.`;
 
-  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`;
+  const alternates = buildLanguageAlternates(`/${country.toLowerCase()}/${city.toLowerCase()}`, lang);
 
   return {
     title,
     description,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}`,
-        ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}`,
-        ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}`,
-        'x-default': `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}`,
-      },
-    },
+    alternates,
     openGraph: {
       title,
       description,
-      url: canonicalUrl,
+      url: alternates.canonical,
       siteName: lang === 'ur' ? 'بصیرہ ڈائریکٹری' : lang === 'ar' ? 'دليل بصيرة' : 'Baseera Local Services Directory',
       images: [
         {

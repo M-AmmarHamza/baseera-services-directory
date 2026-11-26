@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { CATEGORIES, CITIES, COUNTRIES, getAllProviders, Provider } from '@/lib/db';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildSitemapAlternates } from '@/lib/seo/alternates';
 
 const DOMAIN = getSiteUrl();
 const SUPPORTED_LOCALES = ['en', 'ur', 'ar'];
@@ -41,17 +42,7 @@ export async function generateSitemaps() {
   }
 }
 
-/**
- * Helper to build multi-lingual hreflang alternates including x-default (pointing to EN)
- */
-function buildHreflangAlternates(basePath: string) {
-  const languages: Record<string, string> = {};
-  for (const locale of SUPPORTED_LOCALES) {
-    languages[locale] = `${DOMAIN}/${locale}${basePath}`;
-  }
-  languages['x-default'] = `${DOMAIN}/en${basePath}`;
-  return { languages };
-}
+
 
 /**
  * 2. Dynamic Sitemap Generator Handler
@@ -88,7 +79,7 @@ export default async function sitemap(props: SitemapProps): Promise<MetadataRout
           lastModified: currentDate,
           changeFrequency: path === '' ? 'daily' : 'monthly',
           priority: path === '' ? 1.0 : 0.6,
-          alternates: buildHreflangAlternates(path),
+          alternates: buildSitemapAlternates(path),
         });
       }
     }
@@ -125,7 +116,7 @@ export default async function sitemap(props: SitemapProps): Promise<MetadataRout
           lastModified: currentDate,
           changeFrequency: 'weekly',
           priority: 0.9,
-          alternates: buildHreflangAlternates(countryPath),
+          alternates: buildSitemapAlternates(countryPath),
         });
       }
     }
@@ -139,7 +130,7 @@ export default async function sitemap(props: SitemapProps): Promise<MetadataRout
           lastModified: currentDate,
           changeFrequency: 'daily',
           priority: 0.9,
-          alternates: buildHreflangAlternates(cityPath),
+          alternates: buildSitemapAlternates(cityPath),
         });
       }
 
@@ -152,7 +143,7 @@ export default async function sitemap(props: SitemapProps): Promise<MetadataRout
             lastModified: currentDate,
             changeFrequency: 'weekly',
             priority: 0.8,
-            alternates: buildHreflangAlternates(siloPath),
+            alternates: buildSitemapAlternates(siloPath),
           });
         }
       }
@@ -231,7 +222,7 @@ export default async function sitemap(props: SitemapProps): Promise<MetadataRout
         lastModified: currentDate,
         changeFrequency: 'monthly',
         priority: 0.85,
-        alternates: buildHreflangAlternates(providerPath),
+        alternates: buildSitemapAlternates(providerPath),
       });
     }
   }

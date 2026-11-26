@@ -19,6 +19,7 @@ import {
   ChevronRight,
 } from '@/components/Icons';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildLanguageAlternates } from '@/lib/seo/alternates';
 
 interface SearchPageProps {
   params: Promise<{
@@ -61,8 +62,6 @@ export async function generateMetadata({
       ? `ابحث عن فنيين معتمدين في ${cityName}. تواصل مباشرة عبر واتساب بدون عمولة.`
       : `Search verified plumbers, electricians, AC technicians, and home chefs across ${cityName}. Direct WhatsApp contact with zero platform fee.`;
 
-  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/search`;
-
   return {
     title,
     description,
@@ -70,15 +69,7 @@ export async function generateMetadata({
       index: false,
       follow: true,
     },
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/search`,
-        ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}/search`,
-        ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}/search`,
-        'x-default': `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/search`,
-      },
-    },
+    alternates: buildLanguageAlternates(`/${country.toLowerCase()}/${city.toLowerCase()}/search`, lang),
   };
 }
 

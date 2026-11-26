@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { ArrowRight, Clock, User, Calendar, BookOpen } from 'lucide-react';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildLanguageAlternates } from '@/lib/seo/alternates';
 
 interface Props {
   params: Promise<{
@@ -17,15 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: 'Baseera Editorial | Guides, Maintenance Tips & Trade Stories',
     description: 'Practical home maintenance guides, electrician hiring safety, plumbing DIY checklists, and verified local stories across Pakistan and the Middle East.',
-    alternates: {
-      canonical: `${DOMAIN}/${lang}/blog`,
-      languages: {
-        en: `${DOMAIN}/en/blog`,
-        ur: `${DOMAIN}/ur/blog`,
-        ar: `${DOMAIN}/ar/blog`,
-        'x-default': `${DOMAIN}/en/blog`,
-      },
-    },
+    alternates: buildLanguageAlternates('/blog', lang),
   };
 }
 

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { Compass, CheckCircle2, ChevronRight, Globe2, ShieldCheck, Zap } from 'lucide-react';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildLanguageAlternates } from '@/lib/seo/alternates';
 
 interface PageProps {
   params: Promise<{
@@ -17,15 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: 'About Us | Baseera Local Services Directory',
     description: 'Learn about Baseera, the global open directory connecting households directly with trusted local tradespeople and specialists without commission fees.',
-    alternates: {
-      canonical: `${DOMAIN}/${lang}/about`,
-      languages: {
-        en: `${DOMAIN}/en/about`,
-        ur: `${DOMAIN}/ur/about`,
-        ar: `${DOMAIN}/ar/about`,
-        'x-default': `${DOMAIN}/en/about`,
-      },
-    },
+    alternates: buildLanguageAlternates('/about', lang),
   };
 }
 

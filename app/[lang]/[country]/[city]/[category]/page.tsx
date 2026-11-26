@@ -30,6 +30,7 @@ import FeaturedProfilesSlider from '@/components/FeaturedProfilesSlider';
 import JsonLd from '@/components/JsonLd';
 import AdBanner from '@/components/AdBanner';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildCategoryAlternates } from '@/lib/seo/alternates';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -87,26 +88,23 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
       ? [`${categoryName} في ${cityName}`, `أفضل ${categoryName}`, `${categoryName} قريب مني`, `بصيرة ${categoryName}`]
       : [`${categoryName} in ${cityName}`, `top ${categoryName}`, `best ${categoryName} near me`, `Baseera ${categoryName}`];
 
-  const baseUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
-  const canonicalUrl = currentPage > 1 ? `${baseUrl}?page=${currentPage}` : baseUrl;
+  const alternates = buildCategoryAlternates({
+    country,
+    city,
+    category,
+    currentLang: lang,
+    page: currentPage,
+  });
 
   return {
     title,
     description,
     keywords,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}${currentPage > 1 ? `?page=${currentPage}` : ''}`,
-        ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}${currentPage > 1 ? `?page=${currentPage}` : ''}`,
-        ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}${currentPage > 1 ? `?page=${currentPage}` : ''}`,
-        'x-default': `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}${currentPage > 1 ? `?page=${currentPage}` : ''}`,
-      },
-    },
+    alternates,
     openGraph: {
       title,
       description,
-      url: canonicalUrl,
+      url: alternates.canonical,
       siteName: lang === 'ur' ? 'بصیرہ ڈائریکٹری' : lang === 'ar' ? 'دليل بصيرة' : 'Baseera Local Services Directory',
       images: [
         {

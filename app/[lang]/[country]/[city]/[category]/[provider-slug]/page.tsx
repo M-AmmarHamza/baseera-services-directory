@@ -46,6 +46,7 @@ import ProfileUnderReview from '@/components/ProfileUnderReview';
 import CategoryFaqSection from '@/components/CategoryFaqSection';
 import AdBanner from '@/components/AdBanner';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildProviderAlternates } from '@/lib/seo/alternates';
 
 interface ProviderPageProps {
   params: Promise<{
@@ -334,7 +335,13 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
       ? [categoryName, `${categoryName} في ${cityName}`, `توظيف ${categoryName}`, providerName, 'بصيرة']
       : [categoryName, `${categoryName} in ${cityName}`, `hire ${categoryName}`, providerName, 'Baseera'];
 
-  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`;
+  const alternates = buildProviderAlternates({
+    country,
+    city,
+    category,
+    slug,
+    currentLang: lang,
+  });
   const socialImage = provider.profile_picture || provider.avatar_url || getProviderCoverUrl(provider);
 
   return {
@@ -342,19 +349,11 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     description,
     keywords,
     ...(robotsConfig ? { robots: robotsConfig } : {}),
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        en: `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
-        ur: `${DOMAIN}/ur/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
-        ar: `${DOMAIN}/ar/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
-        'x-default': `${DOMAIN}/en/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`,
-      },
-    },
+    alternates,
     openGraph: {
       title,
       description,
-      url: canonicalUrl,
+      url: alternates.canonical,
       siteName: lang === 'ur' ? 'بصیرہ ڈائریکٹری' : lang === 'ar' ? 'دليل بصيرة' : 'Baseera Local Services Directory',
       images: [
         {

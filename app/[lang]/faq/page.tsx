@@ -15,6 +15,7 @@ import JsonLd from '@/components/JsonLd';
 import { createFaqSchema, createBreadcrumbSchema } from '@/lib/schema';
 import FaqAccordion, { FaqAccordionItem, FaqCategory } from '@/components/FaqAccordion';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildLanguageAlternates } from '@/lib/seo/alternates';
 import { getFaqs } from '@/lib/taxonomy-db';
 
 interface PageProps {
@@ -49,15 +50,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
-    alternates: {
-      canonical: `${DOMAIN}/${lang}/faq`,
-      languages: {
-        en: `${DOMAIN}/en/faq`,
-        ur: `${DOMAIN}/ur/faq`,
-        ar: `${DOMAIN}/ar/faq`,
-        'x-default': `${DOMAIN}/en/faq`,
-      },
-    },
+    alternates: buildLanguageAlternates('/faq', lang),
     openGraph: {
       title,
       description,

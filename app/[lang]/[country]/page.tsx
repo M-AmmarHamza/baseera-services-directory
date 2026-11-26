@@ -23,6 +23,7 @@ import CategoryGrid from '@/components/CategoryGrid';
 import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildLanguageAlternates } from '@/lib/seo/alternates';
 
 interface CountryPageProps {
   params: Promise<{
@@ -52,24 +53,16 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
       ? `استعن بأفضل المهنيين المعتمدين في ${countryName}. من تصليح المكيفات إلى مصممي الديكور، تواصل مباشرة عبر واتساب بدون رسوم حجز.`
       : `Hire the best verified professionals in ${countryName}. From expert AC repair to creative interior designers, connect directly via WhatsApp with zero booking fees.`;
 
-  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}`;
+  const alternates = buildLanguageAlternates(`/${country.toLowerCase()}`, lang);
 
   return {
     title,
     description,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        en: `${DOMAIN}/en/${country.toLowerCase()}`,
-        ur: `${DOMAIN}/ur/${country.toLowerCase()}`,
-        ar: `${DOMAIN}/ar/${country.toLowerCase()}`,
-        'x-default': `${DOMAIN}/en/${country.toLowerCase()}`,
-      },
-    },
+    alternates,
     openGraph: {
       title,
       description,
-      url: canonicalUrl,
+      url: alternates.canonical,
       siteName: lang === 'ur' ? 'بصیرہ ڈائریکٹری' : lang === 'ar' ? 'دليل بصيرة' : 'Baseera Local Services Directory',
       images: [
         {

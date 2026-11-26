@@ -14,6 +14,7 @@ import { getAllProviders, CATEGORIES, getCategoryName } from '@/lib/db';
 import { getDictionary } from '@/lib/get-dictionary';
 import JsonLd from '@/components/JsonLd';
 import { getSiteUrl } from '@/lib/site-url';
+import { buildLanguageAlternates } from '@/lib/seo/alternates';
 
 interface PageProps {
   params: Promise<{
@@ -42,15 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
-    alternates: {
-      canonical: `${DOMAIN}/${lang}`,
-      languages: {
-        en: `${DOMAIN}/en`,
-        ur: `${DOMAIN}/ur`,
-        ar: `${DOMAIN}/ar`,
-        'x-default': `${DOMAIN}/en`,
-      },
-    },
+    alternates: buildLanguageAlternates('', lang),
     openGraph: {
       title,
       description,
