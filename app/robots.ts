@@ -40,10 +40,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: [
-      `${domain}/sitemap.xml`,
-      `${domain}/sitemap/0.xml`,
-      `${domain}/sitemap/1.xml`,
-    ],
+    sitemap: `${domain}/sitemap.xml`,
   };
 }

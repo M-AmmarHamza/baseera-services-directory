@@ -1,9 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { FileText, ShieldAlert, CheckCircle2, ChevronRight, Scale, Handshake } from 'lucide-react';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
+import { isValidLocale } from '@/lib/routing/validate-route';
 
 interface PageProps {
   params: Promise<{
@@ -15,6 +17,7 @@ const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
   return {
     title: 'Terms & Conditions | Baseera Local Services Directory',
     description: 'Read the Terms and Conditions for using the Baseera platform. Independent service provider agreements, customer guidelines, and community policies.',
@@ -24,6 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function TermsAndConditionsPage({ params }: PageProps) {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
 
   return (
     <div className="min-h-screen bg-white text-neutral-900 pb-20 font-sans">

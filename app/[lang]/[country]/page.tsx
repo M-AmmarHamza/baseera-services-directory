@@ -1,6 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { isValidLocale, getValidCountry } from '@/lib/routing/validate-route';
 import {
   MapPin,
   ChevronRight,
@@ -36,8 +38,11 @@ const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
   const { lang, country } = await params;
-  const countryObj = getCountryByCode(country);
-  const countryName = getLocalizedCountryName(countryObj, lang);
+  if (!isValidLocale(lang)) notFound();
+  const validCountry = await getValidCountry(country);
+  if (!validCountry) notFound();
+
+  const countryName = lang === 'ur' ? (validCountry.name_ur || validCountry.name_en) : validCountry.name_en;
 
   const title =
     lang === 'ur'
@@ -86,11 +91,14 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
 
 export default async function CountryPage({ params }: CountryPageProps) {
   const { lang, country } = await params;
-  const countryObj = getCountryByCode(country);
-  const countryName = getLocalizedCountryName(countryObj, lang);
-  const cities = getCitiesByCountry(country);
-  const defaultCitySlug = countryObj.defaultCity || cities[0]?.slug || 'capital';
-  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}`;
+  if (!isValidLocale(lang)) notFound();
+  const validCountry = await getValidCountry(country);
+  if (!validCountry) notFound();
+
+  const countryName = lang === 'ur' ? (validCountry.name_ur || validCountry.name_en) : validCountry.name_en;
+  const cities = getCitiesByCountry(validCountry.code);
+  const defaultCitySlug = cities[0]?.slug || 'karachi';
+  const canonicalUrl = `${DOMAIN}/${lang}/${validCountry.code}`;
 
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
@@ -188,7 +196,7 @@ export default async function CountryPage({ params }: CountryPageProps) {
       <section className="border-b border-gray-200 bg-white py-10 sm:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-4">
-            <span className="text-base">{countryObj.flag}</span>
+            <span className="text-base">{validCountry.flag}</span>
             <span>
               {lang === 'ur'
                 ? 'ملک گیر تصدیق شدہ نیٹ ورک'

@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
+import { isValidLocale, getValidProvider } from '@/lib/routing/validate-route';
 import {
   BadgeCheck,
   ShieldCheck,
@@ -226,19 +227,14 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   const { lang, country, city, category } = resolvedParams;
   const slug = resolvedParams['provider-slug'];
 
-  const publicId = extractPublicIdFromSlug(slug);
-  let provider = publicId !== null ? await getProviderByPublicId(publicId) : null;
-  if (!provider) {
-    provider = await getProviderBySlug(city, category, slug);
+  if (!isValidLocale(lang)) notFound();
+
+  const validated = await getValidProvider({ country, city, category, providerSlug: slug });
+  if (!validated) {
+    notFound();
   }
 
-  const categoryInfo = getCategoryBySlug(category);
-
-  if (!provider) {
-    return {
-      title: 'Provider Not Found | Baseera',
-    };
-  }
+  const { provider, category: categoryInfo, city: validCity, country: validCountry } = validated;
 
   // CRITICAL SEO GUARD: If profile status is NOT 'published' / 'approved', forcefully inject noindex, nofollow
   const isPublished = provider.status === 'published' || provider.status === 'approved';
@@ -289,7 +285,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     : undefined;
 
   const cityName = getLocalizedCityName(city, lang);
-  const categoryName = getCategoryName(categoryInfo, lang);
+  const categoryName = getCategoryName(categoryInfo.id, lang);
   const providerName = provider.name;
   const countryObj = getCountryByCode(country);
   const countryName = getLocalizedCountryName(countryObj, lang);
@@ -380,27 +376,23 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
   const { lang, country, city, category } = resolvedParams;
   const slug = resolvedParams['provider-slug'];
 
-  // Smart Route Resolution via Public ID & Canonical Slugs
-  const publicId = extractPublicIdFromSlug(slug);
-  let provider = publicId !== null ? await getProviderByPublicId(publicId) : null;
-  if (!provider) {
-    provider = await getProviderBySlug(city, category, slug);
-  }
+  if (!isValidLocale(lang)) notFound();
 
-  if (!provider) {
+  const validated = await getValidProvider({ country, city, category, providerSlug: slug });
+  if (!validated) {
     notFound();
   }
 
+  const { provider, category: categoryInfo, city: validCity, country: validCountry, canonicalSlug } = validated;
+
   // Canonical Slug Check: If incoming slug differs from current canonical slug, perform 301 permanent redirect
-  const canonicalSlug = provider.slug;
   if (slug.toLowerCase() !== canonicalSlug.toLowerCase()) {
     permanentRedirect(
-      `/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${canonicalSlug}`
+      `/${lang}/${validCountry.code}/${validCity.slug}/${categoryInfo.slug_en}/${canonicalSlug}`
     );
   }
 
-  const categoryInfo = getCategoryBySlug(category);
-  const categoryName = getCategoryName(categoryInfo, lang);
+  const categoryName = getCategoryName(categoryInfo.id, lang);
   const dict = await getDictionary(lang);
 
   // MODERATION WORKFLOW GUARD: If status is not published/approved, render customized "Profile Under Review" UI

@@ -6,153 +6,106 @@ import { buildSitemapAlternates } from '@/lib/seo/alternates';
 
 const DOMAIN = getSiteUrl();
 const SUPPORTED_LOCALES = ['en', 'ur', 'ar'];
-const PROVIDER_CHUNK_SIZE = 1000;
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jkdzlunnrtfdmhgsmxyu.supabase.co';
 const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_ZWex7txUSkCUoSmlDdDQvg__cT_i9gI';
 
-interface SitemapProps {
-  id: Promise<{ id: string | number }> | { id: string | number } | string | number;
-}
-
 /**
- * 1. Define Sitemap Chunks for App Router Scale & Pagination
- * ID 0: Core Pages (Home, Static, Countries, Cities, and Category Silos)
- * ID 1..N: Approved Providers (Chunked by 1,000 per sitemap)
+ * Authoritative Dynamic XML Sitemap Generator
+ * Route: /sitemap.xml
+ * Returns MetadataRoute.Sitemap with raw application/xml and reciprocal <xhtml:link> tags.
  */
-export async function generateSitemaps() {
-  try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-    const { count } = await supabase
-      .from('providers')
-      .select('*', { count: 'exact', head: true })
-      .or('status.eq.published,status.eq.approved')
-      .eq('seo_index', true);
-
-    const totalProviders = count && count > 0 ? count : 30;
-    const providerChunks = Math.max(1, Math.ceil(totalProviders / PROVIDER_CHUNK_SIZE));
-
-    const sitemaps = [{ id: 0 }];
-    for (let i = 1; i <= providerChunks; i++) {
-      sitemaps.push({ id: i });
-    }
-    return sitemaps;
-  } catch {
-    return [{ id: 0 }, { id: 1 }];
-  }
-}
-
-
-
-/**
- * 2. Dynamic Sitemap Generator Handler
- */
-export default async function sitemap(props: SitemapProps): Promise<MetadataRoute.Sitemap> {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const sitemapEntries: MetadataRoute.Sitemap = [];
   const currentDate = new Date().toISOString();
-
-  // Resolve ID across synchronous or Promise parameters
-  let resolvedId: any = props;
-  if (props && typeof props === 'object') {
-    if ('then' in props) {
-      const awaited = await props;
-      resolvedId = awaited?.id;
-    } else if ('id' in props) {
-      resolvedId = typeof props.id === 'object' && props.id && 'then' in props.id
-        ? (await props.id)?.id || (await props.id)
-        : props.id;
-    }
-  }
-  const numericId = Number(resolvedId) || 0;
-
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // CHUNK 0: Core Platform Silos (Home, Static Pages, Countries, Cities, Category Silos)
-  if (numericId === 0) {
-    // 1. Root and Core Static Landing Pages
-    const staticPaths = ['', '/about', '/list-service', '/faq', '/blog', '/privacy', '/terms'];
-
-    for (const path of staticPaths) {
-      for (const lang of SUPPORTED_LOCALES) {
-        sitemapEntries.push({
-          url: `${DOMAIN}/${lang}${path}`,
-          lastModified: currentDate,
-          changeFrequency: path === '' ? 'daily' : 'monthly',
-          priority: path === '' ? 1.0 : 0.6,
-          alternates: buildSitemapAlternates(path),
-        });
-      }
+  // 1. Root & Core Static Pages
+  const staticPaths = ['', '/about', '/list-service', '/faq', '/blog', '/privacy', '/terms'];
+  for (const path of staticPaths) {
+    for (const lang of SUPPORTED_LOCALES) {
+      sitemapEntries.push({
+        url: `${DOMAIN}/${lang}${path}`,
+        lastModified: currentDate,
+        changeFrequency: path === '' ? 'daily' : 'monthly',
+        priority: path === '' ? 1.0 : 0.6,
+        alternates: buildSitemapAlternates(path),
+      });
     }
-
-    // 2. Query Active Countries and Cities
-    let activeCountries: any[] = COUNTRIES.map((c) => ({ code: c.code.toLowerCase(), name: c.name }));
-    let activeCities: any[] = CITIES.map((c) => ({ slug: c.slug, countryCode: c.countryCode.toLowerCase() }));
-
-    try {
-      const [{ data: dbCountries }, { data: dbCities }] = await Promise.all([
-        supabase.from('countries').select('code, name, is_active').eq('is_active', true),
-        supabase.from('cities').select('slug, country_id, is_active, countries(code)').eq('is_active', true),
-      ]);
-
-      if (dbCountries && dbCountries.length > 0) {
-        activeCountries = dbCountries.map((c) => ({ code: c.code.toLowerCase(), name: c.name }));
-      }
-      if (dbCities && dbCities.length > 0) {
-        activeCities = dbCities.map((c: any) => ({
-          slug: c.slug,
-          countryCode: (c.countries?.code || 'pk').toLowerCase(),
-        }));
-      }
-    } catch {
-      // Use fallback db arrays
-    }
-
-    // 3. Country Landing Pages
-    for (const c of activeCountries) {
-      const countryPath = `/${c.code}`;
-      for (const lang of SUPPORTED_LOCALES) {
-        sitemapEntries.push({
-          url: `${DOMAIN}/${lang}${countryPath}`,
-          lastModified: currentDate,
-          changeFrequency: 'weekly',
-          priority: 0.9,
-          alternates: buildSitemapAlternates(countryPath),
-        });
-      }
-    }
-
-    // 4. City Hub Pages & Category Silos
-    for (const city of activeCities) {
-      const cityPath = `/${city.countryCode}/${city.slug}`;
-      for (const lang of SUPPORTED_LOCALES) {
-        sitemapEntries.push({
-          url: `${DOMAIN}/${lang}${cityPath}`,
-          lastModified: currentDate,
-          changeFrequency: 'daily',
-          priority: 0.9,
-          alternates: buildSitemapAlternates(cityPath),
-        });
-      }
-
-      // City + Category Programmatic Silos
-      for (const cat of CATEGORIES) {
-        const siloPath = `/${city.countryCode}/${city.slug}/${cat.slug}`;
-        for (const lang of SUPPORTED_LOCALES) {
-          sitemapEntries.push({
-            url: `${DOMAIN}/${lang}${siloPath}`,
-            lastModified: currentDate,
-            changeFrequency: 'weekly',
-            priority: 0.8,
-            alternates: buildSitemapAlternates(siloPath),
-          });
-        }
-      }
-    }
-
-    return sitemapEntries;
   }
 
-  // CHUNK 1..N: Published Provider Dossiers (Paginated - STRICTLY status = 'published' AND seo_index = true)
+  // 2. Query Active Countries and Cities
+  let activeCountries: Array<{ code: string; name: string }> = COUNTRIES.map((c) => ({
+    code: c.code.toLowerCase(),
+    name: c.name,
+  }));
+  let activeCities: Array<{ slug: string; countryCode: string }> = CITIES.map((c) => ({
+    slug: c.slug,
+    countryCode: c.countryCode.toLowerCase(),
+  }));
+
+  try {
+    const [{ data: dbCountries }, { data: dbCities }] = await Promise.all([
+      supabase.from('countries').select('code, name, is_active').eq('is_active', true),
+      supabase.from('cities').select('slug, country_id, is_active, countries(code)').eq('is_active', true),
+    ]);
+
+    if (dbCountries && dbCountries.length > 0) {
+      activeCountries = dbCountries.map((c: any) => ({ code: c.code.toLowerCase(), name: c.name }));
+    }
+    if (dbCities && dbCities.length > 0) {
+      activeCities = dbCities.map((c: any) => ({
+        slug: c.slug,
+        countryCode: (c.countries?.code || 'pk').toLowerCase(),
+      }));
+    }
+  } catch (err) {
+    console.warn('Sitemap live taxonomy query note:', err);
+  }
+
+  // 3. Country Landing Hubs
+  for (const c of activeCountries) {
+    const countryPath = `/${c.code}`;
+    for (const lang of SUPPORTED_LOCALES) {
+      sitemapEntries.push({
+        url: `${DOMAIN}/${lang}${countryPath}`,
+        lastModified: currentDate,
+        changeFrequency: 'weekly',
+        priority: 0.9,
+        alternates: buildSitemapAlternates(countryPath),
+      });
+    }
+  }
+
+  // 4. City Hub Pages & Category Silos
+  for (const city of activeCities) {
+    const cityPath = `/${city.countryCode}/${city.slug}`;
+    for (const lang of SUPPORTED_LOCALES) {
+      sitemapEntries.push({
+        url: `${DOMAIN}/${lang}${cityPath}`,
+        lastModified: currentDate,
+        changeFrequency: 'daily',
+        priority: 0.9,
+        alternates: buildSitemapAlternates(cityPath),
+      });
+    }
+
+    // City + Category Silos (Canonical Category Slugs)
+    for (const cat of CATEGORIES) {
+      const siloPath = `/${city.countryCode}/${city.slug}/${cat.slug}`;
+      for (const lang of SUPPORTED_LOCALES) {
+        sitemapEntries.push({
+          url: `${DOMAIN}/${lang}${siloPath}`,
+          lastModified: currentDate,
+          changeFrequency: 'weekly',
+          priority: 0.8,
+          alternates: buildSitemapAlternates(siloPath),
+        });
+      }
+    }
+  }
+
+  // 5. Published & SEO-Indexed Providers
   let approvedProviders: Provider[] = [];
   try {
     const { data: dbApproved } = await supabase
@@ -192,25 +145,19 @@ export default async function sitemap(props: SitemapProps): Promise<MetadataRout
     console.warn('Sitemap live provider query note:', err);
   }
 
-  // Fallback to local data store strictly filtered by status === 'published' AND seo_index === true
+  // Fallback to local data store strictly filtered by published & seo_index
   if (approvedProviders.length === 0) {
     try {
       const all = await getAllProviders();
       approvedProviders = all.filter(
-        (p) =>
-          (p.status === 'published' || p.status === 'approved') &&
-          p.seo_index === true
+        (p) => (p.status === 'published' || p.status === 'approved') && p.seo_index === true
       );
     } catch {
       approvedProviders = [];
     }
   }
 
-  const startIndex = (numericId - 1) * PROVIDER_CHUNK_SIZE;
-  const endIndex = startIndex + PROVIDER_CHUNK_SIZE;
-  const chunkProviders = approvedProviders.slice(startIndex, endIndex);
-
-  for (const pro of chunkProviders) {
+  for (const pro of approvedProviders) {
     const countryCode = (pro.country_code || 'pk').toLowerCase();
     const citySlug = (pro.city_slug || 'karachi').toLowerCase();
     const categorySlug = (pro.category_id || 'electrician').toLowerCase();

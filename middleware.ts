@@ -15,9 +15,9 @@ export const config = {
      * - api routes (/api/...)
      * - _next/static (static files)
      * - _next/image (image optimization files)
-     * - favicon.ico, images, documents, sitemap, robots, llms.txt
+     * - favicon, sitemap, robots, manifest, images, assets
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|sitemap|robots.txt|llms.txt|llms-full.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js|txt|xml)$).*)',
+    '/((?!api|_next/static|_next/image|favicon\\.ico|sitemap.*|robots\\.txt|llms\\.txt|llms-full\\.txt|manifest\\.webmanifest|manifest\\.json|apple-icon.*|icon.*|opengraph-image.*|twitter-image.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js|txt|xml|woff2|woff|ttf|ico)$).*)',
     '/api/super-admin/:path*',
   ],
 };
@@ -123,15 +123,26 @@ const SHORT_CATEGORY_REDIRECTS: Record<string, string> = {
 export async function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
-  // Bypass sitemap, robots.txt, and llms.txt
+  // 0. SYSTEM & SEO BYPASS GUARD: Ensure sitemaps, robots, icons, and static assets are never intercepted
   if (
     pathname === '/sitemap.xml' ||
     pathname.startsWith('/sitemap') ||
     pathname === '/robots.txt' ||
     pathname === '/llms.txt' ||
-    pathname === '/llms-full.txt'
+    pathname === '/llms-full.txt' ||
+    pathname === '/favicon.ico' ||
+    pathname.startsWith('/favicon') ||
+    pathname === '/manifest.webmanifest' ||
+    pathname === '/manifest.json' ||
+    pathname.startsWith('/apple-icon') ||
+    pathname.startsWith('/icon') ||
+    pathname.startsWith('/opengraph-image') ||
+    pathname.startsWith('/twitter-image') ||
+    /\.(xml|txt|png|jpg|jpeg|webp|svg|ico|css|js|woff2|woff|ttf|eot|map|json)$/i.test(pathname)
   ) {
-    return NextResponse.next();
+    if (!pathname.startsWith('/api/super-admin')) {
+      return NextResponse.next();
+    }
   }
 
   // Trailing slash 301 Permanent Redirect to prevent duplicate content
@@ -335,13 +346,20 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
-    // Country hub without city -> auto-redirect to default city of that country
+    // Country hub without city -> auto-redirect ONLY if recognized country with a configured hub city
     const country = secondSegment;
-    const targetCity = COUNTRY_DEFAULT_CITIES[country] || (country === 'pk' ? 'karachi' : 'main-city');
-    return NextResponse.redirect(
-      new URL(`/${lang}/${country}/${targetCity}`, request.url),
-      308
-    );
+    if (COUNTRY_DEFAULT_CITIES[country]) {
+      const targetCity = COUNTRY_DEFAULT_CITIES[country];
+      return NextResponse.redirect(
+        new URL(`/${lang}/${country}/${targetCity}`, request.url),
+        308
+      );
+    }
+
+    // If secondSegment is neither a static page nor a recognized country, pass through to Next.js route handlers for proper 404 validation
+    const response = NextResponse.next();
+    response.headers.set('x-baseera-lang', lang);
+    return response;
   }
 
   // Canonical SEO Category Slug Redirects (e.g., /pk/karachi/ac -> /pk/karachi/ac-technician)

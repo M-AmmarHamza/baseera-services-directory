@@ -1,6 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { isValidLocale, getValidCity } from '@/lib/routing/validate-route';
 import {
   getProviders,
   CATEGORIES,
@@ -50,9 +52,12 @@ const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, country, city } = await params;
-  const cityName = getLocalizedCityName(city, lang);
-  const countryObj = getCountryByCode(country);
-  const countryName = getLocalizedCountryName(countryObj, lang);
+  if (!isValidLocale(lang)) notFound();
+  const valid = await getValidCity(country, city);
+  if (!valid) notFound();
+
+  const cityName = lang === 'ur' ? (valid.city.name_ur || valid.city.name_en) : valid.city.name_en;
+  const countryName = lang === 'ur' ? (valid.country.name_ur || valid.country.name_en) : valid.country.name_en;
 
   const title =
     lang === 'ur'
@@ -101,14 +106,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function CityHomePage({ params }: PageProps) {
   const { lang, country, city } = await params;
-  const providers = await getProviders(city);
-  const districts = await getCityDistricts(city);
-  const countryObj = getCountryByCode(country);
-  const countryName = getLocalizedCountryName(countryObj, lang);
-  const cityName = getLocalizedCityName(city, lang);
-  const countryCode = country.toUpperCase();
+  if (!isValidLocale(lang)) notFound();
+  const valid = await getValidCity(country, city);
+  if (!valid) notFound();
+
+  const cityName = lang === 'ur' ? (valid.city.name_ur || valid.city.name_en) : valid.city.name_en;
+  const countryName = lang === 'ur' ? (valid.country.name_ur || valid.country.name_en) : valid.country.name_en;
+  const providers = await getProviders(valid.city.slug);
+  const districts = await getCityDistricts(valid.city.slug);
+  const countryCode = valid.country.code.toUpperCase();
   const commaSeparator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
-  const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`;
+  const canonicalUrl = `${DOMAIN}/${lang}/${valid.country.code}/${valid.city.slug}`;
 
   // Structured Data: BreadcrumbList Schema
   const breadcrumbJsonLd = {
@@ -445,7 +453,7 @@ export default async function CityHomePage({ params }: PageProps) {
             /* Clean Empty State: Invite local vendors to register */
             <section className="bg-white rounded-3xl p-8 sm:p-12 border border-gray-200/80 shadow-2xs text-center flex flex-col items-center max-w-2xl mx-auto gap-5 my-2">
               <div className="w-16 h-16 rounded-full bg-emerald-50 text-[#006948] flex items-center justify-center text-3xl">
-                {countryObj.flag}
+                {valid.country.flag}
               </div>
               <div>
                 <span className="text-xs bg-emerald-50 text-[#006948] font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-100">

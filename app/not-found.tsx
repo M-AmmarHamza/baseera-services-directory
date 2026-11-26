@@ -5,7 +5,7 @@ import { tajawal, inter, notoNastaliqUrdu } from '@/app/fonts';
 import '@/app/globals.css';
 
 export const metadata: Metadata = {
-  title: '404 - Page Not Found | Baseera Directory',
+  title: 'Page Not Found | Baseera',
   description: 'The requested page or specialist profile was not found on Baseera Local Services Directory.',
   robots: {
     index: false,

@@ -1,9 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { ShieldCheck, Lock, EyeOff, FileText, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
+import { isValidLocale } from '@/lib/routing/validate-route';
 
 interface PageProps {
   params: Promise<{
@@ -15,6 +17,7 @@ const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
   return {
     title: 'Privacy Policy | Baseera Local Services Directory',
     description: 'Learn how Baseera protects your privacy. Zero user tracking, zero data selling, and 100% direct connection between customers and local specialists.',
@@ -24,6 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PrivacyPolicyPage({ params }: PageProps) {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
 
   return (
     <div className="min-h-screen bg-white text-neutral-900 pb-20 font-sans">

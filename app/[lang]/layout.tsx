@@ -3,7 +3,9 @@ import React from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/get-dictionary';
+import { isValidLocale } from '@/lib/routing/validate-route';
 import { Plus } from 'lucide-react';
 import CitySelector from '@/components/CitySelector';
 import BottomNav from '@/components/BottomNav';
@@ -53,6 +55,9 @@ export default async function RootLayout({
 }) {
   const resolvedParams = await params;
   const lang = resolvedParams?.lang || 'en';
+  if (!isValidLocale(lang)) {
+    notFound();
+  }
   const isRTL = lang === 'ur' || lang === 'ar';
   const dict = await getDictionary(lang);
 

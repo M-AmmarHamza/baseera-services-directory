@@ -1,6 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { isValidLocale } from '@/lib/routing/validate-route';
 import {
   HelpCircle,
   ChevronRight,
@@ -32,6 +34,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
   const isUrdu = lang === 'ur';
   const isArabic = lang === 'ar';
 
@@ -62,6 +65,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function FaqPage({ params }: PageProps) {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
   const isUrdu = lang === 'ur';
   const isArabic = lang === 'ar';
   const isRTL = isUrdu || isArabic;

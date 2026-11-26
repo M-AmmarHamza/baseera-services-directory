@@ -1,6 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { isValidLocale } from '@/lib/routing/validate-route';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -26,6 +28,7 @@ const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
   const title =
     lang === 'ur'
       ? 'اپنے قریب قابل اعتماد کاریگر اور سروسز تلاش کریں | بصیرہ'
@@ -57,6 +60,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HomePage({ params }: PageProps) {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
   const dict = await getDictionary(lang);
   const providers = await getAllProviders();
   const defaultLocation = lang === 'ur' ? 'عالمی مرکز' : lang === 'ar' ? 'الدليل العام' : 'Global Hub';

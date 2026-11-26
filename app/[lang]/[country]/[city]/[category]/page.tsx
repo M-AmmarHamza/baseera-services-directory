@@ -1,6 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { isValidLocale, getValidCity, getValidCategory } from '@/lib/routing/validate-route';
 import {
   Star,
   BadgeCheck,
@@ -49,14 +51,18 @@ const DOMAIN = getSiteUrl();
 // 1. PROGRAMMATIC SEO META TAGS
 export async function generateMetadata({ params, searchParams }: CategoryPageProps): Promise<Metadata> {
   const { lang, country, city, category } = await params;
+  if (!isValidLocale(lang)) notFound();
+  const validCity = await getValidCity(country, city);
+  if (!validCity) notFound();
+  const validCategory = await getValidCategory(category);
+  if (!validCategory) notFound();
+
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const currentPage = Math.max(1, parseInt(resolvedSearchParams?.page || '1', 10) || 1);
-  const catObj = getCategoryBySlug(category);
-  const categoryName = getCategoryName(catObj, lang);
-  const cityName = getLocalizedCityName(city, lang);
-  const countryObj = getCountryByCode(country);
-  const countryName = getLocalizedCountryName(countryObj, lang);
-  const categoryBannerUrl = getCategoryCoverBanner(category);
+  const categoryName = lang === 'ur' ? (validCategory.name_ur || validCategory.name_en) : validCategory.name_en;
+  const cityName = lang === 'ur' ? (validCity.city.name_ur || validCity.city.name_en) : validCity.city.name_en;
+  const countryName = lang === 'ur' ? (validCity.country.name_ur || validCity.country.name_en) : validCity.country.name_en;
+  const categoryBannerUrl = getCategoryCoverBanner(validCategory.id);
 
   const pageSuffix = currentPage > 1 ? ` (Page ${currentPage})` : '';
   const pageSuffixUr = currentPage > 1 ? ` (صفحہ ${currentPage})` : '';
@@ -128,18 +134,22 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
 
 export default async function CategoryListingPage({ params, searchParams }: CategoryPageProps) {
   const { lang, country, city, category } = await params;
+  if (!isValidLocale(lang)) notFound();
+  const validCity = await getValidCity(country, city);
+  if (!validCity) notFound();
+  const validCategory = await getValidCategory(category);
+  if (!validCategory) notFound();
+
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const requestedPage = Math.max(1, parseInt(resolvedSearchParams?.page || '1', 10) || 1);
-  const providers = await getProviders(city, category);
-  const catObj = getCategoryBySlug(category);
-  const categoryName = getCategoryName(catObj, lang);
-  const cityName = getLocalizedCityName(city, lang);
-  const countryObj = getCountryByCode(country);
-  const countryName = getLocalizedCountryName(countryObj, lang);
+  const providers = await getProviders(validCity.city.slug, validCategory.id);
+  const categoryName = lang === 'ur' ? (validCategory.name_ur || validCategory.name_en) : validCategory.name_en;
+  const cityName = lang === 'ur' ? (validCity.city.name_ur || validCity.city.name_en) : validCity.city.name_en;
+  const countryName = lang === 'ur' ? (validCity.country.name_ur || validCity.country.name_en) : validCity.country.name_en;
   const commaSeparator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
 
-  const baseUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
-  const relativeBaseUrl = `/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}`;
+  const baseUrl = `${DOMAIN}/${lang}/${validCity.country.code}/${validCity.city.slug}/${validCategory.slug_en}`;
+  const relativeBaseUrl = `/${lang}/${validCity.country.code}/${validCity.city.slug}/${validCategory.slug_en}`;
 
   // Pagination Settings & Logic
   const ITEMS_PER_PAGE = 12;
@@ -218,7 +228,7 @@ export default async function CategoryListingPage({ params, searchParams }: Cate
           address: {
             '@type': 'PostalAddress',
             addressLocality: cityName,
-            addressCountry: countryObj.code.toUpperCase(),
+            addressCountry: validCity.country.code.toUpperCase(),
           },
           ...(p.review_count && p.review_count > 0
             ? {

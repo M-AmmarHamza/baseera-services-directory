@@ -57,12 +57,20 @@ const nextConfig = {
       },
     ];
   },
-  // Rewrites for Sitemap Chunking and LLM Optimization
+  // Rewrites for Sitemap and SEO
   async rewrites() {
     return [
       {
+        source: '/sitemap/0.xml',
+        destination: '/sitemap.xml',
+      },
+      {
+        source: '/sitemap/:id.xml',
+        destination: '/sitemap.xml',
+      },
+      {
         source: '/sitemap-providers-:id.xml',
-        destination: '/sitemap/:id.xml',
+        destination: '/sitemap.xml',
       },
     ];
   },

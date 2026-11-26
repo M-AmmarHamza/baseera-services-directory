@@ -1,9 +1,11 @@
 import React, { Suspense } from 'react';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getDictionary } from '@/lib/get-dictionary';
 import ListServiceForm from '@/components/ListServiceForm';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
+import { isValidLocale } from '@/lib/routing/validate-route';
 
 const DOMAIN = getSiteUrl();
 
@@ -19,6 +21,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
   const isUrdu = lang === 'ur';
   const isArabic = lang === 'ar';
 
@@ -51,6 +54,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ListServicePage({ params }: PageProps) {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
   const dict = await getDictionary(lang);
 
   return (

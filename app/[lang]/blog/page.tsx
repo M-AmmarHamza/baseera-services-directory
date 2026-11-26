@@ -1,9 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { ArrowRight, Clock, User, Calendar, BookOpen } from 'lucide-react';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
+import { isValidLocale } from '@/lib/routing/validate-route';
 
 interface Props {
   params: Promise<{
@@ -15,6 +17,7 @@ const DOMAIN = getSiteUrl();
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
   return {
     title: 'Baseera Editorial | Guides, Maintenance Tips & Trade Stories',
     description: 'Practical home maintenance guides, electrician hiring safety, plumbing DIY checklists, and verified local stories across Pakistan and the Middle East.',
@@ -24,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPage({ params }: Props) {
   const { lang } = await params;
+  if (!isValidLocale(lang)) notFound();
 
   const featuredArticle = {
     title: 'How to Prevent AC Inverter PCB Short Circuits in Summer Heatwaves',
