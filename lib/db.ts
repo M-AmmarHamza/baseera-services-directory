@@ -462,7 +462,7 @@ export const SEED_PROVIDERS: Provider[] = [
     name: 'Safeer Digital Surveillance',
     slug: 'safeer-surveillance-sa',
     profile_type: 'shop',
-    category_id: 'cctv-security',
+    category_id: 'cctv-technician',
     trade_title: 'Smart Villa Security & Intercom Solutions',
     city_slug: 'riyadh',
     country_code: 'sa',
@@ -974,32 +974,14 @@ export function getCountryByCode(code: string): Country {
   const found = COUNTRIES.find((c) => c.code.toLowerCase() === norm);
   if (found) return found;
 
-  // Universal fallback for any ISO country code using Intl.DisplayNames
-  let resolvedName = norm.toUpperCase();
-  try {
-    const displayNames = new Intl.DisplayNames(['en'], { type: 'region' });
-    const name = displayNames.of(norm.toUpperCase());
-    if (name) resolvedName = name;
-  } catch {}
-
-  return {
-    code: norm,
-    name: resolvedName,
-    defaultCity: 'capital',
-    flag: '🌍',
-    region: 'Global',
-  };
+  // Strict lookup: fallback to default Pakistan if missing, never fabricate fake country from arbitrary string
+  return COUNTRIES[0];
 }
 
 export function getCitiesByCountry(countryCode: string): City[] {
   let norm = (countryCode || 'pk').toLowerCase();
   if (norm === 'uk') norm = 'gb';
-  const list = CITIES.filter((c) => c.countryCode.toLowerCase() === norm);
-  if (list.length > 0) return list;
-
-  const countryObj = getCountryByCode(norm);
-  const defCity = countryObj.defaultCity && countryObj.defaultCity !== 'capital' ? countryObj.defaultCity : 'main-city';
-  return [{ slug: defCity, name: toTitleCase(defCity), countryCode: norm }];
+  return CITIES.filter((c) => c.countryCode.toLowerCase() === norm);
 }
 
 export const COUNTRY_NAMES_UR: Record<string, string> = {
@@ -1813,8 +1795,8 @@ export function getLocalizedCountryName(countryOrCode: Country | string, lang = 
   if (lang === 'ur' && COUNTRY_NAMES_UR[code]) return COUNTRY_NAMES_UR[code];
   if (lang === 'ar' && COUNTRY_NAMES_AR[code]) return COUNTRY_NAMES_AR[code];
   if (typeof countryOrCode === 'object' && countryOrCode.name) return countryOrCode.name;
-  const c = getCountryByCode(code);
-  return c.name;
+  const c = COUNTRIES.find((item) => item.code.toLowerCase() === code);
+  return c ? c.name : '';
 }
 
 export function getLocalizedCityName(cityOrSlug: City | string, lang = 'en'): string {
@@ -1822,7 +1804,8 @@ export function getLocalizedCityName(cityOrSlug: City | string, lang = 'en'): st
   if (lang === 'ur' && CITY_NAMES_UR[slug]) return CITY_NAMES_UR[slug];
   if (lang === 'ar' && CITY_NAMES_AR[slug]) return CITY_NAMES_AR[slug];
   if (typeof cityOrSlug === 'object' && cityOrSlug.name) return cityOrSlug.name;
-  return toTitleCase(slug);
+  const foundCity = CITIES.find((item) => item.slug.toLowerCase() === slug);
+  return foundCity ? foundCity.name : '';
 }
 
 export interface CategoryDef {
@@ -2058,12 +2041,12 @@ export const CATEGORIES: CategoryDef[] = [
     count: 29,
   },
   {
-    id: 'cctv-installer',
-    slug: 'cctv-installer',
-    aliases: ['cctv-installer', 'cctv', 'cctv-security', 'security-cameras'],
-    name: 'CCTV Installer',
-    nameUr: 'سی سی ٹی وی کیمرہ انسٹالر',
-    nameAr: 'تركيب كاميرات مراقبة',
+    id: 'cctv-technician',
+    slug: 'cctv-technician',
+    aliases: ['cctv-technician', 'cctv-installer', 'cctv', 'cctv-security', 'security-cameras', 'cctv-camera'],
+    name: 'CCTV Technician',
+    nameUr: 'سی سی ٹی وی ٹیکنیشن',
+    nameAr: 'فني كاميرات مراقبة',
     group: 'Cleaning & Security',
     icon: 'Cctv',
     count: 31,
@@ -2114,23 +2097,26 @@ export const CATEGORIES: CategoryDef[] = [
     icon: 'Truck',
     count: 27,
   },
+  {
+    id: 'car-mechanic',
+    slug: 'car-mechanic',
+    aliases: ['car-mechanic', 'auto-mechanic', 'car-repair', 'auto-repair', 'mechanic'],
+    name: 'Car Mechanic',
+    nameUr: 'کار مکینک',
+    nameAr: 'ميكانيكي سيارات',
+    group: 'Maintenance & Construction',
+    icon: 'Wrench',
+    count: 25,
+  },
 ];
 
 export function getCategoryName(catOrSlug: CategoryDef | string | undefined | null, lang = 'en'): string {
   if (!catOrSlug) return '';
   const cat = typeof catOrSlug === 'string' ? getCategoryBySlug(catOrSlug) : catOrSlug;
-  if (!cat) {
-    if (typeof catOrSlug === 'string') {
-      const clean = catOrSlug.toLowerCase().trim();
-      if (lang === 'ur' && (clean === 'car-mechanic' || clean === 'auto-mechanic')) return 'کار مکینک';
-      if (lang === 'ar' && (clean === 'car-mechanic' || clean === 'auto-mechanic')) return 'ميكانيكي سيارات';
-      return toTitleCase(catOrSlug);
-    }
-    return '';
-  }
+  if (!cat) return '';
   if (lang === 'ur' && cat.nameUr) return cat.nameUr;
   if (lang === 'ar' && cat.nameAr) return cat.nameAr;
-  return cat.name;
+  return cat.name || '';
 }
 
 

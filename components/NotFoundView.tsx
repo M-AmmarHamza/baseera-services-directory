@@ -35,7 +35,7 @@ const POPULAR_CATEGORIES = [
   { slug: 'carpenter', icon: Hammer, en: 'Carpenter & Woodwork', ur: 'کارپینٹر و لکڑی', ar: 'نجار' },
   { slug: 'painter', icon: Paintbrush, en: 'Painter & Coating', ur: 'پینٹر و رنگ روغن', ar: 'دهان ومظهر' },
   { slug: 'solar-installer', icon: Sun, en: 'Solar & Inverter', ur: 'سولر پینل انسٹالر', ar: 'طاقة شمسية' },
-  { slug: 'washing-machine-technician', icon: Sparkles, en: 'Appliance Repair', ur: 'واشنگ مشین ریپئر', ar: 'تصليح أجهزة' },
+  { slug: 'washing-machine-repair', icon: Sparkles, en: 'Appliance Repair', ur: 'واشنگ مشین ریپئر', ar: 'تصليح أجهزة' },
 ];
 
 export default function NotFoundView({

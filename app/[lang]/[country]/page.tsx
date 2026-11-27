@@ -2,7 +2,11 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { isValidLocale, getValidCountry } from '@/lib/routing/validate-route';
+import {
+  isValidLocale,
+  resolveCountry,
+  getResolvedCountryName,
+} from '@/lib/routing/resolve-entities';
 import {
   MapPin,
   ChevronRight,
@@ -39,10 +43,13 @@ const DOMAIN = getSiteUrl();
 export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
   const { lang, country } = await params;
   if (!isValidLocale(lang)) notFound();
-  const validCountry = await getValidCountry(country);
+  const validCountry = await resolveCountry(country);
   if (!validCountry) notFound();
 
-  const countryName = lang === 'ur' ? (validCountry.name_ur || validCountry.name_en) : validCountry.name_en;
+  const countryName = getResolvedCountryName(validCountry, lang);
+  if (!countryName || !countryName.trim()) {
+    notFound();
+  }
 
   const title =
     lang === 'ur'
@@ -92,10 +99,13 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
 export default async function CountryPage({ params }: CountryPageProps) {
   const { lang, country } = await params;
   if (!isValidLocale(lang)) notFound();
-  const validCountry = await getValidCountry(country);
+  const validCountry = await resolveCountry(country);
   if (!validCountry) notFound();
 
-  const countryName = lang === 'ur' ? (validCountry.name_ur || validCountry.name_en) : validCountry.name_en;
+  const countryName = getResolvedCountryName(validCountry, lang);
+  if (!countryName || !countryName.trim()) {
+    notFound();
+  }
   const cities = getCitiesByCountry(validCountry.code);
   const defaultCitySlug = cities[0]?.slug || 'karachi';
   const canonicalUrl = `${DOMAIN}/${lang}/${validCountry.code}`;

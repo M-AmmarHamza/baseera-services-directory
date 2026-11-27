@@ -79,10 +79,16 @@ const CATEGORY_KEYWORDS: Record<string, string> = {
   'کھانا': 'food',
 
   // CCTV
-  cctv: 'cctv',
-  camera: 'cctv',
-  security: 'cctv',
-  surveillance: 'cctv',
+  cctv: 'cctv-technician',
+  camera: 'cctv-technician',
+  security: 'cctv-technician',
+  surveillance: 'cctv-technician',
+  'cctv technician': 'cctv-technician',
+  'cctv installer': 'cctv-technician',
+
+  // Car Mechanic
+  'car mechanic': 'car-mechanic',
+  'auto mechanic': 'car-mechanic',
 
   // RO Water
   ro: 'ro-water',

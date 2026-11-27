@@ -203,6 +203,13 @@ export const CATEGORY_ICON_MAP: Record<string, LucideIconComponent> = {
   'packers-and-movers': Truck,
   truck: Truck,
 
+  // 25. Car Mechanic -> Wrench
+  'car-mechanic': Wrench,
+  'auto-mechanic': Wrench,
+  'car-repair': Wrench,
+  'auto-repair': Wrench,
+  mechanic: Wrench,
+
   // Alternate & Default Fallbacks
   shirt: Shirt,
   columns: Columns,

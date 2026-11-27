@@ -2,7 +2,11 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { isValidLocale, getValidCity } from '@/lib/routing/validate-route';
+import {
+  isValidLocale,
+  resolveCity,
+  getResolvedCityName,
+} from '@/lib/routing/resolve-entities';
 import { getDictionary } from '@/lib/get-dictionary';
 import { CATEGORIES, getCategoryBySlug, getCategoryName, getLocalizedCityName } from '@/lib/db';
 import { searchProviders } from '@/lib/search';
@@ -42,12 +46,15 @@ export async function generateMetadata({
 }: SearchPageProps): Promise<Metadata> {
   const { lang, country, city } = await params;
   if (!isValidLocale(lang)) notFound();
-  const valid = await getValidCity(country, city);
+  const valid = await resolveCity(country, city);
   if (!valid) notFound();
 
   const { q } = await searchParams;
   const query = q || '';
-  const cityName = lang === 'ur' ? (valid.city.name_ur || valid.city.name_en) : valid.city.name_en;
+  const cityName = getResolvedCityName(valid.city, lang);
+  if (!cityName || !cityName.trim()) {
+    notFound();
+  }
 
   const title = query
     ? lang === 'ur'
@@ -85,12 +92,15 @@ export default async function SearchResultsPage({
 }: SearchPageProps) {
   const { lang, country, city } = await params;
   if (!isValidLocale(lang)) notFound();
-  const valid = await getValidCity(country, city);
+  const valid = await resolveCity(country, city);
   if (!valid) notFound();
 
   const { q } = await searchParams;
   const dict = await getDictionary(lang);
-  const cityName = lang === 'ur' ? (valid.city.name_ur || valid.city.name_en) : valid.city.name_en;
+  const cityName = getResolvedCityName(valid.city, lang);
+  if (!cityName || !cityName.trim()) {
+    notFound();
+  }
 
   const analysis = await searchProviders(valid.city.slug, q || '');
   const {

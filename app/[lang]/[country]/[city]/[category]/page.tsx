@@ -2,7 +2,14 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { isValidLocale, getValidCity, getValidCategory } from '@/lib/routing/validate-route';
+import {
+  isValidLocale,
+  resolveCity,
+  resolveCategory,
+  getResolvedCountryName,
+  getResolvedCityName,
+  getResolvedCategoryName,
+} from '@/lib/routing/resolve-entities';
 import {
   Star,
   BadgeCheck,
@@ -52,16 +59,21 @@ const DOMAIN = getSiteUrl();
 export async function generateMetadata({ params, searchParams }: CategoryPageProps): Promise<Metadata> {
   const { lang, country, city, category } = await params;
   if (!isValidLocale(lang)) notFound();
-  const validCity = await getValidCity(country, city);
+  const validCity = await resolveCity(country, city);
   if (!validCity) notFound();
-  const validCategory = await getValidCategory(category);
+  const validCategory = await resolveCategory(category);
   if (!validCategory) notFound();
 
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const currentPage = Math.max(1, parseInt(resolvedSearchParams?.page || '1', 10) || 1);
-  const categoryName = lang === 'ur' ? (validCategory.name_ur || validCategory.name_en) : validCategory.name_en;
-  const cityName = lang === 'ur' ? (validCity.city.name_ur || validCity.city.name_en) : validCity.city.name_en;
-  const countryName = lang === 'ur' ? (validCity.country.name_ur || validCity.country.name_en) : validCity.country.name_en;
+  const categoryName = getResolvedCategoryName(validCategory, lang);
+  const cityName = getResolvedCityName(validCity.city, lang);
+  const countryName = getResolvedCountryName(validCity.country, lang);
+
+  // STRICT DEFENSIVE GUARD: Never output broken templates like "Top   in Karachi"
+  if (!categoryName || !categoryName.trim() || !cityName || !cityName.trim() || !countryName || !countryName.trim()) {
+    notFound();
+  }
   const categoryBannerUrl = getCategoryCoverBanner(validCategory.id);
 
   const pageSuffix = currentPage > 1 ? ` (Page ${currentPage})` : '';
@@ -135,17 +147,22 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
 export default async function CategoryListingPage({ params, searchParams }: CategoryPageProps) {
   const { lang, country, city, category } = await params;
   if (!isValidLocale(lang)) notFound();
-  const validCity = await getValidCity(country, city);
+  const validCity = await resolveCity(country, city);
   if (!validCity) notFound();
-  const validCategory = await getValidCategory(category);
+  const validCategory = await resolveCategory(category);
   if (!validCategory) notFound();
+
+  const categoryName = getResolvedCategoryName(validCategory, lang);
+  const cityName = getResolvedCityName(validCity.city, lang);
+  const countryName = getResolvedCountryName(validCity.country, lang);
+
+  if (!categoryName || !categoryName.trim() || !cityName || !cityName.trim() || !countryName || !countryName.trim()) {
+    notFound();
+  }
 
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const requestedPage = Math.max(1, parseInt(resolvedSearchParams?.page || '1', 10) || 1);
   const providers = await getProviders(validCity.city.slug, validCategory.id);
-  const categoryName = lang === 'ur' ? (validCategory.name_ur || validCategory.name_en) : validCategory.name_en;
-  const cityName = lang === 'ur' ? (validCity.city.name_ur || validCity.city.name_en) : validCity.city.name_en;
-  const countryName = lang === 'ur' ? (validCity.country.name_ur || validCity.country.name_en) : validCity.country.name_en;
   const commaSeparator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
 
   const baseUrl = `${DOMAIN}/${lang}/${validCity.country.code}/${validCity.city.slug}/${validCategory.slug_en}`;

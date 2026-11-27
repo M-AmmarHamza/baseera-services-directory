@@ -2,7 +2,13 @@ import React from 'react';
 import Link from 'next/link';
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Metadata } from 'next';
-import { isValidLocale, getValidProvider } from '@/lib/routing/validate-route';
+import {
+  isValidLocale,
+  resolveProvider,
+  getResolvedCountryName,
+  getResolvedCityName,
+  getResolvedCategoryName,
+} from '@/lib/routing/resolve-entities';
 import {
   BadgeCheck,
   ShieldCheck,
@@ -229,7 +235,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
 
   if (!isValidLocale(lang)) notFound();
 
-  const validated = await getValidProvider({ country, city, category, providerSlug: slug });
+  const validated = await resolveProvider({ country, city, category, providerSlug: slug });
   if (!validated) {
     notFound();
   }
@@ -284,11 +290,15 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
       }
     : undefined;
 
-  const cityName = getLocalizedCityName(city, lang);
-  const categoryName = getCategoryName(categoryInfo.id, lang);
+  const cityName = getResolvedCityName(validCity, lang);
+  const categoryName = getResolvedCategoryName(categoryInfo, lang);
   const providerName = provider.name;
-  const countryObj = getCountryByCode(country);
-  const countryName = getLocalizedCountryName(countryObj, lang);
+  const countryName = getResolvedCountryName(validCountry, lang);
+
+  // STRICT DEFENSIVE GUARD: Never interpolate untrusted URL parameters or output broken templates
+  if (!providerName || !providerName.trim() || !categoryName || !categoryName.trim() || !cityName || !cityName.trim() || !countryName || !countryName.trim()) {
+    notFound();
+  }
 
   // Helper to strictly clamp strings to SEO length limits
   const clampLength = (text: string, maxLen: number): string => {
@@ -378,7 +388,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
 
   if (!isValidLocale(lang)) notFound();
 
-  const validated = await getValidProvider({ country, city, category, providerSlug: slug });
+  const validated = await resolveProvider({ country, city, category, providerSlug: slug });
   if (!validated) {
     notFound();
   }
@@ -392,7 +402,16 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     );
   }
 
-  const categoryName = getCategoryName(categoryInfo.id, lang);
+  const categoryName = getResolvedCategoryName(categoryInfo, lang);
+  const cityName = getResolvedCityName(validCity, lang);
+  const countryName = getResolvedCountryName(validCountry, lang);
+  const countryCode = validCountry.code.toUpperCase();
+  const providerName = provider.name;
+
+  if (!providerName || !providerName.trim() || !categoryName || !categoryName.trim() || !cityName || !cityName.trim() || !countryName || !countryName.trim()) {
+    notFound();
+  }
+
   const dict = await getDictionary(lang);
 
   // MODERATION WORKFLOW GUARD: If status is not published/approved, render customized "Profile Under Review" UI
@@ -409,11 +428,6 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
   }
 
   const similarProviders = await getProviders(city, category);
-  const cityName = getLocalizedCityName(city, lang);
-  const countryObj = getCountryByCode(country);
-  const countryName = getLocalizedCountryName(countryObj, lang);
-  const countryCode = countryObj.code.toUpperCase();
-  const providerName = provider.name;
   const canonicalUrl = `${DOMAIN}/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${category.toLowerCase()}/${slug}`;
 
   const effectiveCover = getProviderCoverUrl(provider);

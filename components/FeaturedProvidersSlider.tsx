@@ -189,7 +189,8 @@ export default function FeaturedProvidersSlider({ providers, lang, title, badge,
           // Ensure raw slugs (like car-mechanic) are never shown: capitalize and translate
           const categoryName =
             getCategoryName(provider.category_id, lang) ||
-            toTitleCase(provider.category_id);
+            provider.trade_title ||
+            'Specialist';
 
           return (
             <Link

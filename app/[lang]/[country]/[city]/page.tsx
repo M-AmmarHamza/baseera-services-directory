@@ -2,7 +2,12 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { isValidLocale, getValidCity } from '@/lib/routing/validate-route';
+import {
+  isValidLocale,
+  resolveCity,
+  getResolvedCountryName,
+  getResolvedCityName,
+} from '@/lib/routing/resolve-entities';
 import {
   getProviders,
   CATEGORIES,
@@ -53,11 +58,15 @@ const DOMAIN = getSiteUrl();
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang, country, city } = await params;
   if (!isValidLocale(lang)) notFound();
-  const valid = await getValidCity(country, city);
+  const valid = await resolveCity(country, city);
   if (!valid) notFound();
 
-  const cityName = lang === 'ur' ? (valid.city.name_ur || valid.city.name_en) : valid.city.name_en;
-  const countryName = lang === 'ur' ? (valid.country.name_ur || valid.country.name_en) : valid.country.name_en;
+  const cityName = getResolvedCityName(valid.city, lang);
+  const countryName = getResolvedCountryName(valid.country, lang);
+
+  if (!cityName || !cityName.trim() || !countryName || !countryName.trim()) {
+    notFound();
+  }
 
   const title =
     lang === 'ur'
@@ -107,11 +116,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CityHomePage({ params }: PageProps) {
   const { lang, country, city } = await params;
   if (!isValidLocale(lang)) notFound();
-  const valid = await getValidCity(country, city);
+  const valid = await resolveCity(country, city);
   if (!valid) notFound();
 
-  const cityName = lang === 'ur' ? (valid.city.name_ur || valid.city.name_en) : valid.city.name_en;
-  const countryName = lang === 'ur' ? (valid.country.name_ur || valid.country.name_en) : valid.country.name_en;
+  const cityName = getResolvedCityName(valid.city, lang);
+  const countryName = getResolvedCountryName(valid.country, lang);
+
+  if (!cityName || !cityName.trim() || !countryName || !countryName.trim()) {
+    notFound();
+  }
   const providers = await getProviders(valid.city.slug);
   const districts = await getCityDistricts(valid.city.slug);
   const countryCode = valid.country.code.toUpperCase();
