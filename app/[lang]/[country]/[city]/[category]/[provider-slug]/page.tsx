@@ -55,6 +55,25 @@ import AdBanner from '@/components/AdBanner';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildProviderAlternates } from '@/lib/seo/alternates';
 
+export const revalidate = 3600; // 1 hour ISR CDN caching
+
+export async function generateStaticParams() {
+  return [
+    {
+      country: 'pk',
+      city: 'karachi',
+      category: 'plumber',
+      'provider-slug': 'saleem-master-plumber-1005',
+    },
+    {
+      country: 'pk',
+      city: 'karachi',
+      category: 'electrician',
+      'provider-slug': 'tariq-mahmood-1001',
+    },
+  ];
+}
+
 interface ProviderPageProps {
   params: Promise<{
     lang: string;
@@ -525,15 +544,7 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
     areaServed: areaServedList,
   };
 
-  if (provider.review_count && provider.review_count > 0) {
-    localBusinessSchema.aggregateRating = {
-      '@type': 'AggregateRating',
-      ratingValue: Number(provider.rating || 5).toFixed(1),
-      reviewCount: String(provider.review_count || 1),
-      bestRating: '5',
-      worstRating: '1',
-    };
-  }
+  // Only emit aggregateRating + review[] when real, visibly rendered user reviews exist in DB.
 
   // Extract experience years from bio or provide realistic verified estimate
   const bioMatch = provider.short_bio?.match(/(\d+)\+?\s*years?/i);
@@ -732,9 +743,6 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               <div className="flex items-center gap-1 text-amber-600 font-bold">
                 <Star className="w-4 h-4 fill-amber-500 text-amber-500" />
                 <span>{provider.rating.toFixed(1)}</span>
-                <span className="text-gray-400 font-normal">
-                  ({provider.review_count} {lang === 'ur' ? 'کسٹمر ریویوز' : lang === 'ar' ? 'تقييمات عملاء' : 'client reviews'})
-                </span>
               </div>
 
               <div className="flex items-center gap-1">

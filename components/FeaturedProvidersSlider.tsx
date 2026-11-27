@@ -231,7 +231,6 @@ export default function FeaturedProvidersSlider({ providers, lang, title, badge,
                     <div className="flex items-center gap-1.5 mt-1 text-sm text-amber-600 font-semibold" dir="ltr">
                       <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500 shrink-0" />
                       <span>{provider.rating.toFixed(1)}</span>
-                      <span className="text-gray-400 font-normal">({provider.review_count})</span>
                     </div>
                   </div>
                 </div>

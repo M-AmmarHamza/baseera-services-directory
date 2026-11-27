@@ -169,9 +169,6 @@ export default function FeaturedProfilesSliderClient({
                     <span className="text-xs font-bold text-gray-900">
                       {pro.rating?.toFixed(1) || '4.9'}
                     </span>
-                    <span className="text-[10px] text-gray-500 font-normal">
-                      ({pro.review_count || 10})
-                    </span>
                   </div>
                   {pro.is_verified && (
                     <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-emerald-700 text-white px-2 py-0.5 rounded-md text-[10px] font-semibold shadow-xs">

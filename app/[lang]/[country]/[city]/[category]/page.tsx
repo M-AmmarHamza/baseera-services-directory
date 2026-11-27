@@ -41,6 +41,17 @@ import AdBanner from '@/components/AdBanner';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildCategoryAlternates } from '@/lib/seo/alternates';
 
+export const revalidate = 3600; // 1 hour ISR CDN caching
+
+export async function generateStaticParams() {
+  return [
+    { country: 'pk', city: 'karachi', category: 'plumber' },
+    { country: 'pk', city: 'karachi', category: 'electrician' },
+    { country: 'pk', city: 'karachi', category: 'ac-technician' },
+    { country: 'ae', city: 'dubai', category: 'electrician' },
+  ];
+}
+
 interface CategoryPageProps {
   params: Promise<{
     lang: string;
@@ -247,15 +258,7 @@ export default async function CategoryListingPage({ params, searchParams }: Cate
             addressLocality: cityName,
             addressCountry: validCity.country.code.toUpperCase(),
           },
-          ...(p.review_count && p.review_count > 0
-            ? {
-                aggregateRating: {
-                  '@type': 'AggregateRating',
-                  ratingValue: p.rating.toFixed(1),
-                  reviewCount: p.review_count.toString(),
-                },
-              }
-            : {}),
+          // Only emit aggregateRating + review[] when real, visibly rendered user reviews exist in DB.
         },
       })),
     },
@@ -539,9 +542,6 @@ export default async function CategoryListingPage({ params, searchParams }: Cate
                             <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                             <span>{provider.rating.toFixed(1)}</span>
                           </div>
-                          <span className="text-gray-400 font-normal">
-                            ({provider.review_count} {lang === 'ur' ? 'تبصرے' : lang === 'ar' ? 'تقييم' : 'reviews'})
-                          </span>
                         </div>
                       </div>
                     </div>

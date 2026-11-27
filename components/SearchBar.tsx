@@ -402,7 +402,6 @@ export default function SearchBar({
                           <Star className="w-3.5 h-3.5 fill-amber-400" />
                           <span>{p.rating.toFixed(1)}</span>
                         </div>
-                        <span className="text-[10px] text-gray-400">({p.review_count})</span>
                       </div>
                     </Link>
                   );

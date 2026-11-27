@@ -149,12 +149,19 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Trailing slash 301 Permanent Redirect to prevent duplicate content
-  if (pathname.length > 1 && pathname.endsWith('/')) {
-    const cleanPath = pathname.slice(0, -1);
-    const redirectUrl = new URL(cleanPath, request.url);
-    redirectUrl.search = request.nextUrl.search;
-    return NextResponse.redirect(redirectUrl, 301);
+  // Trailing slash 308 Permanent Redirect to prevent duplicate content
+  if (
+    pathname.length > 1 &&
+    pathname.endsWith('/') &&
+    !pathname.startsWith('/api') &&
+    !pathname.startsWith('/_next')
+  ) {
+    const cleanPath = pathname.replace(/\/+$/, '');
+    const redirectUrl = new URL(
+      cleanPath + (searchParams.toString() ? `?${searchParams.toString()}` : ''),
+      request.url
+    );
+    return NextResponse.redirect(redirectUrl, 308);
   }
 
   // DYNAMIC 301/302 REDIRECT ENGINE (Configured via Super Admin /super-admin/seo)

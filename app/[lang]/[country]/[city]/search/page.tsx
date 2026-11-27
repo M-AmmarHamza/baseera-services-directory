@@ -27,6 +27,8 @@ import {
 import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
 
+export const dynamic = 'force-dynamic';
+
 interface SearchPageProps {
   params: Promise<{
     lang: string;

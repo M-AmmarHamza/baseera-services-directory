@@ -7,6 +7,8 @@ import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
 import { isValidLocale } from '@/lib/routing/validate-route';
 
+export const revalidate = 3600; // 1 hour ISR CDN caching
+
 interface Props {
   params: Promise<{
     lang: string;

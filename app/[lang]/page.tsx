@@ -18,6 +18,8 @@ import JsonLd from '@/components/JsonLd';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
 
+export const revalidate = 3600; // 1 hour ISR CDN caching
+
 interface PageProps {
   params: Promise<{
     lang: string;

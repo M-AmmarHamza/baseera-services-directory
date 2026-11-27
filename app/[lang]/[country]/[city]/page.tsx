@@ -25,6 +25,17 @@ import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
+
+export const revalidate = 3600; // 1 hour ISR CDN caching
+
+export async function generateStaticParams() {
+  return [
+    { country: 'pk', city: 'karachi' },
+    { country: 'pk', city: 'lahore' },
+    { country: 'pk', city: 'islamabad' },
+    { country: 'ae', city: 'dubai' },
+  ];
+}
 import {
   CategoryIcon,
   MapPin,
@@ -393,7 +404,6 @@ export default async function CityHomePage({ params }: PageProps) {
                           <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">
                             <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
                             <span className="text-xs font-bold text-gray-900">{pro.rating}</span>
-                            <span className="text-xs text-gray-500">({pro.review_count})</span>
                           </div>
                           {pro.is_verified && (
                             <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-[#006948] text-white px-2 py-0.5 rounded-md text-xs font-medium shadow-xs">

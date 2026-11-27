@@ -119,15 +119,7 @@ export function createLocalBusinessSchema(params: LocalBusinessSchemaParams) {
     areaServed: areaServedList,
   };
 
-  if (rating && rating > 0 && reviewCount && reviewCount > 0) {
-    schema.aggregateRating = {
-      '@type': 'AggregateRating',
-      ratingValue: Number(rating).toFixed(1),
-      reviewCount: String(reviewCount),
-      bestRating: '5',
-      worstRating: '1',
-    };
-  }
+  // Only emit aggregateRating + review[] when real, visibly rendered user reviews exist in DB.
 
   return schema;
 }
@@ -171,13 +163,7 @@ export function createItemListSchema(params: {
         },
       };
 
-      if (item.rating && item.rating > 0) {
-        listItem.item.aggregateRating = {
-          '@type': 'AggregateRating',
-          ratingValue: Number(item.rating).toFixed(1),
-          reviewCount: String(item.reviewCount || 1),
-        };
-      }
+      // Only emit aggregateRating + review[] when real, visibly rendered user reviews exist in DB.
 
       return listItem;
     }),
