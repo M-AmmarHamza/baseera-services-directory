@@ -153,6 +153,7 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
     category,
     currentLang: lang,
     page: currentPage,
+    categoryItem: validCategory,
   });
 
   return {

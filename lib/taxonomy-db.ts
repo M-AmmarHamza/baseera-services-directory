@@ -62,7 +62,7 @@ export interface FaqItemRecord {
 }
 
 // Roman Urdu slug mapper for 24+ categories
-const ROMAN_URDU_SLUGS: Record<string, string> = {
+export const ROMAN_URDU_SLUGS: Record<string, string> = {
   electrician: 'bijli-mistri',
   'ups-inverter-technician': 'ups-inverter-mistri',
   'solar-installer': 'solar-panel-mistri',

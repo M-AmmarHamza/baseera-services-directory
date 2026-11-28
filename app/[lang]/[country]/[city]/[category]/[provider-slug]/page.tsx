@@ -360,12 +360,19 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
       ? [categoryName, `${categoryName} في ${cityName}`, `توظيف ${categoryName}`, providerName, 'بصيرة']
       : [categoryName, `${categoryName} in ${cityName}`, `hire ${categoryName}`, providerName, 'Baseera'];
 
+  let canonicalProSlug = (provider.slug || slug).toLowerCase().trim();
+  const publicId = provider.publicId !== undefined && provider.publicId !== null ? Number(provider.publicId) : undefined;
+  if (publicId && !canonicalProSlug.endsWith(`-${publicId}`)) {
+    canonicalProSlug = `${canonicalProSlug}-${publicId}`;
+  }
+
   const alternates = buildProviderAlternates({
     country,
     city,
     category,
-    slug,
+    slug: canonicalProSlug,
     currentLang: lang,
+    categoryItem: categoryInfo,
   });
   const socialImage = provider.profile_picture || provider.avatar_url || getProviderCoverUrl(provider);
 

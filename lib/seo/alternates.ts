@@ -1,5 +1,6 @@
 import { getSiteUrl } from '@/lib/site-url';
 import { getCategoryBySlug } from '@/lib/db';
+import { localCategories, ROMAN_URDU_SLUGS } from '@/lib/taxonomy-db';
 
 export const SUPPORTED_LOCALES = ['en', 'ur', 'ar'] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
@@ -99,10 +100,75 @@ export function buildLanguageAlternates(
   };
 }
 
+export interface CategorySlugInfo {
+  slug_en: string;
+  slug_ur: string;
+  slug_ar: string;
+}
+
+/**
+ * Resolves localized category slugs:
+ *   - slug_en: canonical English slug (e.g. 'electrician')
+ *   - slug_ur: Roman Urdu slug (e.g. 'bijli-mistri')
+ *   - slug_ar: Arabic slug (e.g. 'electrician')
+ */
+export function resolveCategorySlugs(
+  categoryInput?: string | { slug_en?: string; slug_ur?: string; slug_ar?: string; id?: string; slug?: string } | null
+): CategorySlugInfo {
+  if (!categoryInput) {
+    return { slug_en: 'electrician', slug_ur: 'bijli-mistri', slug_ar: 'electrician' };
+  }
+
+  if (typeof categoryInput === 'object') {
+    const rawEn = categoryInput.slug_en || categoryInput.slug || categoryInput.id || 'electrician';
+    const slug_en = rawEn.toLowerCase().trim();
+    const rawUr =
+      categoryInput.slug_ur ||
+      ROMAN_URDU_SLUGS[categoryInput.id || ''] ||
+      ROMAN_URDU_SLUGS[slug_en] ||
+      `${slug_en}-mistri`;
+    const slug_ur = rawUr.toLowerCase().trim();
+    const rawAr = categoryInput.slug_ar || slug_en;
+    const slug_ar = rawAr.toLowerCase().trim();
+    return { slug_en, slug_ur, slug_ar };
+  }
+
+  const norm = categoryInput.toLowerCase().trim();
+
+  // 1. Check localCategories (matches slug_en, slug_ur, id, or slug_ar)
+  const match = localCategories.find(
+    (c) =>
+      c.slug_en.toLowerCase() === norm ||
+      c.slug_ur.toLowerCase() === norm ||
+      c.id.toLowerCase() === norm ||
+      (c.slug_ar && c.slug_ar.toLowerCase() === norm)
+  );
+
+  if (match) {
+    const slug_en = match.slug_en.toLowerCase().trim();
+    const slug_ur = (match.slug_ur || ROMAN_URDU_SLUGS[match.id] || `${slug_en}-mistri`).toLowerCase().trim();
+    const slug_ar = (match.slug_ar || slug_en).toLowerCase().trim();
+    return { slug_en, slug_ur, slug_ar };
+  }
+
+  // 2. Fallback to getCategoryBySlug & ROMAN_URDU_SLUGS
+  const catObj = getCategoryBySlug(norm);
+  const canonicalId = (catObj?.id || catObj?.slug || norm).toLowerCase().trim();
+  const slug_en = (catObj?.slug || canonicalId).toLowerCase().trim();
+  const slug_ur = (ROMAN_URDU_SLUGS[canonicalId] || ROMAN_URDU_SLUGS[slug_en] || `${slug_en}-mistri`).toLowerCase().trim();
+  const slug_ar = (catObj?.slug || slug_en).toLowerCase().trim();
+
+  return { slug_en, slug_ur, slug_ar };
+}
+
 /**
  * Specialized builder for Category Silo pages.
- * Resolves canonical category slug (aliases or Roman Urdu to canonical)
- * and formats pagination query param when page > 1.
+ * Resolves localized category slugs:
+ *   - en: /en/[country]/[city]/[slug_en]
+ *   - ur: /ur/[country]/[city]/[slug_ur] (Roman Urdu, e.g. bijli-mistri)
+ *   - ar: /ar/[country]/[city]/[slug_ar]
+ *   - x-default: /en/[country]/[city]/[slug_en]
+ * Formats pagination query param when page > 1 (e.g. ?page=2).
  */
 export function buildCategoryAlternates({
   country,
@@ -110,29 +176,49 @@ export function buildCategoryAlternates({
   category,
   currentLang,
   page,
+  categoryItem,
 }: {
   country: string;
   city: string;
   category: string;
   currentLang: string;
   page?: number;
+  categoryItem?: { slug_en?: string; slug_ur?: string; slug_ar?: string; id?: string };
 }): AlternatesMetadata {
+  const domain = getSiteUrl();
   const normCountry = (country || 'pk').toLowerCase().trim();
   const normCity = (city || 'karachi').toLowerCase().trim();
+  const qs = page && page > 1 ? `?page=${page}` : '';
 
-  // Resolve category to its canonical ASCII slug
-  const catObj = getCategoryBySlug(category);
-  const normCategory = (catObj?.slug || category || 'electrician').toLowerCase().trim();
+  const { slug_en, slug_ur, slug_ar } = resolveCategorySlugs(categoryItem || category);
 
-  const basePath = `/${normCountry}/${normCity}/${normCategory}`;
-  const searchParams = page && page > 1 ? { page } : undefined;
+  const lang = SUPPORTED_LOCALES.includes(currentLang.toLowerCase() as SupportedLocale)
+    ? currentLang.toLowerCase()
+    : DEFAULT_LOCALE;
 
-  return buildLanguageAlternates(basePath, currentLang, searchParams);
+  const enUrl = `${domain}/en/${normCountry}/${normCity}/${slug_en}${qs}`;
+  const urUrl = `${domain}/ur/${normCountry}/${normCity}/${slug_ur}${qs}`;
+  const arUrl = `${domain}/ar/${normCountry}/${normCity}/${slug_ar}${qs}`;
+  const xDefaultUrl = `${domain}/en/${normCountry}/${normCity}/${slug_en}${qs}`;
+
+  const canonicalUrl =
+    lang === 'ur' ? urUrl : lang === 'ar' ? arUrl : enUrl;
+
+  return {
+    canonical: canonicalUrl,
+    languages: {
+      en: enUrl,
+      ur: urUrl,
+      ar: arUrl,
+      'x-default': xDefaultUrl,
+    },
+  };
 }
 
 /**
  * Specialized builder for Provider Profile pages.
  * Preserves the canonical slug format: [slugified-name]-[publicId]
+ * and localized category slugs per locale (e.g. bijli-mistri for ur).
  */
 export function buildProviderAlternates({
   country,
@@ -140,22 +226,43 @@ export function buildProviderAlternates({
   category,
   slug,
   currentLang,
+  categoryItem,
 }: {
   country: string;
   city: string;
   category: string;
   slug: string;
   currentLang: string;
+  categoryItem?: { slug_en?: string; slug_ur?: string; slug_ar?: string; id?: string };
 }): AlternatesMetadata {
+  const domain = getSiteUrl();
   const normCountry = (country || 'pk').toLowerCase().trim();
   const normCity = (city || 'karachi').toLowerCase().trim();
-
-  const catObj = getCategoryBySlug(category);
-  const normCategory = (catObj?.slug || category || 'electrician').toLowerCase().trim();
   const normSlug = slug.toLowerCase().trim();
 
-  const basePath = `/${normCountry}/${normCity}/${normCategory}/${normSlug}`;
-  return buildLanguageAlternates(basePath, currentLang);
+  const { slug_en, slug_ur, slug_ar } = resolveCategorySlugs(categoryItem || category);
+
+  const lang = SUPPORTED_LOCALES.includes(currentLang.toLowerCase() as SupportedLocale)
+    ? currentLang.toLowerCase()
+    : DEFAULT_LOCALE;
+
+  const enUrl = `${domain}/en/${normCountry}/${normCity}/${slug_en}/${normSlug}`;
+  const urUrl = `${domain}/ur/${normCountry}/${normCity}/${slug_ur}/${normSlug}`;
+  const arUrl = `${domain}/ar/${normCountry}/${normCity}/${slug_ar}/${normSlug}`;
+  const xDefaultUrl = `${domain}/en/${normCountry}/${normCity}/${slug_en}/${normSlug}`;
+
+  const canonicalUrl =
+    lang === 'ur' ? urUrl : lang === 'ar' ? arUrl : enUrl;
+
+  return {
+    canonical: canonicalUrl,
+    languages: {
+      en: enUrl,
+      ur: urUrl,
+      ar: arUrl,
+      'x-default': xDefaultUrl,
+    },
+  };
 }
 
 /**
