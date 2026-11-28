@@ -21,6 +21,7 @@ import { getDictionary } from '@/lib/get-dictionary';
 import JsonLd from '@/components/JsonLd';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
+import { getGlobalAllowIndexing } from '@/lib/settings-db';
 
 export const revalidate = 3600; // 1 hour ISR CDN caching
 
@@ -35,6 +36,12 @@ const DOMAIN = getSiteUrl();
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { lang } = await params;
   if (!isValidLocale(lang)) notFound();
+
+  const allowGlobalIndexing = await getGlobalAllowIndexing();
+  const robots = !allowGlobalIndexing
+    ? { index: false, follow: false }
+    : { index: true, follow: true };
+
   const title =
     lang === 'ur'
       ? 'اپنے قریب قابل اعتماد کاریگر اور سروسز تلاش کریں | بصیرہ'
@@ -52,6 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
+    robots,
     alternates: buildLanguageAlternates('', lang),
     openGraph: {
       title,

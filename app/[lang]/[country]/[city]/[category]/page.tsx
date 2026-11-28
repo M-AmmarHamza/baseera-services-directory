@@ -42,6 +42,7 @@ import RelatedServicesSection from '@/components/RelatedServicesSection';
 import OtherCitiesForCategory from '@/components/OtherCitiesForCategory';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildCategoryAlternates } from '@/lib/seo/alternates';
+import { getGlobalAllowIndexing } from '@/lib/settings-db';
 
 export const revalidate = 3600; // 1 hour ISR CDN caching
 
@@ -87,6 +88,23 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
   if (!categoryName || !categoryName.trim() || !cityName || !cityName.trim() || !countryName || !countryName.trim()) {
     notFound();
   }
+
+  const [providers, allowGlobalIndexing] = await Promise.all([
+    getProviders(validCity.city.slug, validCategory.id),
+    getGlobalAllowIndexing(),
+  ]);
+
+  const hasPublishedProviders = providers.length > 0;
+  // Thin-content indexing guard:
+  // If 0 published providers exist, noindex, follow
+  // If global indexing is disabled, noindex, nofollow
+  // If published providers > 0 and global indexing is allowed, index, follow
+  const robots = !allowGlobalIndexing
+    ? { index: false, follow: false }
+    : !hasPublishedProviders
+    ? { index: false, follow: true }
+    : { index: true, follow: true };
+
   const categoryBannerUrl = getCategoryCoverBanner(validCategory.id);
 
   const pageSuffix = currentPage > 1 ? ` (Page ${currentPage})` : '';
@@ -131,6 +149,7 @@ export async function generateMetadata({ params, searchParams }: CategoryPagePro
     title,
     description,
     keywords,
+    robots,
     alternates,
     openGraph: {
       title,

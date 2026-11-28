@@ -637,6 +637,7 @@ export async function POST(req: NextRequest) {
     // 7. CACHE REVALIDATION
     try {
       revalidatePath('/', 'layout');
+      revalidatePath('/sitemap.xml');
       revalidatePath('/[lang]/super-admin/providers', 'page');
     } catch (e) {
       // Safe fallback in route handlers

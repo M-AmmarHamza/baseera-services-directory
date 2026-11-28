@@ -26,6 +26,7 @@ import QuickFacts from '@/components/QuickFacts';
 import JsonLd from '@/components/JsonLd';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
+import { getGlobalAllowIndexing } from '@/lib/settings-db';
 
 export const revalidate = 3600; // 1 hour ISR CDN caching
 
@@ -80,6 +81,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     notFound();
   }
 
+  const [providers, allowGlobalIndexing] = await Promise.all([
+    getProviders(valid.city.slug),
+    getGlobalAllowIndexing(),
+  ]);
+
+  const hasPublishedProviders = providers.length > 0;
+  // Thin-content indexing guard:
+  // If 0 published providers exist, noindex, follow
+  // If global indexing is disabled, noindex, nofollow
+  // If published providers > 0 and global indexing is allowed, index, follow
+  const robots = !allowGlobalIndexing
+    ? { index: false, follow: false }
+    : !hasPublishedProviders
+    ? { index: false, follow: true }
+    : { index: true, follow: true };
+
   const title =
     lang === 'ur'
       ? `${cityName} میں تصدیق شدہ کاریگر اور لوکل سروسز | بصیرہ`
@@ -99,6 +116,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title,
     description,
+    robots,
     alternates,
     openGraph: {
       title,

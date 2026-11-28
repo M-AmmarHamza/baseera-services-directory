@@ -123,6 +123,12 @@ export async function POST(req: NextRequest) {
 
     revalidatePath('/[lang]/super-admin/providers', 'page');
     revalidatePath('/[lang]/admin/providers', 'page');
+    try {
+      revalidatePath('/sitemap.xml');
+      revalidatePath('/', 'layout');
+    } catch (e) {
+      // Safe fallback
+    }
 
     return NextResponse.json({
       success: true,

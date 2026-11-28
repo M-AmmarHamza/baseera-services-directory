@@ -55,6 +55,7 @@ import RelatedServicesSection from '@/components/RelatedServicesSection';
 import AdBanner from '@/components/AdBanner';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildProviderAlternates } from '@/lib/seo/alternates';
+import { getGlobalAllowIndexing } from '@/lib/settings-db';
 
 export const revalidate = 3600; // 1 hour ISR CDN caching
 
@@ -262,6 +263,10 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
 
   const { provider, category: categoryInfo, city: validCity, country: validCountry } = validated;
 
+  const [allowGlobalIndexing] = await Promise.all([
+    getGlobalAllowIndexing(),
+  ]);
+
   // CRITICAL SEO GUARD: If profile status is NOT 'published' / 'approved', forcefully inject noindex, nofollow
   const isPublished = provider.status === 'published' || provider.status === 'approved';
   const isSeoIndexed = provider.seo_index !== undefined ? Boolean(provider.seo_index) : true;
@@ -293,22 +298,15 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     };
   }
 
-  // SEO INDEXING LOGIC: If seo_index is false, forcefully inject noindex, nofollow
-  const robotsConfig = !isSeoIndexed
-    ? {
-        index: false,
-        follow: false,
-        nocache: true,
-        googleBot: {
-          index: false,
-          follow: false,
-          noimageindex: true,
-          'max-video-preview': -1,
-          'max-image-preview': 'none' as const,
-          'max-snippet': -1,
-        },
-      }
-    : undefined;
+  // Master Staging Guard & SEO Indexing Guard:
+  // If global indexing is disabled, noindex, nofollow
+  // If seo_index is false, noindex, follow
+  // Otherwise index, follow
+  const robots = !allowGlobalIndexing
+    ? { index: false, follow: false }
+    : !isSeoIndexed
+    ? { index: false, follow: true }
+    : { index: true, follow: true };
 
   const cityName = getResolvedCityName(validCity, lang);
   const categoryName = getResolvedCategoryName(categoryInfo, lang);
@@ -374,7 +372,7 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
     title,
     description,
     keywords,
-    ...(robotsConfig ? { robots: robotsConfig } : {}),
+    robots,
     alternates,
     openGraph: {
       title,

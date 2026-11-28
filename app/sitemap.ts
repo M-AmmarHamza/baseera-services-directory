@@ -110,65 +110,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 2b. Published & SEO-Indexed Providers (Queried early to enforce thin-content indexing guards)
   let approvedProviders: Provider[] = [];
-  if (supabase) {
-    try {
-      const { data: dbApproved } = await supabase
-        .from('providers')
-        .select('*, cities(slug), countries(code)')
-        .or('status.eq.published,status.eq.approved')
-        .eq('seo_index', true)
-        .order('rating', { ascending: false });
-
-      if (Array.isArray(dbApproved) && dbApproved.length > 0) {
-        approvedProviders = dbApproved.map((r: any) => ({
-          id: r.id,
-          name: r.name,
-          slug: r.slug,
-          category_id: r.category_id,
-          city_slug: r.cities?.slug || 'karachi',
-          country_code: r.countries?.code || 'pk',
-          status: 'published' as const,
-          seo_index: true,
-          is_verified: Boolean(r.is_verified),
-          is_featured: Boolean(r.is_featured),
-          trade_title: r.trade_title || r.name,
-          profile_type: r.profile_type || 'individual',
-          district: r.district || 'Karachi',
-          service_area: Array.isArray(r.service_area) ? r.service_area : [],
-          whatsapp_number: r.whatsapp_number,
-          avatar_url: r.avatar_url,
-          short_bio: r.short_bio || '',
-          starting_price: r.starting_price || 500,
-          rating: Number(r.rating) || 5.0,
-          review_count: Number(r.review_count) || 1,
-          total_leads: Number(r.total_leads) || 0,
-          is_available: true,
-        }));
-      }
-    } catch (err) {
-      console.warn('Sitemap live provider query note:', err);
-    }
+  try {
+    const allProviders = await getAllProviders();
+    approvedProviders = allProviders.filter((p) => {
+      const status = p.status || (p.is_verified ? 'published' : 'pending');
+      const isIndexed = p.seo_index !== false;
+      return (status === 'published' || status === 'approved') && isIndexed;
+    });
+  } catch (err) {
+    console.warn('Sitemap provider query note:', err);
+    approvedProviders = [];
   }
 
-  // Fallback to local data store strictly filtered by published & seo_index
-  if (approvedProviders.length === 0) {
-    try {
-      const all = await getAllProviders();
-      approvedProviders = all.filter((p) => {
-        const status = p.status || (p.is_verified ? 'published' : 'pending');
-        const isIndexed = p.seo_index !== false;
-        return (status === 'published' || status === 'approved') && isIndexed;
-      });
-    } catch {
-      approvedProviders = [];
-    }
-  }
-
-  // Count approved providers per country to guard against indexing thin-content countries
+  // Count approved providers per country, city, and city x category to guard against indexing thin-content entities
   const providerCountByCountry = new Map<string, number>();
+  const publishedCitiesSet = new Set<string>();
+  const publishedCityCategoriesSet = new Set<string>();
+
   for (const pro of approvedProviders) {
-    const code = (pro.country_code || 'pk').toLowerCase();
-    providerCountByCountry.set(code, (providerCountByCountry.get(code) || 0) + 1);
+    const countryCode = (pro.country_code || 'pk').toLowerCase();
+    const citySlug = (pro.city_slug || 'karachi').toLowerCase();
+    const categoryId = (pro.category_id || '').toLowerCase();
+
+    providerCountByCountry.set(countryCode, (providerCountByCountry.get(countryCode) || 0) + 1);
+    publishedCitiesSet.add(citySlug);
+    if (categoryId) {
+      publishedCityCategoriesSet.add(`${citySlug}|${categoryId}`);
+    }
   }
 
   // 3. Country Landing Hubs (Guarded: Only indexable countries with >= 1 published providers)
@@ -190,8 +158,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // 4. City Hub Pages & Category Silos
+  // 4. City Hub Pages & Category Silos (Guarded: Only indexable entities with >= 1 published providers)
   for (const city of activeCities) {
+    const citySlug = city.slug.toLowerCase();
+    // Skip cities with 0 published providers (thin content guard)
+    if (!publishedCitiesSet.has(citySlug)) continue;
+
     const cityPath = `/${city.countryCode}/${city.slug}`;
     for (const lang of SUPPORTED_LOCALES) {
       sitemapEntries.push({
@@ -203,8 +175,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
 
-    // City + Category Silos (Canonical Category Slugs)
+    // City + Category Silos (Canonical Category Slugs - strictly filtered to >= 1 published providers)
     for (const cat of CATEGORIES) {
+      const isPublished =
+        publishedCityCategoriesSet.has(`${citySlug}|${cat.id.toLowerCase()}`) ||
+        publishedCityCategoriesSet.has(`${citySlug}|${cat.slug.toLowerCase()}`);
+
+      // Skip categories in this city with 0 published providers (thin content guard)
+      if (!isPublished) continue;
+
       const siloPath = `/${city.countryCode}/${city.slug}/${cat.slug}`;
       for (const lang of SUPPORTED_LOCALES) {
         sitemapEntries.push({

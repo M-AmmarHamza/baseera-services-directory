@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { revalidatePath } from 'next/cache';
 import { verifyAdminToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth';
 import { localProvidersOverrides } from '@/lib/db';
 import { sanitizeText } from '@/lib/security';
@@ -34,6 +35,13 @@ export async function POST(req: NextRequest) {
       is_verified: true,
       seo_index: true,
     });
+
+    try {
+      revalidatePath('/sitemap.xml');
+      revalidatePath('/', 'layout');
+    } catch (e) {
+      // Safe fallback
+    }
 
     if (SUPABASE_URL && SUPABASE_KEY) {
       const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
