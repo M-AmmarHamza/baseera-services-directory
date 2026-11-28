@@ -95,7 +95,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? { index: false, follow: false }
     : !hasPublishedProviders
     ? { index: false, follow: true }
-    : { index: true, follow: true };
+    : {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-image-preview': 'large' as const,
+          'max-snippet': -1,
+          'max-video-preview': -1,
+        },
+      };
 
   const title =
     lang === 'ur'

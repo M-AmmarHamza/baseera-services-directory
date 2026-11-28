@@ -40,7 +40,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const allowGlobalIndexing = await getGlobalAllowIndexing();
   const robots = !allowGlobalIndexing
     ? { index: false, follow: false }
-    : { index: true, follow: true };
+    : {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-image-preview': 'large' as const,
+          'max-snippet': -1,
+          'max-video-preview': -1,
+        },
+      };
 
   const title =
     lang === 'ur'

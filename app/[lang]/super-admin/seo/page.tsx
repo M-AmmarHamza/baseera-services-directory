@@ -339,7 +339,7 @@ export default function SuperAdminSeoPage() {
                 <p className="text-xs text-slate-400 max-w-2xl leading-relaxed mt-0.5">
                   {globalAllowIndexing
                     ? 'Search engine crawlers (Googlebot, Bingbot) are permitted. Public categories, hubs, and individual verified providers with seo_index=true will be indexed.'
-                    : 'SAFEGUARD ACTIVE: The entire website outputs <meta name="robots" content="noindex, nofollow" /> and robots.txt blocks all crawlers. Real data entered on staging will never cause duplicate content penalties.'}
+                    : 'SAFEGUARD ACTIVE: The entire website outputs <meta name="robots" content="noindex, nofollow" /> without blocking crawling so search engines can read the noindex directive.'}
                 </p>
               </div>
             </div>

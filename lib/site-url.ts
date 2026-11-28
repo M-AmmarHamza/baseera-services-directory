@@ -43,8 +43,8 @@ export const SITE_URL = getSiteUrl();
 
 /**
  * Staging Indexing Protection Guard:
- * When false, explicitly blocks search engine spiders via robots.txt ("Disallow: /")
- * and outputs <meta name="robots" content="noindex, nofollow" /> on pages.
+ * When false, outputs <meta name="robots" content="noindex, nofollow" /> on pages
+ * while allowing crawling in robots.txt so search engines can read the noindex directive.
  *
  * Defaults to false (protected staging mode) so real data entered on staging
  * is not indexed by Google, preventing duplicate content penalties.

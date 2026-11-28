@@ -18,7 +18,7 @@ export default function GlobalNotFound() {
     <html lang="en" className={`${tajawal.variable} ${inter.variable} ${notoNastaliqUrdu.variable}`}>
       <head>
         <title>Page Not Found | Baseera</title>
-        <meta name="robots" content="noindex, nofollow, nocache" />
+        <meta name="robots" content="noindex, nofollow" />
       </head>
       <body className="font-sans bg-[#f9f9ff] text-[#141b2b] min-h-screen antialiased flex flex-col">
         <NotFoundView lang="en" country="pk" city="karachi" />

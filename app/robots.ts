@@ -1,42 +1,30 @@
 import { MetadataRoute } from 'next';
-import { getSiteUrl, isIndexingAllowed } from '@/lib/site-url';
+import { getSiteUrl } from '@/lib/site-url';
 
 export default function robots(): MetadataRoute.Robots {
   const domain = getSiteUrl();
-  const allowIndexing = isIndexingAllowed();
 
-  // STAGING / TEMPORARY DOMAIN PROTECTION:
-  // If indexing is not explicitly enabled, disallow all crawlers from the root
-  // to avoid duplicate content penalties before the production custom domain is live.
-  if (!allowIndexing) {
-    return {
-      rules: [
-        {
-          userAgent: '*',
-          disallow: '/',
-        },
-      ],
-      sitemap: `${domain}/sitemap.xml`,
-    };
-  }
-
-  // PRODUCTION CONFIGURATION:
+  // NEVER block root with Disallow: /
+  // Even on staging, crawlers must be allowed to fetch HTML to cleanly read <meta name="robots" content="noindex, nofollow">
   return {
     rules: [
       {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/admin',
+          '/super-admin/',
+          '/super-admin',
+          '/*/super-admin/',
+          '/*/super-admin',
           '/admin/',
-          '/*/admin',
+          '/admin',
           '/*/admin/',
-          '/api/',
-          '/saved',
-          '/saved/',
-          '/*/saved',
-          '/*/dashboard',
+          '/*/admin',
+          '/dashboard/',
           '/dashboard',
+          '/*/dashboard/',
+          '/*/dashboard',
+          '/api/',
         ],
       },
     ],

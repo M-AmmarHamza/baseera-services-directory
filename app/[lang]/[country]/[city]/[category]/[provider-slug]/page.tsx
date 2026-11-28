@@ -285,15 +285,6 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
       robots: {
         index: false,
         follow: false,
-        nocache: true,
-        googleBot: {
-          index: false,
-          follow: false,
-          noimageindex: true,
-          'max-video-preview': -1,
-          'max-image-preview': 'none' as const,
-          'max-snippet': -1,
-        },
       },
     };
   }
@@ -301,12 +292,22 @@ export async function generateMetadata({ params }: ProviderPageProps): Promise<M
   // Master Staging Guard & SEO Indexing Guard:
   // If global indexing is disabled, noindex, nofollow
   // If seo_index is false, noindex, follow
-  // Otherwise index, follow
+  // Otherwise index, follow with rich previews
   const robots = !allowGlobalIndexing
     ? { index: false, follow: false }
     : !isSeoIndexed
     ? { index: false, follow: true }
-    : { index: true, follow: true };
+    : {
+        index: true,
+        follow: true,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-image-preview': 'large' as const,
+          'max-snippet': -1,
+          'max-video-preview': -1,
+        },
+      };
 
   const cityName = getResolvedCityName(validCity, lang);
   const categoryName = getResolvedCategoryName(categoryInfo, lang);

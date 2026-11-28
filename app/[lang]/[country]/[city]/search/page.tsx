@@ -26,6 +26,7 @@ import {
 } from '@/components/Icons';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildLanguageAlternates } from '@/lib/seo/alternates';
+import { getGlobalAllowIndexing } from '@/lib/settings-db';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,13 +78,15 @@ export async function generateMetadata({
       ? `ابحث عن فنيين معتمدين في ${cityName}. تواصل مباشرة عبر واتساب بدون عمولة.`
       : `Search verified plumbers, electricians, AC technicians, and home chefs across ${cityName}. Direct WhatsApp contact with zero platform fee.`;
 
+  const allowGlobalIndexing = await getGlobalAllowIndexing();
+  const robots = !allowGlobalIndexing
+    ? { index: false, follow: false }
+    : { index: false, follow: true };
+
   return {
     title,
     description,
-    robots: {
-      index: false,
-      follow: true,
-    },
+    robots,
     alternates: buildLanguageAlternates(`/${country.toLowerCase()}/${city.toLowerCase()}/search`, lang),
   };
 }
