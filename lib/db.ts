@@ -2592,6 +2592,12 @@ export async function getAllProviders(): Promise<Provider[]> {
   return combined;
 }
 
+export async function getPublishedProvidersByCountry(countryCode: string): Promise<Provider[]> {
+  const norm = (countryCode || 'pk').toLowerCase().trim();
+  const all = await getAllProviders();
+  return all.filter((p) => (p.country_code || 'pk').toLowerCase() === norm);
+}
+
 export const CITY_DISTRICTS: Record<string, string[]> = {
   // Pakistan
   karachi: [

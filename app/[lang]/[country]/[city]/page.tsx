@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { ChevronRight } from 'lucide-react';
 import {
   isValidLocale,
   resolveCity,
@@ -241,6 +242,23 @@ export default async function CityHomePage({ params }: PageProps) {
       <JsonLd data={[breadcrumbJsonLd, cityCollectionJsonLd]} />
 
       <div className={`bg-[#f9f9ff] min-h-screen text-[#141b2b] ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
+        {/* Breadcrumb Navigation */}
+        <div className="border-b border-gray-200 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <nav className="flex items-center gap-1.5 text-xs text-gray-500 overflow-x-auto whitespace-nowrap">
+              <Link href={`/${lang}`} className="hover:text-[#059669] transition-colors">
+                {lang === 'ur' ? 'مرکزی صفحہ' : lang === 'ar' ? 'الرئيسية' : 'Home'}
+              </Link>
+              <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
+              <Link href={`/${lang}/${country.toLowerCase()}`} className="hover:text-[#059669] transition-colors">
+                {countryName}
+              </Link>
+              <ChevronRight className="w-3.5 h-3.5 text-gray-400 shrink-0 rtl:rotate-180" />
+              <span className="text-neutral-900 font-semibold">{cityName}</span>
+            </nav>
+          </div>
+        </div>
+
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-24 md:pb-16 flex flex-col gap-10">
           
           {/* Centered Hero Section */}

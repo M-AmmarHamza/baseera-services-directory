@@ -7,6 +7,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   Clock,
+  Globe,
+  ArrowRight,
 } from 'lucide-react';
 import CategoryIcon from '@/components/CategoryIcon';
 import CategoryGrid from '@/components/CategoryGrid';
@@ -147,6 +149,92 @@ export default async function HomePage({ params }: PageProps) {
           activeCountText={dict.home?.activeCount}
           categoriesCountText={dict.home?.categoriesCount}
         />
+      </section>
+
+      {/* 2b. EXPLORE COUNTRY HUBS */}
+      <section className="border-t border-gray-200 bg-gray-50/50 py-10 sm:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 uppercase tracking-wider mb-1">
+                <Globe className="w-3.5 h-3.5 text-[#059669]" />
+                <span>{lang === 'ur' ? 'ملک گیر حبس' : lang === 'ar' ? 'المراكز الإقليمية' : 'Country Hubs'}</span>
+              </div>
+              <h2 className={`text-xl sm:text-2xl font-bold text-gray-900 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
+                {lang === 'ur'
+                  ? 'ملک کے لحاظ سے تصدیق شدہ سروسز دیکھیں'
+                  : lang === 'ar'
+                  ? 'استكشف الخدمات حسب الدولة'
+                  : 'Explore Verified Services by Country'}
+              </h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+            {[
+              {
+                code: 'pk',
+                flag: '🇵🇰',
+                name_en: 'Pakistan',
+                name_ur: 'پاکستان',
+                name_ar: 'باكستان',
+                cities_en: 'Karachi, Lahore, Islamabad, Rawalpindi...',
+                cities_ur: 'کراچی، لاہور، اسلام آباد، راولپنڈی...',
+                cities_ar: 'كراتشي، لاهور، إسلام آباد...',
+              },
+              {
+                code: 'ae',
+                flag: '🇦🇪',
+                name_en: 'United Arab Emirates',
+                name_ur: 'متحدہ عرب امارات',
+                name_ar: 'الإمارات العربية المتحدة',
+                cities_en: 'Dubai, Abu Dhabi, Sharjah...',
+                cities_ur: 'دبئی، ابوظہبی، شارجہ...',
+                cities_ar: 'دبي، أبوظبي، الشارقة...',
+              },
+              {
+                code: 'sa',
+                flag: '🇸🇦',
+                name_en: 'Saudi Arabia',
+                name_ur: 'سعودی عرب',
+                name_ar: 'المملكة العربية السعودية',
+                cities_en: 'Riyadh, Jeddah, Dammam...',
+                cities_ur: 'ریاض، جدہ، دمام...',
+                cities_ar: 'الرياض، جدة، الدمام...',
+              },
+            ].map((hub) => {
+              const countryName = lang === 'ur' ? hub.name_ur : lang === 'ar' ? hub.name_ar : hub.name_en;
+              const citiesSummary = lang === 'ur' ? hub.cities_ur : lang === 'ar' ? hub.cities_ar : hub.cities_en;
+              return (
+                <Link
+                  key={hub.code}
+                  href={`/${lang}/${hub.code}`}
+                  className="group p-5 rounded-2xl border border-gray-200 bg-white hover:border-emerald-500 hover:shadow-md transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-2xl">{hub.flag}</span>
+                      <span className="text-xs font-semibold text-emerald-700 group-hover:underline flex items-center gap-1">
+                        {lang === 'ur' ? 'پورٹل دیکھیں' : lang === 'ar' ? 'دخول الدليل' : 'View Hub'}
+                        <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
+                      </span>
+                    </div>
+                    <h3 className={`text-lg font-bold text-gray-900 group-hover:text-emerald-700 transition-colors ${lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}`}>
+                      {countryName}
+                    </h3>
+                    <p className={`text-xs text-gray-500 mt-1 line-clamp-1 ${lang === 'ur' ? 'font-urdu leading-[1.8]' : ''}`}>
+                      {citiesSummary}
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+                    <span className="font-semibold text-emerald-700">100% Direct WhatsApp</span>
+                    <span className="uppercase">{hub.code}</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
       </section>
 
       {/* 3. CONTINUOUS SLIDING 20 FEATURED PROVIDERS */}

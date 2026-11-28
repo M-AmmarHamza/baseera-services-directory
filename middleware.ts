@@ -357,19 +357,12 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
-    // Country hub without city -> auto-redirect ONLY if recognized country with a configured hub city
+    // Dedicated Country Hub route (e.g. /en/pk, /ur/pk, /ar/pk)
+    // Pass through to app/[lang]/[country]/page.tsx for strict country validation or 404
     const country = secondSegment;
-    if (COUNTRY_DEFAULT_CITIES[country]) {
-      const targetCity = COUNTRY_DEFAULT_CITIES[country];
-      return NextResponse.redirect(
-        new URL(`/${lang}/${country}/${targetCity}`, request.url),
-        308
-      );
-    }
-
-    // If secondSegment is neither a static page nor a recognized country, pass through to Next.js route handlers for proper 404 validation
     const response = NextResponse.next();
     response.headers.set('x-baseera-lang', lang);
+    response.headers.set('x-baseera-country', country);
     return response;
   }
 
