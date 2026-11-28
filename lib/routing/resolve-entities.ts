@@ -105,13 +105,10 @@ export const resolveCity = cache(async (countrySlugOrCode: string, citySlug: str
 
 // Canonical category aliases mapping alternate/legacy slugs to canonical category IDs
 const CANONICAL_CATEGORY_ALIASES: Record<string, string> = {
-  cctv: 'cctv-technician',
-  'cctv-installer': 'cctv-technician',
-  'cctv-security': 'cctv-technician',
-  'cctv-camera': 'cctv-technician',
-  'security-cameras': 'cctv-technician',
-  'cctv-security-technician': 'cctv-technician',
-  'cctv-camera-mistri': 'cctv-technician',
+  cctv: 'cctv-installer',
+  'cctv-camera': 'cctv-installer',
+  'security-cameras': 'cctv-installer',
+  'cctv-camera-mistri': 'cctv-installer',
   'car-mechanic': 'car-mechanic',
   'auto-mechanic': 'car-mechanic',
   'car-repair': 'car-mechanic',
@@ -332,7 +329,7 @@ export function getResolvedCategoryName(category: CategoryItem | null | undefine
       mason: 'بناء وسيراميك',
       'pest-control': 'مكافحة حشرات',
       'sofa-carpet-cleaning': 'غسيل كنب وسجاد',
-      'cctv-technician': 'تركيب كاميرات مراقبة',
+      'cctv-installer': 'تركيب كاميرات مراقبة',
       locksmith: 'فني أقفال ومفاتيح',
       'home-chef': 'طاهي منزلي',
       'interior-designer': 'مصمم ديكور داخلي',

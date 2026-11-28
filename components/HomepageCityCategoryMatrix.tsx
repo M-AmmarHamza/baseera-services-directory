@@ -39,7 +39,7 @@ const DEFAULT_MATRIX_CATEGORIES: MatrixCategory[] = [
   { id: 'ac-technician', name_en: 'AC Technician', name_ur: 'اے سی ٹیکنیشن', name_ar: 'فني تكييف', slug_en: 'ac-technician', slug_ur: 'ac-repair-mistri' },
   { id: 'carpenter', name_en: 'Carpenter', name_ur: 'کارپینٹر', name_ar: 'نجار', slug_en: 'carpenter', slug_ur: 'carpenter-barhai' },
   { id: 'painter', name_en: 'Painter', name_ur: 'پینٹر', name_ar: 'دهان وصباغ', slug_en: 'painter', slug_ur: 'rang-paint-mistri' },
-  { id: 'car-mechanic', name_en: 'Car Mechanic', name_ur: 'گاڑی مکینک', name_ar: 'ميكانيكي سيارات', slug_en: 'car-mechanic', slug_ur: 'gari-car-mistri' },
+  { id: 'car-mechanic', name_en: 'Car Mechanic', name_ur: 'کار مکینک', name_ar: 'ميكانيكي سيارات', slug_en: 'car-mechanic', slug_ur: 'gari-car-mistri' },
 ];
 
 export default async function HomepageCityCategoryMatrix({

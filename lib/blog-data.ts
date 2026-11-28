@@ -188,7 +188,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: '5 min read',
     image:
       'https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=800&q=80',
-    relatedCategorySlugs: ['cctv-technician', 'electrician'],
+    relatedCategorySlugs: ['cctv-installer', 'electrician'],
     featuredCitySlugs: ['karachi', 'lahore', 'islamabad'],
     content: `
 <p>Home surveillance camera brands increasingly steer consumers toward monthly subscription cloud plans for video retention. For a standard 4-camera 4K setup, cloud storage fees can quickly surpass the initial cost of the hardware itself within 18 months.</p>

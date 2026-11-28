@@ -44,7 +44,7 @@ Baseera operates on a 5-tier programmatic SEO silo architecture:
 - **Cooling & Climate**: AC Technician (`ac-technician`), Refrigerator Mechanic (`refrigerator-technician`), Washing Machine Repair (`washing-machine-technician`), Geyser & Water Heater Technician (`geyser-technician`).
 - **Home Improvement & Construction**: Carpenter (`carpenter`), Painter (`painter`), Mason & Tile Worker (`mason`), Welder & Fabricator (`welder`).
 - **Specialized Cleaning & Hygiene**: Pest Control Specialist (`pest-control`), Sofa & Carpet Cleaner (`sofa-cleaner`).
-- **Security & Hardware**: CCTV & Security Installer (`cctv-technician`), Locksmith & Key Specialist (`locksmith`).
+- **Security & Hardware**: CCTV & Security Installer (`cctv-installer`), Locksmith & Key Specialist (`locksmith`).
 - **Automotive Assistance**: Car Mechanic (`car-mechanic`), Car AC Technician (`car-ac-technician`).
 - **Lifestyle & Logistics**: Home Chef & Catering (`home-chef`), Interior Designer (`interior-designer`), Movers & Packers (`movers-packers`).
 

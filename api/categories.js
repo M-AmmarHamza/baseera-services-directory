@@ -46,8 +46,8 @@ const FALLBACK_CATEGORIES = [
     description: 'On-grid, off-grid and hybrid solar installations, K-Electric net metering documentation, and high-efficiency panels.'
   },
   {
-    id: 'cctv',
-    slug: 'cctv-security',
+    id: 'cctv-installer',
+    slug: 'cctv-installer',
     name: 'CCTV & Home Security',
     icon: 'videocam',
     active_count: 31,

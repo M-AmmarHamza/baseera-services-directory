@@ -450,15 +450,14 @@ export const CATEGORY_ALIASES: Record<string, string> = {
   'كنب': 'sofa-carpet-cleaning',
 
   // CCTV
-  cctv: 'cctv-technician',
-  camera: 'cctv-technician',
-  cameras: 'cctv-technician',
-  'security camera': 'cctv-technician',
-  'cctv installer': 'cctv-technician',
-  'cctv technician': 'cctv-technician',
-  surveillance: 'cctv-technician',
-  'کیمرہ': 'cctv-technician',
-  'كاميرات': 'cctv-technician',
+  cctv: 'cctv-installer',
+  camera: 'cctv-installer',
+  cameras: 'cctv-installer',
+  'security camera': 'cctv-installer',
+  'cctv installer': 'cctv-installer',
+  surveillance: 'cctv-installer',
+  'کیمرہ': 'cctv-installer',
+  'كاميرات': 'cctv-installer',
 
   // Car Mechanic
   'car mechanic': 'car-mechanic',

@@ -200,7 +200,7 @@ const CATEGORY_SPECIALIZATIONS: Record<string, Array<{ title: string; desc: stri
   ],
 
   // Security & Hardware
-  'cctv-technician': [
+  'cctv-installer': [
     { title: '5MP/4K ColorVu IP Network Camera Installation', desc: 'Cat-6 shielded structured cabling, PoE switch setup, and RJ-45 crimping.' },
     { title: 'NVR/DVR Cloud Remote Viewing Calibration', desc: 'Static IP / P2P smartphone application streaming with push motion alert triggers.' },
     { title: 'PTZ 360-Degree Optical Tracking Setup', desc: 'Auto-cruise patrol tour programming, human/vehicle AI classification filtering.' },

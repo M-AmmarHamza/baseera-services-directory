@@ -190,7 +190,7 @@ export default async function CountryPage({ params }: CountryPageProps) {
     'ac-technician',
     'carpenter',
     'painter',
-    'cctv-technician',
+    'cctv-installer',
     'car-mechanic',
   ];
   const matrixCategoriesFiltered = activeCategories.filter(

@@ -169,8 +169,6 @@ export const CATEGORY_ICON_MAP: Record<string, LucideIconComponent> = {
 
   // 20. CCTV Installer -> Cctv
   'cctv-installer': Cctv,
-  'cctv-technician': Cctv,
-  'cctv-security': Cctv,
   cctv: Cctv,
   'security-cameras': Cctv,
   camera: Cctv,

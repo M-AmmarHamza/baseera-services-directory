@@ -13,11 +13,9 @@ export interface RelatedCategoryLink {
 
 // Canonical category aliases
 const CANONICAL_ALIASES: Record<string, string> = {
-  cctv: 'cctv-technician',
-  'cctv-installer': 'cctv-technician',
-  'cctv-security': 'cctv-technician',
-  'cctv-camera': 'cctv-technician',
-  'cctv-camera-mistri': 'cctv-technician',
+  cctv: 'cctv-installer',
+  'cctv-camera': 'cctv-installer',
+  'cctv-camera-mistri': 'cctv-installer',
   'bijli-mistri': 'electrician',
   'ups-inverter-mistri': 'ups-inverter-technician',
   'solar-panel-mistri': 'solar-installer',
@@ -47,9 +45,9 @@ const CANONICAL_ALIASES: Record<string, string> = {
 // Semantically clustered service mappings (customer intent groups)
 const TOPICAL_CLUSTERS: Record<string, string[]> = {
   // Electrical & Power
-  electrician: ['ups-inverter-technician', 'solar-installer', 'generator-repair', 'cctv-technician'],
+  electrician: ['ups-inverter-technician', 'solar-installer', 'generator-repair', 'cctv-installer'],
   'ups-inverter-technician': ['electrician', 'solar-installer', 'generator-repair', 'battery-repair'],
-  'solar-installer': ['electrician', 'ups-inverter-technician', 'generator-repair', 'cctv-technician'],
+  'solar-installer': ['electrician', 'ups-inverter-technician', 'generator-repair', 'cctv-installer'],
   'generator-repair': ['electrician', 'ups-inverter-technician', 'solar-installer', 'car-mechanic'],
 
   // Plumbing & Water
@@ -73,9 +71,9 @@ const TOPICAL_CLUSTERS: Record<string, string[]> = {
   'pest-control': ['water-tank-cleaning', 'sofa-carpet-cleaning', 'painter', 'mason'],
 
   // Cleaning & Security
-  'cctv-technician': ['electrician', 'ups-inverter-technician', 'solar-installer', 'locksmith'],
+  'cctv-installer': ['electrician', 'ups-inverter-technician', 'solar-installer', 'locksmith'],
   'sofa-carpet-cleaning': ['pest-control', 'water-tank-cleaning', 'painter', 'deep-cleaning-services'],
-  locksmith: ['carpenter', 'cctv-technician', 'aluminium-glass-worker', 'welder'],
+  locksmith: ['carpenter', 'cctv-installer', 'aluminium-glass-worker', 'welder'],
 
   // Lifestyle & Specialist Services
   'home-chef': ['sofa-carpet-cleaning', 'movers-packers', 'deep-cleaning-services', 'pest-control'],
