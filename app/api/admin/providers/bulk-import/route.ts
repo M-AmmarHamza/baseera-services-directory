@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@supabase/supabase-js';
 import Papa from 'papaparse';
 import { z } from 'zod';
@@ -388,6 +389,16 @@ export async function POST(req: NextRequest) {
           is_verified: p.is_verified,
           is_available: p.is_available,
         });
+      }
+
+      // Trigger ISR revalidation for sitemap and layouts if providers were imported
+      if (validProvidersToInsert.length > 0) {
+        try {
+          revalidatePath('/sitemap.xml');
+          revalidatePath('/', 'layout');
+        } catch (revalErr) {
+          console.warn('Bulk import revalidation notice:', revalErr);
+        }
       }
     }
 

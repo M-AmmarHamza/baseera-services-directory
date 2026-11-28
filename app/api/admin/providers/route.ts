@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@supabase/supabase-js';
 import { verifyAdminToken, ADMIN_COOKIE_NAME } from '@/lib/admin-auth';
 import { SEED_PROVIDERS, Provider, localProvidersOverrides, localImportedProviders } from '@/lib/db';
@@ -305,6 +306,14 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
+    // Trigger ISR revalidation for sitemap and layouts
+    try {
+      revalidatePath('/sitemap.xml');
+      revalidatePath('/', 'layout');
+    } catch (revalErr) {
+      console.warn('Revalidation notice:', revalErr);
+    }
+
     return NextResponse.json({
       success: true,
       message: 'Provider updated successfully',
@@ -340,6 +349,14 @@ export async function DELETE(req: NextRequest) {
     } catch (err) {
       console.warn('Supabase provider delete note:', err);
     }
+  }
+
+  // Trigger ISR revalidation for sitemap and layouts
+  try {
+    revalidatePath('/sitemap.xml');
+    revalidatePath('/', 'layout');
+  } catch (revalErr) {
+    console.warn('Revalidation notice:', revalErr);
   }
 
   return NextResponse.json({ success: true, message: 'Provider deleted' });
