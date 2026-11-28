@@ -351,7 +351,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(`/${lang}`, request.url), 301);
     }
 
-    if (['list-service', 'search', 'services', 'dashboard', 'blog', 'admin', 'super-admin', 'privacy', 'terms', 'about'].includes(secondSegment)) {
+    if (['list-service', 'search', 'services', 'dashboard', 'blog', 'authors', 'admin', 'super-admin', 'privacy', 'terms', 'about'].includes(secondSegment)) {
       const response = NextResponse.next();
       response.headers.set('x-baseera-lang', lang);
       return response;
@@ -373,8 +373,15 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  // Top-level content hubs bypass (blog and authors detail pages)
+  if (['blog', 'authors'].includes(segments[1]?.toLowerCase())) {
+    const response = NextResponse.next();
+    response.headers.set('x-baseera-lang', lang);
+    return response;
+  }
+
   // Canonical SEO Category Slug Redirects (e.g., /pk/karachi/ac -> /pk/karachi/ac-technician)
-  if (segments.length >= 4 && !['blog', 'admin', 'super-admin', 'dashboard', 'privacy', 'terms', 'about', 'list-service'].includes(segments[1])) {
+  if (segments.length >= 4 && !['blog', 'authors', 'admin', 'super-admin', 'dashboard', 'privacy', 'terms', 'about', 'list-service'].includes(segments[1])) {
     const rawCategory = segments[3].toLowerCase();
     const canonicalCategory = SHORT_CATEGORY_REDIRECTS[rawCategory];
     if (canonicalCategory && canonicalCategory !== rawCategory) {
@@ -387,7 +394,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // 301 Permanent Redirects for Provider Migrations (e.g. slug, city, or category updates)
-  if (segments.length === 5 && !['admin', 'super-admin', 'api', '_next', 'blog', 'dashboard', 'privacy', 'terms', 'about', 'list-service'].includes(segments[1])) {
+  if (segments.length === 5 && !['admin', 'super-admin', 'api', '_next', 'blog', 'authors', 'dashboard', 'privacy', 'terms', 'about', 'list-service'].includes(segments[1])) {
     const [_, currentCountry, currentCity, currentCategory, currentSlug] = segments;
     const compoundKey = `${currentCity.toLowerCase()}/${currentCategory.toLowerCase()}/${currentSlug.toLowerCase()}`;
     const redirectTarget = PROVIDER_PERMANENT_REDIRECTS[compoundKey] || PROVIDER_PERMANENT_REDIRECTS[currentSlug.toLowerCase()];

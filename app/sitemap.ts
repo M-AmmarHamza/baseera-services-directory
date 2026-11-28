@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import { CATEGORIES, CITIES, COUNTRIES, getAllProviders, Provider } from '@/lib/db';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildSitemapAlternates } from '@/lib/seo/alternates';
+import { getBlogPosts } from '@/lib/blog-data';
+import { getAuthors } from '@/lib/authors-data';
 
 const DOMAIN = getSiteUrl();
 const SUPPORTED_LOCALES = ['en', 'ur', 'ar'];
@@ -21,7 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // 1. Root & Core Static Pages
-  const staticPaths = ['', '/about', '/list-service', '/faq', '/blog', '/privacy', '/terms'];
+  const staticPaths = ['', '/about', '/list-service', '/faq', '/blog', '/authors', '/privacy', '/terms'];
   for (const path of staticPaths) {
     for (const lang of SUPPORTED_LOCALES) {
       sitemapEntries.push({
@@ -32,6 +34,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         alternates: buildSitemapAlternates(path),
       });
     }
+  }
+
+  // 1b. Editorial Blog Posts & Author Profiles
+  try {
+    const blogPosts = await getBlogPosts();
+    for (const post of blogPosts) {
+      const postPath = `/blog/${post.slug}`;
+      for (const lang of SUPPORTED_LOCALES) {
+        sitemapEntries.push({
+          url: `${DOMAIN}/${lang}${postPath}`,
+          lastModified: post.publishedAt || currentDate,
+          changeFrequency: 'monthly',
+          priority: 0.7,
+          alternates: buildSitemapAlternates(postPath),
+        });
+      }
+    }
+
+    const authors = await getAuthors({ activeOnly: true });
+    for (const author of authors) {
+      const authorPath = `/authors/${author.slug}`;
+      for (const lang of SUPPORTED_LOCALES) {
+        sitemapEntries.push({
+          url: `${DOMAIN}/${lang}${authorPath}`,
+          lastModified: currentDate,
+          changeFrequency: 'monthly',
+          priority: 0.65,
+          alternates: buildSitemapAlternates(authorPath),
+        });
+      }
+    }
+  } catch (err) {
+    console.warn('Sitemap blog/authors generation note:', err);
   }
 
   // 2. Query Active Countries and Cities

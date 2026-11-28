@@ -51,6 +51,7 @@ import JsonLd from '@/components/JsonLd';
 import ProfileViewTracker from '@/components/ProfileViewTracker';
 import ProfileUnderReview from '@/components/ProfileUnderReview';
 import CategoryFaqSection from '@/components/CategoryFaqSection';
+import RelatedServicesSection from '@/components/RelatedServicesSection';
 import AdBanner from '@/components/AdBanner';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildProviderAlternates } from '@/lib/seo/alternates';
@@ -1087,6 +1088,15 @@ export default async function DynamicProviderProfilePage({ params }: ProviderPag
               ? `المزيد من ${categoryName} المميزين في ${cityName}`
               : `More Featured ${categoryName}s in ${cityName}`
           }
+        />
+
+        {/* Topical Cluster: Related Services in Same City */}
+        <RelatedServicesSection
+          country={country}
+          city={city}
+          category={category}
+          cityName={cityName}
+          lang={lang}
         />
 
         {/* Strategic Ad Unit Placed Directly Above Dynamic FAQs */}

@@ -38,6 +38,8 @@ import CategoryFaqSection from '@/components/CategoryFaqSection';
 import FeaturedProfilesSlider from '@/components/FeaturedProfilesSlider';
 import JsonLd from '@/components/JsonLd';
 import AdBanner from '@/components/AdBanner';
+import RelatedServicesSection from '@/components/RelatedServicesSection';
+import OtherCitiesForCategory from '@/components/OtherCitiesForCategory';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildCategoryAlternates } from '@/lib/seo/alternates';
 
@@ -694,6 +696,24 @@ export default async function CategoryListingPage({ params, searchParams }: Cate
             </div>
           </div>
         )}
+
+        {/* Topical Cluster: Related Services Cross-Links */}
+        <RelatedServicesSection
+          country={country}
+          city={city}
+          category={validCategory.id}
+          cityName={cityName}
+          lang={lang}
+        />
+
+        {/* Lateral Link Graph: City Cross-Links for this Category */}
+        <OtherCitiesForCategory
+          country={country}
+          currentCitySlug={city}
+          categorySlug={category}
+          categoryName={categoryName}
+          lang={lang}
+        />
 
         {/* Dynamic Category FAQ & FAQPage Schema */}
         <CategoryFaqSection
