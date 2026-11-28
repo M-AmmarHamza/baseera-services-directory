@@ -269,7 +269,20 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                         <Link
                           key={city.slug}
                           href={`/${lang}/${country.code}/${city.slug}`}
-                          onClick={() => setIsOpen(false)}
+                          onClick={() => {
+                            setIsOpen(false);
+                            try {
+                              const payload = {
+                                slug: city.slug,
+                                citySlug: city.slug,
+                                countryCode: country.code,
+                                countrySlug: country.code,
+                                name: city.name,
+                              };
+                              localStorage.setItem('baseera_selected_city', JSON.stringify(payload));
+                              window.dispatchEvent(new CustomEvent('baseera:city-changed', { detail: payload }));
+                            } catch {}
+                          }}
                           className={`flex items-center justify-between w-full px-2.5 py-1.5 rounded-lg text-xs transition-colors overflow-hidden group ${
                             isSelected
                               ? 'bg-emerald-50 text-[#059669] font-bold ring-1 ring-emerald-300'
@@ -415,7 +428,20 @@ export default function CitySelector({ lang }: CitySelectorProps) {
                           <Link
                             key={city.slug}
                             href={`/${lang}/${country.code}/${city.slug}`}
-                            onClick={() => setIsOpen(false)}
+                            onClick={() => {
+                              setIsOpen(false);
+                              try {
+                                const payload = {
+                                  slug: city.slug,
+                                  citySlug: city.slug,
+                                  countryCode: country.code,
+                                  countrySlug: country.code,
+                                  name: city.name,
+                                };
+                                localStorage.setItem('baseera_selected_city', JSON.stringify(payload));
+                                window.dispatchEvent(new CustomEvent('baseera:city-changed', { detail: payload }));
+                              } catch {}
+                            }}
                             className={`flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs transition-colors overflow-hidden ${
                               isSelected
                                 ? 'bg-emerald-50 text-[#059669] font-bold border border-emerald-300 ring-1 ring-emerald-200'

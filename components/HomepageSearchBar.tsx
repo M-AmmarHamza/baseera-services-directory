@@ -168,6 +168,28 @@ export default function HomepageSearchBar({ lang, defaultLocation }: Props) {
         }
       })
       .catch(() => {});
+
+    // Listen to app-wide city changes (e.g. from HomepageCategoryGrid or CitySelector)
+    const handleCityChanged = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent?.detail) {
+        const { slug, citySlug, countryCode, countrySlug, name } = customEvent.detail;
+        const targetSlug = slug || citySlug;
+        const targetCountry = countryCode || countrySlug;
+        if (targetSlug && targetCountry) {
+          setSelectedCity({
+            slug: targetSlug,
+            name: name || targetSlug,
+            countryCode: targetCountry,
+          });
+        }
+      }
+    };
+
+    window.addEventListener('baseera:city-changed', handleCityChanged);
+    return () => {
+      window.removeEventListener('baseera:city-changed', handleCityChanged);
+    };
   }, []);
 
   // Lock body scroll and handle Escape key on modal
@@ -329,7 +351,15 @@ export default function HomepageSearchBar({ lang, defaultLocation }: Props) {
     setCitySearch('');
 
     try {
-      localStorage.setItem('baseera_selected_city', JSON.stringify(newSelected));
+      const storageData = {
+        slug: city.slug,
+        citySlug: city.slug,
+        countryCode: city.countryCode,
+        countrySlug: city.countryCode,
+        name: city.name,
+      };
+      localStorage.setItem('baseera_selected_city', JSON.stringify(storageData));
+      window.dispatchEvent(new CustomEvent('baseera:city-changed', { detail: storageData }));
     } catch {
       // Ignore localStorage failure
     }
@@ -614,7 +644,15 @@ export default function HomepageSearchBar({ lang, defaultLocation }: Props) {
               };
               setSelectedCity(newSelected);
               try {
-                localStorage.setItem('baseera_selected_city', JSON.stringify(newSelected));
+                const storageData = {
+                  slug: detectedGeo.citySlug,
+                  citySlug: detectedGeo.citySlug,
+                  countryCode: detectedGeo.countryCode,
+                  countrySlug: detectedGeo.countryCode,
+                  name: detectedGeo.cityName,
+                };
+                localStorage.setItem('baseera_selected_city', JSON.stringify(storageData));
+                window.dispatchEvent(new CustomEvent('baseera:city-changed', { detail: storageData }));
               } catch {}
             }}
             className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-2xs group cursor-pointer transition-all"

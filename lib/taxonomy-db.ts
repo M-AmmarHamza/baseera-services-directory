@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { CATEGORIES as SEED_CATEGORIES, CITIES as SEED_CITIES, COUNTRIES as SEED_COUNTRIES, CITY_DISTRICTS } from './db';
+import { CATEGORIES as SEED_CATEGORIES, CITIES as SEED_CITIES, COUNTRIES as SEED_COUNTRIES, CITY_DISTRICTS, CITY_NAMES_AR } from './db';
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -12,8 +12,10 @@ export interface CategoryItem {
   id: string;
   name_en: string;
   name_ur: string;
+  name_ar?: string;
   slug_en: string;
   slug_ur: string;
+  slug_ar?: string;
   icon: string;
   sortOrder: number;
   isActive: boolean;
@@ -39,6 +41,7 @@ export interface CityItem {
   countryCode: string;
   name_en: string;
   name_ur: string;
+  name_ar?: string;
   slug: string;
   targetAreas: string[];
   isActive: boolean;
@@ -103,8 +106,10 @@ export const localCategories: CategoryItem[] = SEED_CATEGORIES.map((c, index) =>
   id: c.id,
   name_en: c.name,
   name_ur: c.nameUr || c.name,
+  name_ar: c.nameAr || c.name,
   slug_en: c.slug,
   slug_ur: ROMAN_URDU_SLUGS[c.id] || `${c.slug}-mistri`,
+  slug_ar: c.slug,
   icon: c.icon || 'Wrench',
   sortOrder: index + 1,
   isActive: true,
@@ -132,6 +137,7 @@ export const localCities: CityItem[] = SEED_CITIES.map((c, idx) => ({
   countryCode: c.countryCode.toLowerCase(),
   name_en: c.name,
   name_ur: c.slug === 'karachi' ? 'کراچی' : c.slug === 'lahore' ? 'لاہور' : c.slug === 'islamabad' ? 'اسلام آباد' : c.name,
+  name_ar: CITY_NAMES_AR[c.slug.toLowerCase()] || c.name,
   slug: c.slug,
   targetAreas: CITY_DISTRICTS[c.slug.toLowerCase()] || ['City Center', 'Saddar', 'Model Town', 'Industrial Zone'],
   isActive: true,
@@ -237,8 +243,10 @@ export async function saveCategory(input: Partial<CategoryItem> & { id: string }
       ...input,
       name_en: input.name_en || localCategories[existingIndex].name_en,
       name_ur: input.name_ur || localCategories[existingIndex].name_ur,
+      name_ar: input.name_ar || localCategories[existingIndex].name_ar,
       slug_en: input.slug_en || localCategories[existingIndex].slug_en,
       slug_ur: input.slug_ur || localCategories[existingIndex].slug_ur,
+      slug_ar: input.slug_ar || localCategories[existingIndex].slug_ar,
     };
     updatedItem = localCategories[existingIndex];
   } else {
@@ -246,8 +254,10 @@ export async function saveCategory(input: Partial<CategoryItem> & { id: string }
       id: input.id,
       name_en: input.name_en || input.id,
       name_ur: input.name_ur || input.name_en || input.id,
+      name_ar: input.name_ar || input.name_en || input.id,
       slug_en: input.slug_en || input.id,
       slug_ur: input.slug_ur || `${input.id}-mistri`,
+      slug_ar: input.slug_ar || input.slug_en || input.id,
       icon: input.icon || 'Wrench',
       sortOrder: input.sortOrder !== undefined ? input.sortOrder : localCategories.length + 1,
       isActive: input.isActive !== undefined ? input.isActive : true,
@@ -388,6 +398,9 @@ export async function saveCity(input: Partial<CityItem> & { slug: string; countr
       ...input,
       slug: normSlug,
       countryCode: input.countryCode.toLowerCase(),
+      name_en: input.name_en || localCities[existingIndex].name_en,
+      name_ur: input.name_ur || localCities[existingIndex].name_ur,
+      name_ar: input.name_ar || localCities[existingIndex].name_ar,
       targetAreas: input.targetAreas || localCities[existingIndex].targetAreas,
     };
     updatedItem = localCities[existingIndex];
@@ -397,6 +410,7 @@ export async function saveCity(input: Partial<CityItem> & { slug: string; countr
       countryCode: input.countryCode.toLowerCase(),
       name_en: input.name_en || normSlug,
       name_ur: input.name_ur || input.name_en || normSlug,
+      name_ar: input.name_ar || input.name_en || normSlug,
       slug: normSlug,
       targetAreas: input.targetAreas || ['City Center'],
       isActive: input.isActive !== undefined ? input.isActive : true,

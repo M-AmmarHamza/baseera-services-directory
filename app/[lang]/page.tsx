@@ -11,10 +11,12 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import CategoryIcon from '@/components/CategoryIcon';
-import CategoryGrid from '@/components/CategoryGrid';
+import HomepageCategoryGrid from '@/components/HomepageCategoryGrid';
+import HomepageCityCategoryMatrix from '@/components/HomepageCityCategoryMatrix';
 import HomepageSearchBar from '@/components/HomepageSearchBar';
 import FeaturedProvidersSlider from '@/components/FeaturedProvidersSlider';
 import { getAllProviders, CATEGORIES, getCategoryName } from '@/lib/db';
+import { getCategories, getCities } from '@/lib/taxonomy-db';
 import { getDictionary } from '@/lib/get-dictionary';
 import JsonLd from '@/components/JsonLd';
 import { getSiteUrl } from '@/lib/site-url';
@@ -67,7 +69,34 @@ export default async function HomePage({ params }: PageProps) {
   if (!isValidLocale(lang)) notFound();
   const dict = await getDictionary(lang);
   const providers = await getAllProviders();
+  const [categories, cities] = await Promise.all([
+    getCategories({ activeOnly: true }),
+    getCities({ activeOnly: true }),
+  ]);
+
+  const defaultCity = {
+    slug: 'karachi',
+    name: 'Karachi',
+    countryCode: 'pk',
+    name_ur: 'کراچی',
+    name_ar: 'كراتشي',
+  };
+
   const defaultLocation = lang === 'ur' ? 'عالمی مرکز' : lang === 'ar' ? 'الدليل العام' : 'Global Hub';
+
+  const h1Text =
+    lang === 'ur'
+      ? 'اپنے قریب قابل اعتماد لوکل سروسز تلاش کریں'
+      : lang === 'ar'
+      ? 'اعثر على خدمات وفنيين محليين موثوقين بالقرب منك'
+      : 'Find Trusted Local Services Near You';
+
+  const h2Text =
+    lang === 'ur'
+      ? '24+ تصدیق شدہ کیٹیگریز دیکھیں'
+      : lang === 'ar'
+      ? 'تصفح أكثر من 24 تخصصاً موثقاً'
+      : 'Browse 24+ Verified Specialties';
 
   // Dynamic JSON-LD WebSite & ItemList Schema
   const websiteSchema = {
@@ -87,30 +116,20 @@ export default async function HomePage({ params }: PageProps) {
   const categoriesItemListSchema = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
-    name: 'Browse 24+ Verified Specialties',
+    name: h2Text,
     url: `${DOMAIN}/${lang}`,
-    numberOfItems: CATEGORIES.length,
-    itemListElement: CATEGORIES.map((cat, idx) => ({
-      '@type': 'ListItem',
-      position: idx + 1,
-      name: cat.name,
-      url: `${DOMAIN}/${lang}/pk/karachi/${cat.slug}`,
-    })),
+    numberOfItems: categories.length,
+    itemListElement: categories.map((cat, idx) => {
+      const catSlug = lang === 'ur' ? cat.slug_ur || cat.slug_en : cat.slug_en;
+      const catName = lang === 'ur' ? cat.name_ur : lang === 'ar' ? cat.name_ar || cat.name_en : cat.name_en;
+      return {
+        '@type': 'ListItem',
+        position: idx + 1,
+        name: catName,
+        url: `${DOMAIN}/${lang}/pk/karachi/${catSlug}`,
+      };
+    }),
   };
-
-  const h1Text =
-    lang === 'ur'
-      ? 'اپنے قریب قابل اعتماد لوکل سروسز تلاش کریں'
-      : lang === 'ar'
-      ? 'اعثر على خدمات وفنيين محليين موثوقين بالقرب منك'
-      : 'Find Trusted Local Services Near You';
-
-  const h2Text =
-    lang === 'ur'
-      ? '24+ تصدیق شدہ کیٹیگریز دیکھیں'
-      : lang === 'ar'
-      ? 'تصفح أكثر من 24 تخصصاً موثقاً'
-      : 'Browse 24+ Verified Specialties';
 
   return (
     <div className="min-h-screen bg-white text-neutral-900 pb-20 md:pb-12">
@@ -138,18 +157,22 @@ export default async function HomePage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* 2. BROWSE BY SPECIALTY (RESPONSIVE NON-OVERFLOWING GRID) */}
+      {/* 2. BROWSE BY SPECIALTY (DYNAMIC BY SELECTED CITY) */}
       <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14 overflow-hidden scroll-mt-20">
-        <CategoryGrid
+        <HomepageCategoryGrid
           lang={lang}
-          country="pk"
-          city="karachi"
+          categories={categories}
+          cities={cities}
+          defaultCity={defaultCity}
           title={h2Text}
           subtitle={dict.home?.specialtySubtitle || 'Verified community technicians & specialists worldwide'}
           activeCountText={dict.home?.activeCount}
           categoriesCountText={dict.home?.categoriesCount}
         />
       </section>
+
+      {/* 2b. SERVER-RENDERED REGIONAL CITY × CATEGORY MATRIX */}
+      <HomepageCityCategoryMatrix lang={lang} />
 
       {/* 2b. EXPLORE COUNTRY HUBS */}
       <section className="border-t border-gray-200 bg-gray-50/50 py-10 sm:py-14">
