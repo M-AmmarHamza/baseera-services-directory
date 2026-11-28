@@ -113,6 +113,12 @@ model Category {
   sortOrder    Int                   @default(0) @map("sort_order")
   isActive     Boolean?              @default(true) @map("is_active")
   activeCount  Int?                  @default(0) @map("active_count")
+  intro_en     String?               @map("intro_en")
+  intro_ur     String?               @map("intro_ur")
+  intro_ar     String?               @map("intro_ar")
+  faqs_en      Json?                 @map("faqs_en")
+  faqs_ur      Json?                 @map("faqs_ur")
+  faqs_ar      Json?                 @map("faqs_ar")
   createdAt    DateTime              @default(now()) @map("created_at")
   translations CategoryTranslation[]
   providers    Provider[]

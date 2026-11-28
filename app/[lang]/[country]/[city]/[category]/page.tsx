@@ -43,6 +43,7 @@ import OtherCitiesForCategory from '@/components/OtherCitiesForCategory';
 import { getSiteUrl } from '@/lib/site-url';
 import { buildCategoryAlternates } from '@/lib/seo/alternates';
 import { getGlobalAllowIndexing } from '@/lib/settings-db';
+import { getCategoryTradeContent } from '@/lib/taxonomy-db';
 
 export const revalidate = 3600; // 1 hour ISR CDN caching
 
@@ -207,6 +208,9 @@ export default async function CategoryListingPage({ params, searchParams }: Cate
   const requestedPage = Math.max(1, parseInt(resolvedSearchParams?.page || '1', 10) || 1);
   const providers = await getProviders(validCity.city.slug, validCategory.id);
   const commaSeparator = lang === 'ur' || lang === 'ar' ? '، ' : ', ';
+
+  // Fetch trade-specific intro and FAQs
+  const tradeContent = getCategoryTradeContent(validCategory.id || category, lang);
 
   const baseUrl = `${DOMAIN}/${lang}/${validCity.country.code}/${validCity.city.slug}/${validCategory.slug_en}`;
   const relativeBaseUrl = `/${lang}/${validCity.country.code}/${validCity.city.slug}/${validCategory.slug_en}`;
@@ -389,11 +393,13 @@ export default async function CategoryListingPage({ params, searchParams }: Cate
                   : `Top-Rated ${categoryName} in ${cityName}`}
               </h1>
               <p className={`text-base text-gray-600 max-w-2xl overflow-visible ${lang === 'ur' ? 'font-urdu leading-[2.5]' : 'mt-1 leading-relaxed'}`}>
-                {lang === 'ur'
-                  ? 'تصدیق شدہ کاریگروں کے پروفائلز، ریٹنگز، سروس کے علاقے دیکھیں اور بغیر کسی مڈل مین کمیشن کے براہِ راست واٹس ایپ پر رابطہ کریں۔'
+                {providers.length > 0
+                  ? tradeContent.intro
+                  : lang === 'ur'
+                  ? `${cityName} میں تصدیق شدہ ${categoryName} کی رجسٹریشن جاری ہے۔ بغیر کسی کمیشن کے اپنے کاروبار کو رجسٹر کریں۔`
                   : lang === 'ar'
-                  ? 'قارن بين ملفات الفنيين المعتمدين، والتقييمات، ومناطق الخدمة، وتواصل مباشرة عبر واتساب بدون أي عمولة وسيط.'
-                  : 'Compare verified specialist profiles, ratings, service areas, and connect directly on WhatsApp with zero middlemen commission.'}
+                  ? `جاري تسجيل فنيي ${categoryName} المعتمدين في ${cityName}. سجل خدماتك الآن بدون أي عمولة.`
+                  : `We are currently onboarding verified ${categoryName.toLowerCase()} specialists in ${cityName}. Register your trade services with zero commission.`}
               </p>
             </div>
 
@@ -458,11 +464,38 @@ export default async function CategoryListingPage({ params, searchParams }: Cate
                 <ArrowRight className="w-4 h-4 rtl:rotate-180" />
               </Link>
               <Link
-                href={`/${lang}`}
+                href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}`}
                 className="w-full sm:w-auto bg-white hover:bg-gray-50 border border-gray-200 text-neutral-900 text-sm font-semibold px-5 py-3 rounded-xl transition-colors inline-flex items-center justify-center"
               >
-                {lang === 'ur' ? 'تمام سروسز دیکھیں' : lang === 'ar' ? 'تصفح جميع الخدمات' : 'Browse All Services'}
+                {lang === 'ur' ? `${cityName} کی تمام سروسز` : lang === 'ar' ? `كافة خدمات ${cityName}` : `All Services in ${cityName}`}
               </Link>
+            </div>
+
+            {/* Curated Active Trade Links in this City */}
+            <div className="mt-8 pt-6 border-t border-gray-100 text-start">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 text-center">
+                {lang === 'ur'
+                  ? `${cityName} میں دستیاب مقبول ترین سروسز:`
+                  : lang === 'ar'
+                  ? `أكثر الخدمات طلباً في ${cityName}:`
+                  : `Popular active services in ${cityName}:`}
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {[
+                  { slug: 'electrician', en: 'Electrician', ur: 'الیکٹریشن', ar: 'كهربائي' },
+                  { slug: 'plumber', en: 'Plumber', ur: 'پلمبر', ar: 'سباك' },
+                  { slug: 'ac-technician', en: 'AC Technician', ur: 'اے سی ٹیکنیشن', ar: 'فني تكييف' },
+                ].map((quickCat) => (
+                  <Link
+                    key={quickCat.slug}
+                    href={`/${lang}/${country.toLowerCase()}/${city.toLowerCase()}/${quickCat.slug}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 hover:bg-emerald-50 text-gray-700 hover:text-emerald-700 border border-gray-200 hover:border-emerald-200 text-xs font-medium transition-colors"
+                  >
+                    <span>{lang === 'ur' ? quickCat.ur : lang === 'ar' ? quickCat.ar : quickCat.en}</span>
+                    <ArrowRight className="w-3 h-3 rtl:rotate-180 text-gray-400" />
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         ) : (
@@ -745,15 +778,18 @@ export default async function CategoryListingPage({ params, searchParams }: Cate
           lang={lang}
         />
 
-        {/* Dynamic Category FAQ & FAQPage Schema */}
-        <CategoryFaqSection
-          categoryName={categoryName}
-          categorySlug={category}
-          cityName={cityName}
-          countryName={countryName}
-          startingPrice={providers[0]?.starting_price ? formatVisitingPrice(providers[0].starting_price, providers[0].country_code || country) : undefined}
-          lang={lang}
-        />
+        {/* Dynamic Category FAQ & FAQPage Schema (Only rendered when providers exist) */}
+        {providers.length > 0 && (
+          <CategoryFaqSection
+            categoryName={categoryName}
+            categorySlug={validCategory.id || category}
+            cityName={cityName}
+            countryName={countryName}
+            startingPrice={providers[0]?.starting_price ? formatVisitingPrice(providers[0].starting_price, providers[0].country_code || country) : undefined}
+            lang={lang}
+            hasPublishedProviders={true}
+          />
+        )}
       </main>
     </div>
   );

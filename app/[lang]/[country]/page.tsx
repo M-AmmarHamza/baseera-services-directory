@@ -280,6 +280,10 @@ export default async function CountryPage({ params }: CountryPageProps) {
   const defaultCitySlug = activeCities[0]?.slug || 'karachi';
   const canonicalUrl = `${DOMAIN}/${lang}/${validCountry.code.toLowerCase()}`;
 
+  // Check supply quality gate: whether published providers exist in this country
+  const publishedProviders = await getPublishedProvidersByCountry(validCountry.code);
+  const hasPublishedProviders = publishedProviders.length > 0;
+
   // Structured Data: BreadcrumbList (Home -> [Country])
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
@@ -320,19 +324,21 @@ export default async function CountryPage({ params }: CountryPageProps) {
     },
   };
 
-  // Structured Data: FAQPage Schema
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map((f) => ({
-      '@type': 'Question',
-      name: f.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: f.answer,
-      },
-    })),
-  };
+  // Structured Data: FAQPage Schema (Only emitted if published providers exist)
+  const faqSchema = hasPublishedProviders
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((f) => ({
+          '@type': 'Question',
+          name: f.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: f.answer,
+          },
+        })),
+      }
+    : null;
 
   const countryFacts = [
     {
@@ -370,10 +376,14 @@ export default async function CountryPage({ params }: CountryPageProps) {
     },
   ];
 
+  const jsonLdSchemas = faqSchema
+    ? [breadcrumbSchema, countryCollectionSchema, faqSchema]
+    : [breadcrumbSchema, countryCollectionSchema];
+
   return (
     <div className={`min-h-screen bg-white text-neutral-900 pb-20 ${lang === 'ur' ? 'font-urdu' : lang === 'ar' ? 'font-tajawal' : 'font-sans'}`}>
-      {/* Programmatic JSON-LD Schemas: BreadcrumbList + CollectionPage + FAQPage */}
-      <JsonLd data={[breadcrumbSchema, countryCollectionSchema, faqSchema]} />
+      {/* Programmatic JSON-LD Schemas: BreadcrumbList + CollectionPage (+ FAQPage if supply exists) */}
+      <JsonLd data={jsonLdSchemas} />
 
       {/* Breadcrumb Navigation */}
       <div className="border-b border-gray-200 bg-white">
@@ -619,48 +629,50 @@ export default async function CountryPage({ params }: CountryPageProps) {
         </div>
       </section>
 
-      {/* Section 5: Country & Global FAQs with FAQPage Schema */}
-      <section className="border-t border-gray-200 bg-gray-50/50 py-12 sm:py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-3">
-              <HelpCircle className="w-3.5 h-3.5 text-[#059669]" />
-              <span>{lang === 'ur' ? 'عام سوالات و جوابات' : lang === 'ar' ? 'الأسئلة الشائعة' : 'Frequently Asked Questions'}</span>
-            </div>
-            <h2 className={`text-xl sm:text-3xl font-bold text-gray-900 ${lang === 'ur' ? 'font-urdu leading-[2.3]' : ''}`}>
-              {lang === 'ur'
-                ? `${countryName} میں بصیرہ کے بارے میں اہم سوالات`
-                : lang === 'ar'
-                ? `الأسئلة الشائعة حول خدمات بصيرة في ${countryName}`
-                : `Frequently Asked Questions About Baseera in ${countryName}`}
-            </h2>
-            <p className={`text-sm text-gray-500 mt-2 ${lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}`}>
-              {lang === 'ur'
-                ? 'پلیٹ فارم کے استعمال، فیس اور کاریگروں کی تصدیق سے متعلق واضح معلومات'
-                : lang === 'ar'
-                ? 'كل ما تحتاج لمعرفته حول توظيف الفنيين والأسعار وبدون عمولات'
-                : `Everything you need to know about direct booking, safety, and zero commissions`}
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <div
-                key={index}
-                className="p-5 sm:p-6 rounded-2xl border border-gray-200 bg-white shadow-2xs hover:border-gray-300 transition-colors"
-              >
-                <h3 className={`text-base sm:text-lg font-bold text-gray-900 flex items-start gap-2.5 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
-                  <span className="text-[#059669] font-black shrink-0">Q.</span>
-                  <span>{faq.question}</span>
-                </h3>
-                <p className={`text-sm sm:text-base text-gray-600 mt-2 sm:mt-3 ps-5 sm:ps-6 leading-relaxed ${lang === 'ur' ? 'font-urdu leading-[2.4]' : ''}`}>
-                  {faq.answer}
-                </p>
+      {/* Section 5: Country & Global FAQs with FAQPage Schema (Only rendered when providers exist) */}
+      {hasPublishedProviders && faqs.length > 0 && (
+        <section className="border-t border-gray-200 bg-gray-50/50 py-12 sm:py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-[#059669] border border-emerald-200 mb-3">
+                <HelpCircle className="w-3.5 h-3.5 text-[#059669]" />
+                <span>{lang === 'ur' ? 'عام سوالات و جوابات' : lang === 'ar' ? 'الأسئلة الشائعة' : 'Frequently Asked Questions'}</span>
               </div>
-            ))}
+              <h2 className={`text-xl sm:text-3xl font-bold text-gray-900 ${lang === 'ur' ? 'font-urdu leading-[2.3]' : ''}`}>
+                {lang === 'ur'
+                  ? `${countryName} میں بصیرہ کے بارے میں اہم سوالات`
+                  : lang === 'ar'
+                  ? `الأسئلة الشائعة حول خدمات بصيرة في ${countryName}`
+                  : `Frequently Asked Questions About Baseera in ${countryName}`}
+              </h2>
+              <p className={`text-sm text-gray-500 mt-2 ${lang === 'ur' ? 'font-urdu leading-[2.0]' : ''}`}>
+                {lang === 'ur'
+                  ? 'پلیٹ فارم کے استعمال، فیس اور کاریگروں کی تصدیق سے متعلق واضح معلومات'
+                  : lang === 'ar'
+                  ? 'كل ما تحتاج لمعرفته حول توظيف الفنيين والأسعار وبدون عمولات'
+                  : `Everything you need to know about direct booking, safety, and zero commissions`}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {faqs.map((faq, index) => (
+                <div
+                  key={index}
+                  className="p-5 sm:p-6 rounded-2xl border border-gray-200 bg-white shadow-2xs hover:border-gray-300 transition-colors"
+                >
+                  <h3 className={`text-base sm:text-lg font-bold text-gray-900 flex items-start gap-2.5 ${lang === 'ur' ? 'font-urdu leading-[2.2]' : ''}`}>
+                    <span className="text-[#059669] font-black shrink-0">Q.</span>
+                    <span>{faq.question}</span>
+                  </h3>
+                  <p className={`text-sm sm:text-base text-gray-600 mt-2 sm:mt-3 ps-5 sm:ps-6 leading-relaxed ${lang === 'ur' ? 'font-urdu leading-[2.4]' : ''}`}>
+                    {faq.answer}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }
